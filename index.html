@@ -3,2358 +3,540 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SISTEMA DE MANDO TÁCTICO - CHILE</title>
+    <title>Panel Táctico de Operaciones - Burkina Faso 2027</title>
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Jura:wght@400;600;700&family=Share+Tech+Mono&display=swap');
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background-color: #0d0f12;
+            color: #d1d7e0;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+        /* Sidebar Layout */
+        .sidebar {
+            width: 420px;
+            background-color: #12161c;
+            border-right: 2px solid #232b35;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 4px 0 15px rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+        .sidebar-header {
+            padding: 20px;
+            background-color: #171d24;
+            border-bottom: 2px solid #232b35;
+        }
+        .sidebar-header h1 {
+            font-size: 18px;
+            color: #ff4a4a;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .defcon-badge {
+            background-color: #ff0000;
+            color: white;
+            font-size: 11px;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-weight: bold;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.6; }
+        }
+        .sidebar-header .meta-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 12px;
+            font-size: 12px;
+        }
+        .meta-item {
+            background: #1c232c;
+            padding: 6px 10px;
+            border-radius: 4px;
+            border-left: 3px solid #47a3ff;
+        }
+        .meta-label {
+            color: #8592a6;
+            font-size: 10px;
+            text-transform: uppercase;
+        }
+        .meta-val {
+            font-weight: bold;
+            color: #ffffff;
+        }
+        .sidebar-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        .section-title {
+            font-size: 13px;
+            color: #47a3ff;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 20px 0 10px 0;
+            padding-bottom: 4px;
+            border-bottom: 1px solid #232b35;
+        }
+        .section-title:first-of-type {
+            margin-top: 0;
+        }
+        .intel-card {
+            background: #171d24;
+            border: 1px solid #232b35;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 10px;
+            font-size: 13px;
+            transition: background 0.2s;
+        }
+        .intel-card:hover {
+            background: #1c232c;
+            border-color: #384556;
+            cursor: pointer;
+        }
+        .intel-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+        }
+        .intel-row:last-child {
+            margin-bottom: 0;
+        }
+        .label { color: #8592a6; }
+        .value { color: #ffffff; font-weight: 500; }
+        
+        /* Badges de Estado */
+        .badge {
+            font-size: 11px;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+        .badge-red { background: rgba(255,74,74,0.15); color: #ff4a4a; border: 1px solid #ff4a4a; }
+        .badge-orange { background: rgba(255,170,0,0.15); color: #ffaa00; border: 1px solid #ffaa00; }
+        .badge-green { background: rgba(0,255,102,0.15); color: #00ff66; border: 1px solid #00ff66; }
+        .badge-blue { background: rgba(71,163,255,0.15); color: #47a3ff; border: 1px solid #47a3ff; }
 
-        :root { 
-            --theme-color: #00e5ff; 
-            --theme-dim: rgba(0, 229, 255, 0.15);
-            --army-dark: #070b11; 
-            --glass-bg: rgba(15, 22, 35, 0.6);
-            --glass-border: rgba(255, 255, 255, 0.08);
-            --alert-amber: #ffb400;
-            --danger-red: #da291c;
-            --admin-blue: #0033a0;
-            --admin-neon: #b666ff;
-            
-            /* Colores de División */
-            --ejercito-color: #4df24d;
-            --armada-color: #0033a0;
-            --fach-color: #ffffff;
-            --boe-color: #da291c;
+        /* Map Container */
+        #map {
+            flex: 1;
+            height: 100%;
+            background-color: #11141a;
         }
 
-        body.defcon-5 { --theme-color: #00e5ff; --theme-dim: rgba(0, 229, 255, 0.15); } 
-        body.defcon-4 { --theme-color: #4df24d; --theme-dim: rgba(77, 242, 77, 0.15); } 
-        body.defcon-3 { --theme-color: #f2e24d; --theme-dim: rgba(242, 226, 77, 0.15); } 
-        body.defcon-2 { --theme-color: #f28a4d; --theme-dim: rgba(242, 138, 77, 0.15); } 
-        body.defcon-1 { --theme-color: #da291c; --theme-dim: rgba(218, 41, 28, 0.15); animation: red-pulse 2s infinite; } 
-
-        body { 
-            background: radial-gradient(circle at 50% 0%, #111a28 0%, var(--army-dark) 100%); 
-            color: var(--theme-color); 
-            font-family: 'Jura', sans-serif; 
-            margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; 
-            transition: background-color 0.4s ease, color 0.4s ease; 
+        /* Popup Custom Styling */
+        .leaflet-popup-content-wrapper {
+            background: #171d24 !important;
+            color: #d1d7e0 !important;
+            border: 1px solid #384556;
+            border-radius: 6px;
+            font-size: 13px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+        }
+        .leaflet-popup-tip {
+            background: #171d24 !important;
+            border: 1px solid #384556;
+        }
+        .popup-title {
+            font-size: 14px;
+            font-weight: bold;
+            color: #ffffff;
+            border-bottom: 1px solid #232b35;
+            padding-bottom: 5px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .popup-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 5px;
+        }
+        .popup-table td {
+            padding: 4px 0;
+            vertical-align: top;
+        }
+        .popup-table td.lbl {
+            color: #8592a6;
+            width: 40%;
+        }
+        .popup-table td.val {
+            color: #ffffff;
+            font-weight: 500;
         }
 
-        /* EFECTOS NEÓN DE PERFILES */
-        .glow-ejercito { border-color: var(--ejercito-color) !important; box-shadow: 0 0 15px rgba(77, 242, 77, 0.3) !important; }
-        .glow-armada { border-color: var(--armada-color) !important; box-shadow: 0 0 15px rgba(0, 51, 160, 0.4) !important; }
-        .glow-fach { border-color: var(--fach-color) !important; box-shadow: 0 0 15px rgba(255, 255, 255, 0.3) !important; }
-        .glow-boe { border-color: var(--boe-color) !important; box-shadow: 0 0 15px rgba(218, 41, 28, 0.4) !important; }
-        .mando-admin-glow { border-color: var(--admin-neon) !important; box-shadow: 0 0 15px rgba(182, 102, 255, 0.4) !important; }
-
-        /* OPTIMIZACIÓN: visibility: hidden corta el renderizado cuando no se usa */
-        .crt-scanlines {
-            position: fixed; inset: 0; z-index: 99999; pointer-events: none; opacity: 0; transition: opacity 0.3s;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-            background-size: 100% 2px, 3px 100%;
-            visibility: hidden; 
-        }
-        @keyframes crtFlicker { 0% { opacity: 0.95; } 5% { opacity: 0.85; } 10% { opacity: 0.95; } 100% { opacity: 0.95; } }
-        body.crt-on .crt-scanlines { visibility: visible; opacity: 0.6; }
-        body.crt-on { animation: crtFlicker 0.15s infinite; text-shadow: 0 0 3px rgba(0, 229, 255, 0.4); }
-
-        .chile-flag-top { height: 4px; width: 100%; display: flex; position: absolute; top: 0; left: 0; z-index: 10000; }
-        .chile-flag-top .blue { flex: 1; background-color: var(--admin-blue); }
-        .chile-flag-top .white { flex: 1; background-color: #ffffff; }
-        .chile-flag-top .red { flex: 1; background-color: var(--danger-red); }
-
-        @keyframes red-pulse { 0%, 100% { box-shadow: inset 0 0 0px transparent; } 50% { box-shadow: inset 0 0 120px rgba(218, 41, 28, 0.2); } }
-
-        .fade-in { animation: fadeIn 0.4s ease-out forwards; }
-        .slide-up { animation: slideUp 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: var(--theme-dim); border-radius: 10px; border: 1px solid var(--army-dark); }
-        ::-webkit-scrollbar-thumb:hover { background: var(--theme-color); }
-
-        /* OPTIMIZACIÓN: Se retiran los will-change masivos para evitar colapso de VRAM */
-        .glass-panel { background: var(--glass-bg); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border: 1px solid var(--glass-border); border-radius: 12px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3); transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease; }
-        .glass-panel:hover { border-color: var(--theme-dim); box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5); }
-
-        .sidebar { width: 270px; background: rgba(8, 12, 18, 0.85); border-right: 1px solid var(--glass-border); display: flex; flex-direction: column; padding: 25px 0; z-index: 10; backdrop-filter: blur(15px); border-radius: 0; box-shadow: 5px 0 25px rgba(0,0,0,0.5); overflow-y: auto; margin-top: 4px; }
-        .menu-category { font-size: 11px; color: #888; padding: 10px 25px; letter-spacing: 2px; font-weight: 700; margin-top: 10px;}
-        .menu-item { padding: 14px 25px; cursor: pointer; display: flex; align-items: center; gap: 15px; transition: background-color 0.2s, border-color 0.2s, color 0.2s, padding-left 0.2s; border-left: 3px solid transparent; color: #ccc; font-weight: 600; font-size: 14px; position: relative; overflow: hidden; }
-        .menu-item:hover { background: var(--theme-dim); border-left-color: var(--theme-color); color: var(--theme-color); padding-left: 30px; }
-        .menu-item.active { background: linear-gradient(90deg, var(--theme-dim), transparent); border-left-color: var(--theme-color); color: white; padding-left: 30px; }
-        .btn-alert { color: var(--danger-red); border-left-color: transparent; margin-top: 10px; border-top: 1px solid var(--glass-border); border-bottom: 1px solid var(--glass-border); }
-        .btn-alert:hover { color: var(--danger-red); background: rgba(218, 41, 28, 0.1); border-left-color: var(--danger-red); }
-        .menu-hidden { display: none !important; }
-
-        .main-content { flex: 1; padding: 40px; overflow-y: auto; z-index: 5; position: relative; margin-top: 4px; }
-        
-        #seccionFach, #seccionMisiones, #seccionDocumentos, #seccionHangar, #seccionLogs, #seccionLicencias, #seccionEstadisticas, #seccionReclutamiento, #seccionMapa, #seccionCalendario, #seccionComunicados, #seccionSolicitudes, #seccionAsuntosInternos, #seccionRadiogramas, #seccionEscuadrones { display: none; }
-        
-        .section-title { margin-top: 0; color: white; font-weight: 700; letter-spacing: 2px; font-size: 24px; border-bottom: 1px solid var(--glass-border); padding-bottom: 15px; margin-bottom: 25px; display: flex; align-items: center; gap: 10px; text-transform: uppercase; }
-
-        .auth-input { background: rgba(0,0,0,0.4); border: 1px solid var(--glass-border); color: white; padding: 14px; width: 100%; margin-bottom: 15px; font-family: 'Share Tech Mono', monospace; box-sizing: border-box; outline: none; border-radius: 8px; transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s; }
-        .auth-input:focus { border-color: var(--theme-color); box-shadow: 0 0 15px var(--theme-dim); background: rgba(0,0,0,0.6); }
-        .btn-tactical { background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); color: white; padding: 12px 25px; font-family: inherit; font-weight: bold; cursor: pointer; transition: background-color 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s, transform 0.2s; text-transform: uppercase; border-radius: 8px; letter-spacing: 1px; backdrop-filter: blur(5px); }
-        .btn-tactical:hover { background: var(--theme-color); color: #000; border-color: var(--theme-color); box-shadow: 0 0 15px var(--theme-dim); transform: translateY(-2px); }
-
-        /* --- NUEVO SISTEMA DE LOGIN / REGISTRO --- */
-        #loginScreen {
-            position: fixed; inset: 0; background: #050a10; /* Fondo oscuro estilo captura */
-            background-image: radial-gradient(circle at 50% 0%, #0d1624 0%, #050a10 100%);
-            z-index: 30000; display: flex; justify-content: center; align-items: center;
-        }
-        
-        .auth-card {
-            background: #0b111a; border: 1px solid #1a2332; border-radius: 12px; width: 480px; padding: 40px; 
-            box-shadow: 0 15px 40px rgba(0,0,0,0.8); color: white; animation: slideUp 0.5s ease-out;
-        }
-        
-        .auth-tabs { display: flex; gap: 10px; margin-bottom: 30px; }
-        .auth-tab {
-            flex: 1; padding: 14px; text-align: center; border-radius: 8px; cursor: pointer; font-weight: bold; 
-            font-size: 12px; letter-spacing: 1px; transition: 0.3s; background: #111a26; border: 1px solid #1a2332; color: #888;
-        }
-        .auth-tab.active { background: #0033a0; color: white; border-color: #0044cc; box-shadow: inset 0 0 10px rgba(0,0,0,0.3);}
-        
-        .auth-header { margin-bottom: 25px; }
-        .auth-title { font-size: 32px; font-weight: 800; margin: 0; text-transform: uppercase; line-height: 1.1; font-family: 'Jura', sans-serif;}
-        .auth-title-chile { color: #ffb400; /* Amarillo estilo la foto */ text-shadow: 0 0 15px rgba(255, 180, 0, 0.3); }
-        .auth-subtitle { font-family: 'Share Tech Mono', monospace; font-size: 10px; color: #666; margin-top: 8px; letter-spacing: 1px; }
-        
-        .auth-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
-        .auth-form-full { grid-column: 1 / -1; }
-        
-        .auth-field-label { font-size: 11px; color: #888; font-weight: bold; margin-bottom: 6px; display: flex; align-items: center; gap: 5px; text-transform: uppercase;}
-        .auth-input-new {
-            background: #0f1520; border: 1px solid #1a2332; color: white; padding: 14px 15px; border-radius: 6px; width: 100%; box-sizing: border-box; outline: none; transition: 0.3s; font-family: 'Share Tech Mono', monospace; font-size: 14px;
-        }
-        .auth-input-new:focus { border-color: #0033a0; box-shadow: 0 0 15px rgba(0, 51, 160, 0.2); background: #121926;}
-        
-        .btn-auth-primary {
-            background: #0033a0; color: white; border: 1px solid #0044cc; padding: 16px; border-radius: 8px; width: 100%; font-weight: bold; cursor: pointer; transition: 0.3s; letter-spacing: 1px; font-size: 13px; text-transform: uppercase; font-family: 'Jura', sans-serif;
-        }
-        .btn-auth-primary:hover { background: #0044cc; box-shadow: 0 0 20px rgba(0, 51, 160, 0.6); transform: translateY(-2px);}
-        
-        .auth-footer { margin-top: 30px; text-align: center; border-top: 1px solid #1a2332; padding-top: 25px; position: relative;}
-        .auth-footer span { background: #0b111a; padding: 0 15px; color: #555; font-size: 10px; position: absolute; top: -7px; left: 50%; transform: translateX(-50%); letter-spacing: 1px;}
-        .btn-auth-secondary { background: #0f1520; border: 1px solid #1a2332; color: #888; padding: 14px; border-radius: 6px; width: 100%; font-weight: bold; cursor: pointer; transition: 0.3s; font-size: 11px; letter-spacing: 1px;}
-        .btn-auth-secondary:hover { color: white; border-color: #555; background: #151d2b;}
-        .custom-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 4000; justify-content: center; align-items: center; backdrop-filter: blur(8px); }
-        .modal-body { width: 450px; padding: 35px; text-align: center; animation: slideUp 0.3s ease-out; }
-
-        .perfil-container { width: 850px; max-width: 95vw; display: flex; flex-direction: column; animation: slideUp 0.3s ease-out; overflow: hidden; border-radius: 15px; }
-        .perfil-header { background: rgba(0,0,0,0.5); color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center; font-weight: bold; letter-spacing: 2px; border-bottom: 1px solid var(--theme-color); }
-        .perfil-body { display: grid; grid-template-columns: 300px 1fr; gap: 0; background: rgba(10, 15, 25, 0.9); }
-        .perfil-col-izq { padding: 30px; border-right: 1px solid var(--glass-border); display: flex; flex-direction: column; align-items: center; background: rgba(255,255,255,0.01); position: relative; }
-        .perfil-foto-hd { width: 190px; height: 230px; border-radius: 8px; border: 2px solid var(--theme-dim); background: #000 url('https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png') center/cover; margin-bottom: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.5); transition: filter 0.3s; }
-        .perfil-col-der { padding: 30px; display: flex; flex-direction: column; gap: 20px; }
-        .perfil-data-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .perfil-item { background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); padding: 15px; border-radius: 8px; }
-        .perfil-item span { display: block; font-size: 11px; color: #888; margin-bottom: 5px; font-family: 'Share Tech Mono', monospace;}
-        .perfil-item strong { color: white; font-size: 15px; text-transform: uppercase; }
-        
-        .especialidades-container { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
-        .esp-tag { padding: 6px 14px; border-radius: 6px; font-size: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; font-family: 'Share Tech Mono', monospace; display: inline-flex; align-items: center; gap: 5px; box-shadow: 0 0 10px rgba(0,0,0,0.3); }
-        .esp-piloto { background: rgba(77, 144, 242, 0.15); color: #4d90f2; border: 1px solid #4d90f2; }
-        .esp-francotirador { background: rgba(255, 180, 0, 0.15); color: #ffb400; border: 1px solid #ffb400; }
-        .esp-artilleria { background: rgba(218, 41, 28, 0.15); color: #da291c; border: 1px solid #da291c; }
-        .esp-infanteria { background: rgba(77, 242, 77, 0.15); color: #4df24d; border: 1px solid #4df24d; }
-        .esp-fuerzas { background: rgba(150, 50, 255, 0.15); color: #b666ff; border: 1px solid #b666ff; }
-        .esp-default { background: rgba(255, 255, 255, 0.05); color: #ccc; border: 1px solid #aaa; }
-
-        .insignia-container { display: flex; flex-wrap: wrap; gap: 15px; justify-content: center; margin-top: 20px; padding-top: 20px; border-top: 1px dashed var(--glass-border); width: 100%; }
-        .insignia { width: 45px; height: 45px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 22px; background: rgba(0,0,0,0.6); border: 2px solid; position: relative; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; will-change: transform; transform: translateZ(0);}
-        .insignia:hover { transform: scale(1.15) translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.5); z-index: 10; }
-        .insignia-glow { animation: insigniaGlow 2s infinite alternate; }
-        .insignia-spin::before { content:''; position:absolute; inset:-4px; border: 2px dashed currentColor; border-radius: 50%; animation: spin 4s linear infinite; opacity: 0.5; }
-        .insignia-float { animation: float 3s ease-in-out infinite; }
-        
-        @keyframes insigniaGlow { from { box-shadow: 0 0 5px currentColor; } to { box-shadow: 0 0 15px currentColor; } }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
-        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
-
-        .censurado-bar { background-color: #050a0f !important; color: #050a0f !important; position: relative; overflow: hidden; border-color: #050a0f !important; user-select: none; border-radius: 4px; display: inline-block;}
-        .censurado-bar::after { content: ''; position: absolute; inset: 0; background: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,0.03) 10px, rgba(255,255,255,0.03) 20px); pointer-events: none; }
-        .censurado-blur { filter: blur(12px) grayscale(100%) contrast(1.2) !important; user-select: none;}
-        .sello-clasificado { position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%) rotate(-20deg); color: var(--danger-red); border: 4px solid var(--danger-red); padding: 5px 15px; font-size: 20px; font-weight: bold; letter-spacing: 4px; pointer-events: none; z-index: 10; text-shadow: 0 0 10px rgba(218,41,28,0.5); background: rgba(0,0,0,0.8); box-shadow: 0 0 15px rgba(218,41,28,0.3), inset 0 0 10px rgba(218,41,28,0.2); font-family: 'Share Tech Mono', monospace; white-space: nowrap; }
-
-        .hangar-grid-new { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 25px; }
-        .hangar-card-new { display: flex; flex-direction: column; overflow: hidden; }
-        .hangar-img { height: 190px; background-size: cover; background-position: center; border-bottom: 2px solid var(--theme-dim); transition: transform 0.4s; }
-        .hangar-card-new:hover .hangar-img { transform: scale(1.03); }
-        .img-wrapper { overflow: hidden; border-radius: 12px 12px 0 0; }
-
-        #toastContainer { position: fixed; left: 25px; bottom: 25px; z-index: 9999; display: flex; flex-direction: column; gap: 12px; }
-        .toast { background: rgba(10, 15, 25, 0.95); border-left: 4px solid; color: white; padding: 18px 25px; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 12px; animation: slideRight 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; max-width: 350px; }
-        .toast-error { border-color: var(--danger-red); }
-        .toast-success { border-color: var(--theme-color); }
-        @keyframes slideRight { from { transform: translateX(-150%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-
-        /* OPTIMIZACIÓN: Solo el radar lleva aceleración forzada */
-        .radar-realista { position: relative; width: 140px; height: 140px; border-radius: 50%; border: 2px solid var(--theme-color); background: radial-gradient(circle, rgba(0, 0, 0, 0) 50%, rgba(0, 229, 255, 0.1) 100%), repeating-radial-gradient(rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0) 23%, var(--theme-dim) 24%, var(--theme-dim) 25%); background-color: #050a0f; overflow: hidden; box-shadow: 0 0 25px var(--theme-dim), inset 0 0 25px var(--theme-dim); margin: auto; transform: translateZ(0); }
-        .radar-realista::before { content: ''; position: absolute; top: 0; bottom: 0; left: 50%; width: 1px; background: var(--theme-dim); }
-        .radar-realista::after { content: ''; position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: var(--theme-dim); }
-        .radar-sweep { position: absolute; top: 50%; left: 50%; width: 50%; height: 50%; background: conic-gradient(from 0deg, var(--theme-color) 0%, transparent 60%); transform-origin: 0 0; animation: sweep 2.5s linear infinite; opacity: 0.6; will-change: transform; }
-        .blip { position: absolute; width: 6px; height: 6px; background: var(--theme-color); border-radius: 50%; box-shadow: 0 0 10px var(--theme-color); opacity: 0; animation: blip-fade 2.5s infinite; will-change: opacity, transform; }
-        @keyframes sweep { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        @keyframes blip-fade { 0% { opacity: 0; } 10% { opacity: 1; transform: scale(1.5); } 50% { opacity: 0.2; transform: scale(1); } 100% { opacity: 0; } }
-
-        .drag-icon { font-size: 24px; cursor: grab; transition: transform 0.2s, filter 0.2s; user-select: none; filter: drop-shadow(0 0 5px rgba(0,0,0,0.5)); display: flex; justify-content: center; width: 100%; }
-        .drag-icon:active { cursor: grabbing; transform: scale(0.9); }
-        .drag-icon:hover { transform: scale(1.2); filter: drop-shadow(0 0 10px var(--theme-color)); }
-        
-        .map-marker { position: absolute; transform: translate(-50%, -50%); font-size: 28px; cursor: pointer; z-index: 10; filter: drop-shadow(0 0 8px rgba(0,0,0,0.8)); transition: transform 0.2s; user-select: none; animation: bounceIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
-        .map-marker:hover { transform: translate(-50%, -50%) scale(1.2); filter: drop-shadow(0 0 12px var(--danger-red)); }
-        @keyframes bounceIn { from { transform: translate(-50%, -100%) scale(0.5); opacity: 0; } to { transform: translate(-50%, -50%) scale(1); opacity: 1; } }
-
-        .map-nav-btn { position: absolute; background: rgba(0, 0, 0, 0.6); border: 1px solid var(--theme-color); color: var(--theme-color); font-size: 16px; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; z-index: 20; display: flex; justify-content: center; align-items: center; transition: background-color 0.2s, box-shadow 0.2s, color 0.2s, transform 0.2s; backdrop-filter: blur(5px); }
-        .map-nav-btn:hover { background: var(--theme-color); color: #000; box-shadow: 0 0 15px var(--theme-color); transform: scale(1.1); }
-        .map-nav-left { left: 15px; top: calc(50% - 20px); }
-        .map-nav-right { right: 15px; top: calc(50% - 20px); }
-        .map-nav-up { top: 15px; left: calc(50% - 20px); }
-        .map-nav-down { bottom: 15px; left: calc(50% - 20px); }
-
-        .responsive-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 20px; }
-        .admin-grid { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr 1fr auto; gap: 15px; margin-bottom: 25px; }
-        .form-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 15px; margin-bottom: 15px; }
-        .calif-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr auto; gap: 10px; }
-
-        /* WIDGET NOTAS FLOTANTE */
-        .floating-notes-btn { position: fixed; right: 25px; bottom: 50px; z-index: 8000; background: rgba(15, 22, 35, 0.9); border: 2px solid var(--theme-color); color: var(--theme-color); width: 55px; height: 55px; border-radius: 50%; cursor: pointer; box-shadow: 0 0 15px rgba(0, 229, 255, 0.3); transition: transform 0.3s, background-color 0.3s, filter 0.3s; display: flex; justify-content: center; align-items: center; font-size: 22px; }
-        .floating-notes-btn:hover { background: var(--theme-color); filter: brightness(1.2); transform: scale(1.1); }
-        .notes-panel { position: fixed; right: 25px; bottom: 115px; z-index: 8000; width: 320px; display: none; flex-direction: column; animation: slideUp 0.3s ease-out; box-shadow: 0 15px 40px rgba(0,0,0,0.8); }
-
-        /* EFECTO TEXTO ENCRIPTADO */
-        .encrypted-text { font-family: 'Share Tech Mono', monospace; word-break: break-all; color: var(--theme-color); filter: brightness(0.7); }
-
-        /* ESTILOS DE ESCUADRONES */
-        .squad-board { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; min-height: 500px; margin-bottom: 30px;}
-        .squad-col { background: rgba(0,0,0,0.4); border: 1px solid var(--glass-border); border-radius: 8px; display: flex; flex-direction: column; }
-        .squad-header { padding: 15px; text-align: center; font-weight: bold; border-bottom: 1px dashed var(--glass-border); letter-spacing: 1px; font-size: 14px;}
-        .squad-body { padding: 10px; flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; min-height: 300px; }
-        .squad-item { background: rgba(255,255,255,0.05); border: 1px solid var(--theme-dim); padding: 10px; border-radius: 6px; cursor: grab; display: flex; justify-content: space-between; align-items: center; transition: opacity 0.2s, background-color 0.2s;}
-        .squad-item:active { cursor: grabbing; opacity: 0.5; }
-        .squad-item:hover { background: rgba(0,229,255,0.1); }
-        .squad-item.is-leader { border-color: var(--alert-amber); box-shadow: inset 0 0 15px rgba(255,180,0,0.2); background: rgba(255,180,0,0.05);}
-
-        @media (max-width: 900px) {
-            body { height: 100vh; overflow-y: auto; overflow-x: hidden; } 
-            .top-bar { flex-direction: column !important; height: auto !important; padding: 15px !important; gap: 12px; text-align: center; }
-            .tactical-clock { width: 100% !important; text-align: center !important; margin-top: 5px; border-left: none !important; padding-left: 0 !important; }
-            .main-wrapper { flex-direction: column !important; overflow: visible !important; height: auto !important; }
-            .sidebar { width: 100% !important; max-height: none !important; height: auto; overflow-y: visible; flex-direction: row !important; flex-wrap: wrap; padding: 10px !important; border-right: none !important; border-bottom: 2px solid var(--theme-color) !important; box-shadow: 0 10px 20px rgba(0,0,0,0.5) !important; z-index: 100;}
-            .sidebar-header { width: 100%; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--glass-border) !important; padding: 0 10px 10px !important; margin-bottom: 10px !important; text-align: left;}
-            .sidebar-header select { width: auto !important; padding: 5px !important; font-size: 11px !important; margin: 0 !important;}
-            .menu-category { width: 100%; text-align: center; padding: 5px !important; margin-top: 5px !important;}
-            .menu-item { flex: 1 1 45%; justify-content: center; padding: 10px !important; font-size: 11px !important; border-left: none !important; border-bottom: 2px solid transparent; gap: 8px !important; }
-            .menu-item.active { border-left: none !important; border-bottom-color: var(--theme-color) !important; padding-left: 10px !important; background: var(--theme-dim); }
-            .btn-alert, .btn-logout { flex: 1 1 100% !important; margin-top: 10px !important; justify-content: center;}
-            .main-content { padding: 15px !important; overflow: visible !important; height: auto !important; }
-            .responsive-grid, .admin-grid, .form-grid, .calif-grid, .hangar-grid-new { grid-template-columns: 1fr !important; gap: 10px !important; }
-            .squad-board { grid-template-columns: 1fr !important; }
-            .perfil-container { width: 95vw !important; max-height: 90vh; overflow-y: auto; }
-            .perfil-body { grid-template-columns: 1fr !important; }
-            .perfil-col-izq { border-right: none !important; border-bottom: 1px solid var(--glass-border); padding: 20px !important; }
-            .perfil-data-grid { grid-template-columns: 1fr !important; }
-            .fach-layout { grid-template-columns: 1fr !important; height: auto !important; gap: 15px !important; }
-            .flight-display { padding: 30px 10px !important; }
-            .radar-realista { width: 180px !important; height: 180px !important; margin-bottom: 20px !important;}
-            #vPilot { font-size: 24px !important; }
-            .login-box { width: 90% !important; padding: 30px 20px !important; margin-top: 20px; }
-            .map-layout { flex-direction: column !important; height: 75vh !important; min-height: 400px !important;}
-            .map-tools { width: 100% !important; flex-direction: row !important; height: auto !important; flex-wrap: wrap; padding: 10px !important; justify-content: center; }
-            .map-tools > div { width: 100%; margin: 5px 0;}
-            .map-tools .drag-icon { width: auto !important; padding: 0 5px; display: inline-block;}
-            
-            .floating-notes-btn { bottom: 15px; right: 15px; width: 45px; height: 45px; font-size: 18px; }
-            .notes-panel { bottom: 70px; right: 15px; width: 90vw; }
+        /* Controls layer customization */
+        .leaflet-control-layers {
+            background: #171d24 !important;
+            color: #d1d7e0 !important;
+            border: 1px solid #384556 !important;
+            border-radius: 6px !important;
         }
     </style>
 </head>
-<body class="defcon-5">
+<body>
 
-    <div class="crt-scanlines"></div>
+    <!-- SIDEBAR DE CONTROL TÁCTICO -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h1>📡 PANEL DE SITUACIÓN <span class="defcon-badge">DEFCON 1</span></h1>
+            <div class="meta-grid">
+                <div class="meta-item">
+                    <div class="meta-label">📅 Fecha de Operación</div>
+                    <div class="meta-val">24 JUN 2027</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">🕒 Hora Local</div>
+                    <div class="meta-val">18:30</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">🌍 País Objetivo</div>
+                    <div class="meta-val">Burkina Faso</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">🏛️ Estado de Alerta</div>
+                    <div class="meta-val" style="color: #ff4a4a;">Ejército Movilizado</div>
+                </div>
+            </div>
+        </div>
 
-    <div class="chile-flag-top">
-        <div class="blue"></div>
-        <div class="white"></div>
-        <div class="red"></div>
+        <div class="sidebar-content">
+            <div class="section-title">🎯 Objetivo de Alta Prioridad (HVT)</div>
+            <div class="intel-card" id="card-hvt" style="border-left: 4px solid #ff4a4a;">
+                <div class="intel-row">
+                    <span class="label">Objetivo:</span>
+                    <span class="value" style="color: #ff4a4a; font-weight: bold;">Abdul Rahman Al-Karim</span>
+                </div>
+                <div class="intel-row">
+                    <span class="label">Rol:</span>
+                    <span class="value">Líder Frente Liberación Sahel</span>
+                </div>
+                <div class="intel-row">
+                    <span class="label">Última Ubicación:</span>
+                    <span class="value">Campamento Norte (95 km de la Capital)</span>
+                </div>
+                <div class="intel-row">
+                    <span class="label">Certeza Inteligencia:</span>
+                    <span class="badge badge-red">90% Probabilidad</span>
+                </div>
+            </div>
+
+            <div class="section-title">🛡️ Fuerza Desplegada (Chile)</div>
+            <div class="intel-card" id="card-chile" style="border-left: 4px solid #47a3ff;">
+                <div class="intel-row">
+                    <span class="label">Base Operativa:</span>
+                    <span class="value">Base Temporal "Cóndor" (Aeropuerto)</span>
+                </div>
+                <div class="intel-row">
+                    <span class="label">Efectivos Totales:</span>
+                    <span class="value">520 Militares</span>
+                </div>
+                <div class="intel-row">
+                    <span class="label">Brigada Lautaro:</span>
+                    <span class="value">300 (Alpha: 100 | Bravo: 100 | Charlie: 100)</span>
+                </div>
+                <div class="intel-row">
+                    <span class="label">Unidades de Apoyo:</span>
+                    <span class="value">220 (Logística, Médicos, Intel, Coms)</span>
+                </div>
+                <div class="intel-row">
+                    <span class="label">Medios Aéreos:</span>
+                    <span class="value">2 C-130H Hercules | 4 Bell 412EP</span>
+                </div>
+                <div class="intel-row">
+                    <span class="label">Medios Terrestres:</span>
+                    <span class="value">18 Veh. Tácticos | 6 Amb. | 1 Puesto Mando</span>
+                </div>
+            </div>
+
+            <div class="section-title">⚠️ Atentados Recientes</div>
+            <div class="intel-card" id="card-atentado1">
+                <div class="intel-row">
+                    <span class="value" style="color: #ffaa00;">1. Embajada de Chile</span>
+                    <span class="label">23 Jun - 08:10</span>
+                </div>
+                <div class="intel-row">
+                    <span class="label">Bajas:</span>
+                    <span class="value" style="color: #ff4a4a;">40 Muertos / 12 Heridos</span>
+                </div>
+                <div class="intel-row">
+                    <span class="label">Estado actual:</span>
+                    <span class="badge badge-red">Perímetro Asegurado</span>
+                </div>
+            </div>
+
+            <div class="intel-card" id="card-atentado2">
+                <div class="intel-row">
+                    <span class="value" style="color: #ffaa00;">2. Ataques Coordinados</span>
+                    <span class="label">24 Jun - 09:15</span>
+                </div>
+                <div class="intel-row">
+                    <span class="label">Objetivos:</span>
+                    <span class="value">Hotel Int. / Centro Com. / Res. Extranjeros</span>
+                </div>
+                <div class="intel-row">
+                    <span class="label">Bajas Totales:</span>
+                    <span class="value" style="color: #ff4a4a;">78 Muertos / 150 Heridos</span>
+                </div>
+            </div>
+
+            <div class="section-title">🌐 Fuerzas Aliadas y Locales</div>
+            <div class="intel-card">
+                <div class="intel-row">
+                    <span class="label">Burkina Faso (Capital):</span>
+                    <span class="value">3.500 Ejército | 1.200 FF.EE | 5.000 Policía</span>
+                </div>
+                <div class="intel-row">
+                    <span class="label">Francia:</span>
+                    <span class="value">80 Operadores Esp. | 2 Helicópteros Caracal</span>
+                </div>
+                <div class="intel-row">
+                    <span class="label">EE.UU. (Drones):</span>
+                    <span class="value">50 Operadores | 2 MQ-9 Reaper (Vigilancia)</span>
+                </div>
+                <div class="intel-row">
+                    <span class="label">ONU:</span>
+                    <span class="value">150 Observadores (No Combatientes)</span>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <audio id="sndHover" src="https://www.soundjay.com/buttons/sounds/button-28.mp3" preload="auto"></audio>
-    <audio id="sndClick" src="https://www.soundjay.com/buttons/sounds/button-09.mp3" preload="auto"></audio>
-    <audio id="sndAlert" src="https://www.soundjay.com/mechanical/sounds/smoke-detector-1.mp3" preload="auto" loop></audio>
-    <audio id="sndError" src="https://www.soundjay.com/buttons/sounds/beep-03.mp3" preload="auto"></audio>
-    <audio id="sndStartup" src="https://www.soundjay.com/computers/sounds/computer-startup-1.mp3" preload="auto"></audio>
-    <audio id="sndTypewriter" src="https://www.soundjay.com/mechanical/sounds/keyboard-typing-1.mp3" preload="auto" loop></audio>
+    <!-- MAPA INTERACTIVO -->
+    <div id="map"></div>
 
-    <div style="position: fixed; bottom: 15px; right: 20px; font-size: 11px; color: rgba(255,255,255,0.2); z-index: 50000; letter-spacing: 1px; pointer-events: none; display: flex; align-items: center; gap: 5px;">
-        Desarrollado por: Lukas Brown 🇨🇱
-    </div>
-
-    <div class="floating-notes-btn" onclick="toggleNotas()" title="Cuaderno de Campo">📓</div>
-    <div class="notes-panel glass-panel" id="panelNotasWidget">
-        <div style="background: rgba(0,0,0,0.5); padding: 12px 15px; border-bottom: 1px solid var(--glass-border); font-weight: bold; font-size: 13px; letter-spacing: 1px; display: flex; justify-content: space-between; align-items: center; border-radius: 12px 12px 0 0;">
-            <span style="color:var(--theme-color);">📓 CUADERNO DE CAMPO (PRIVADO)</span>
-            <span onclick="toggleNotas()" style="cursor:pointer; color:var(--danger-red); font-size: 16px;">✖</span>
-        </div>
-        <div style="padding: 15px; background: rgba(10, 15, 25, 0.95); border-radius: 0 0 12px 12px;">
-            <textarea id="textoNotas" class="auth-input" style="height: 220px; margin-bottom: 15px; font-size: 13px; resize: none; border-color:var(--glass-border); background:rgba(0,0,0,0.4);" placeholder="Escriba aquí sus notas tácticas, códigos de radio, frecuencias o apuntes de su expediente. Solo usted tiene acceso a esta información..."></textarea>
-            <button onclick="guardarNotas()" class="btn-tactical" style="width: 100%; font-size: 11px;">💾 GUARDAR APUNTES CLASIFICADOS</button>
-        </div>
-    </div>
-
-    <div id="toastContainer"></div>
-
-    <div class="top-bar glass-panel" style="border-radius: 0; height: 60px; min-height: 60px; border-bottom: 1px solid var(--glass-border); background: rgba(8, 12, 18, 0.9); display: flex; align-items: center; justify-content: space-between; padding: 0 25px; z-index: 20; box-shadow: 0 5px 20px rgba(0,0,0,0.5); margin-top: 4px;">
-        <div style="font-family: 'Share Tech Mono'; color: var(--alert-amber); font-size: 13px; border: 1px solid var(--alert-amber); padding: 6px 12px; background: rgba(255, 180, 0, 0.1); border-radius: 4px; letter-spacing: 1px; box-shadow: 0 0 10px rgba(255,180,0,0.2);">IP: mtasa://45.236.90.25:26101</div>
-        <div style="text-align: center;">
-            <div style="font-size: 22px; font-weight: bold; letter-spacing: 4px; color: white; text-shadow: 0 0 15px var(--theme-color);">🇨🇱 EJÉRCITO DE CHILE RP 🇨🇱</div>
-            <div style="font-size: 10px; color: #aaa; letter-spacing: 2px; margin-top: -2px; font-family: 'Share Tech Mono';">"POR LA RAZÓN O LA FUERZA"</div>
-        </div>
-        
-        <div class="tactical-clock" style="text-align: right; width: 150px; display: flex; flex-direction: column; justify-content: center; border-left: 1px solid var(--glass-border); padding-left: 20px;">
-            <div id="relojLocal" style="color: white; font-weight: bold; font-size: 16px; letter-spacing: 2px; text-shadow: 0 0 10px var(--theme-color);">00:00:00</div>
-            <div id="relojZulu" style="color: var(--alert-amber); font-size: 10px; font-family: 'Share Tech Mono'; letter-spacing: 1px;">00:00:00 Z</div>
-        </div>
-    </div>
-
-    <div class="main-wrapper" style="display: flex; flex: 1; overflow: hidden;">
-
-        <div id="modalAdminAuth" class="custom-modal">
-            <div class="modal-body glass-panel">
-                <h3 style="color: var(--danger-red); margin-top: 0; letter-spacing: 2px;">ACCESO RESTRINGIDO</h3>
-                <p style="font-size: 12px; color: #aaa; margin-bottom: 20px;">INGRESE CLAVE DE AUTORIDAD GENERAL</p>
-                <input type="password" id="adminPassInput" class="auth-input" placeholder="CONTRASEÑA SECRETA" style="text-align: center; border-color: var(--danger-red);">
-                <div style="display: flex; gap: 10px; margin-top: 10px;">
-                    <button onclick="verificarAdminAuth()" class="btn-tactical" style="flex: 1; background: rgba(255,59,59,0.1); border-color: var(--danger-red); color: var(--danger-red);">AUTORIZAR</button>
-                    <button onclick="cerrarAdminAuth()" class="btn-tactical" style="background: transparent; color: #888; border-color: var(--glass-border);">CANCELAR</button>
-                </div>
-            </div>
-        </div>
-
-        <div id="modalDefconAuth" class="custom-modal">
-            <div class="modal-body glass-panel">
-                <h3 style="color: var(--alert-amber); margin-top: 0; letter-spacing: 2px;">PROTOCOLO DEFCON</h3>
-                <p style="font-size: 12px; color: #aaa; margin-bottom: 20px;">INGRESE CÓDIGO DE AUTORIZACIÓN (ESTADO ACTUAL: <span id="spanCurrentDefcon">5</span>)</p>
-                <input type="password" id="defconPassInput" class="auth-input" placeholder="CÓDIGO SECRETO" style="text-align: center; border-color: var(--alert-amber);">
-                <div style="display: flex; gap: 10px; margin-top: 10px;">
-                    <button onclick="verificarDefconAuth()" class="btn-tactical" style="flex: 1; background: rgba(255,180,0,0.1); border-color: var(--alert-amber); color: var(--alert-amber);">CONFIRMAR</button>
-                    <button onclick="cerrarDefconAuth()" class="btn-tactical" style="background: transparent; color: #888; border-color: var(--glass-border);">CANCELAR</button>
-                </div>
-            </div>
-        </div>
-
-        <div id="perfilModal" class="custom-modal">
-            <div class="perfil-container glass-panel">
-                <div class="perfil-header">
-                    <span style="display:flex; align-items:center; gap:10px;"><span style="font-size:20px;">🎖️</span> EXPEDIENTE CLASIFICADO</span>
-                    <button class="btn-cerrar-perfil" onclick="cerrarPerfil()" style="color:white; background:transparent; border:none; font-size:18px; cursor:pointer;">✖</button>
-                </div>
-                <div class="perfil-body">
-                    <div class="perfil-col-izq">
-                        <div id="p_foto" class="perfil-foto-hd"></div>
-                        <div style="margin-top: 10px; text-align: center; width: 100%;">
-                            <div style="font-size: 10px; color: #888; margin-bottom: 15px; letter-spacing: 1px;">SEÑAL VITAL (EN LÍNEA)</div>
-                            <div class="radar-realista" style="width: 130px; height: 130px;">
-                                <div class="radar-sweep"></div>
-                                <div class="blip" style="top: 25%; left: 55%; animation-delay: 0.2s;"></div>
-                                <div class="blip" style="top: 65%; left: 35%; animation-delay: 1.4s;"></div>
-                            </div>
-                        </div>
-                        
-                        <div class="insignia-container" id="p_insignias"></div>
-                        
-                        <div id="p_insignia_desc" style="margin-top: 15px; padding: 10px; background: rgba(0,0,0,0.5); border: 1px dashed var(--glass-border); border-radius: 6px; font-size: 11px; color: #aaa; text-align: center; min-height: 40px; font-family: 'Share Tech Mono'; display: flex; align-items: center; justify-content: center; line-height: 1.4; width: 100%; box-sizing: border-box; box-shadow: inset 0 0 10px rgba(0,0,0,0.5);">
-                            [ INFO. MEDALLA: ESPERANDO SELECCIÓN ]
-                        </div>
-                    </div>
-                    
-                    <div class="perfil-col-der">
-                        <div style="border-bottom: 1px solid var(--glass-border); padding-bottom: 15px;">
-                            <h2 id="p_nombre" style="margin: 0; color: white; font-size: 32px; letter-spacing: 1px;">NOMBRE SOLDADO</h2>
-                            <div style="color: var(--theme-color); font-size: 13px; font-family: 'Share Tech Mono'; margin-top:5px;"><span id="p_id">CHL-XXXXXX-000</span></div>
-                        </div>
-                        
-                        <div class="perfil-data-grid">
-                            <div class="perfil-item"><span>RANGO ACTUAL:</span> <strong id="p_rango" style="color: var(--alert-amber);">---</strong></div>
-                            <div class="perfil-item"><span>DIVISIÓN ASIGNADA:</span> <strong id="p_division">---</strong></div>
-                            <div class="perfil-item"><span>UNIDAD / AERONAVE:</span> <strong id="p_unidad" style="color: var(--admin-blue);">---</strong></div>
-                            <div class="perfil-item"><span>INGRESO AL SISTEMA:</span> <strong id="p_creacion">01/01/2026</strong></div>
-                            <div class="perfil-item glass-panel" style="grid-column: 1 / -1; border: 1px solid var(--theme-dim); background: rgba(0,229,255,0.05);">
-                                <span>ESTADO OPERACIONAL:</span> <strong id="p_mision" style="color: var(--theme-color);">DISPONIBLE</strong>
-                            </div>
-                        </div>
-
-                        <div class="perfil-especialidades glass-panel" style="border:none; box-shadow: inset 0 0 20px rgba(0,0,0,0.5); padding: 15px 20px; background: rgba(0,0,0,0.4);">
-                            <div style="font-size: 12px; color: #888; letter-spacing: 2px; border-bottom: 1px solid var(--glass-border); padding-bottom: 8px; margin-bottom: 10px;">ESPECIALIDADES TÁCTICAS</div>
-                            <div class="especialidades-container" id="p_especialidades"></div>
-                        </div>
-
-                        <div class="perfil-calificaciones glass-panel" style="border:none; box-shadow: inset 0 0 20px rgba(0,0,0,0.5); padding: 15px 20px; background: rgba(0,0,0,0.4); margin-top: 5px;">
-                            <div style="font-size: 12px; color: #888; letter-spacing: 2px; border-bottom: 1px solid var(--glass-border); padding-bottom: 8px; margin-bottom: 10px;">EVALUACIONES MILITARES</div>
-                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px; text-align: center;">
-                                <div style="background: rgba(255,255,255,0.02); padding: 10px; border-radius: 6px; border: 1px solid var(--glass-border);">
-                                    <div style="font-size: 10px; color: #aaa; margin-bottom: 5px;">🎯 RENDIMIENTO TIRO</div>
-                                    <div id="p_tiro" style="color: white; font-weight: bold; font-family: 'Share Tech Mono', monospace;">---</div>
-                                </div>
-                                <div style="background: rgba(255,255,255,0.02); padding: 10px; border-radius: 6px; border: 1px solid var(--glass-border);">
-                                    <div style="font-size: 10px; color: #aaa; margin-bottom: 5px;">🏃 CONDICIÓN FÍSICA</div>
-                                    <div id="p_fisico" style="color: white; font-weight: bold; font-family: 'Share Tech Mono', monospace;">---</div>
-                                </div>
-                                <div style="background: rgba(255,255,255,0.02); padding: 10px; border-radius: 6px; border: 1px solid var(--glass-border);">
-                                    <div style="font-size: 10px; color: #aaa; margin-bottom: 5px;">🧠 EVAL. PSICOLÓGICA</div>
-                                    <div id="p_psico" style="color: white; font-weight: bold; font-family: 'Share Tech Mono', monospace;">---</div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div id="p_radiograma_container" style="display:none; margin-top: 15px;">
-                            <button onclick="document.getElementById('p_radiograma_form').style.display='block'; this.style.display='none';" class="btn-tactical" style="width:100%; border-color:var(--theme-color); color:var(--theme-color); background:rgba(0,229,255,0.1);">✉️ ENVIAR RADIOGRAMA PRIVADO</button>
-                            <div id="p_radiograma_form" style="display:none; padding:15px; background:rgba(0,0,0,0.5); border:1px solid var(--theme-color); border-radius:8px;">
-                                <div style="font-size:11px; color:var(--theme-color); margin-bottom:10px; font-weight:bold; letter-spacing:1px;">ENVIANDO TRANSMISIÓN P2P ENCRIPTADA...</div>
-                                <textarea id="p_radiograma_txt" class="auth-input" rows="3" placeholder="Mensaje clasificado de transmisión directa..." style="font-size:12px; margin-bottom:10px;"></textarea>
-                                <div style="display:flex; gap:10px;">
-                                    <button onclick="enviarRadiograma()" class="btn-tactical" style="flex:1; background:var(--theme-color); color:#000;">TRANSMITIR</button>
-                                    <button onclick="document.getElementById('p_radiograma_form').style.display='none'; document.getElementById('p_radiograma_container').firstElementChild.style.display='block';" class="btn-tactical" style="background:transparent; border-color:var(--glass-border); color:#888;">CANCELAR</button>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-            </div>
-        </div>
-
-       <div id="loginScreen">
-            <div class="auth-card">
-                <div class="auth-tabs">
-                    <div class="auth-tab" id="tabIngresar" onclick="setAuthMode('login')">🔒 INGRESAR</div>
-                    <div class="auth-tab active" id="tabEnlistarse" onclick="setAuthMode('register')">🪖 ENLISTARSE</div>
-                </div>
-
-                <div class="auth-header">
-                    <h1 class="auth-title" id="authTitleMain">ENLISTARSE EN</h1>
-                    <h1 class="auth-title auth-title-chile">CHILE</h1>
-                    <div class="auth-subtitle" id="authSubtitle">// REGÍSTRATE PARA DEFENDER LA PATRIA EN EL SERVIDOR MTA</div>
-                </div>
-
-                <div class="auth-form-grid">
-                    <div class="auth-form-full">
-                        <div class="auth-field-label">📧 CORREO</div>
-                        <input type="email" id="userEmail" class="auth-input-new" placeholder="tu@correo.com">
-                    </div>
-                    
-                    <div class="auth-form-full" id="boxNombre">
-                        <div class="auth-field-label">🪖 NOMBRE IC (IN-CHARACTER)</div>
-                        <input type="text" id="regNombre" class="auth-input-new" placeholder="Nombre de tu personaje">
-                    </div>
-
-                    <div id="boxPais">
-                        <div class="auth-field-label">🌎 PAÍS</div>
-                        <input type="text" id="regPais" class="auth-input-new" value="Chile" readonly style="color:#666; background: #0a0e14;">
-                    </div>
-
-                    <div id="boxEdad">
-                        <div class="auth-field-label">📅 EDAD</div>
-                        <input type="number" id="regEdad" class="auth-input-new" placeholder="18">
-                    </div>
-
-                    <div class="auth-form-full">
-                        <div class="auth-field-label">🔒 CONTRASEÑA</div>
-                        <input type="password" id="userPass" class="auth-input-new" placeholder="Mínimo 6 caracteres">
-                    </div>
-                </div>
-
-                <button id="btnRegisterAction" onclick="register()" class="btn-auth-primary">+ INGRESAR AL EJÉRCITO DE CHILE</button>
-                <button id="btnLoginAction" onclick="login()" class="btn-auth-primary" style="display:none;">ACCEDER AL SISTEMA TÁCTICO</button>
-
-                <div class="auth-footer" id="authFooterWrap">
-                    <span>¿YA TIENES CREDENCIALES?</span>
-                    <button class="btn-auth-secondary" onclick="setAuthMode('login')">🔒 HAZ TU INGRESO AQUÍ →</button>
-                </div>
-            </div>
-        </div>
-
-        <div class="sidebar">
-            <div class="sidebar-header">
-                <div>
-                    <div id="userName" style="color: white; font-weight: bold; text-transform: uppercase; font-size: 16px;">...</div>
-                    <div id="userRank" style="font-size: 11px; color: var(--alert-amber); margin-top: 4px; letter-spacing: 1px;">IDENTIFICANDO...</div>
-                </div>
-                <select id="myStatus" class="auth-input" style="padding: 8px; font-size: 11px; text-align: center; margin:0; font-weight: bold; width: auto;" onchange="updateMyStatus()">
-                    <option value="ACTIVO">🟢 ACTIVO</option>
-                    <option value="EN BASE">🟡 EN BASE</option>
-                    <option value="EN ENTRENAMIENTO">🔵 EN ENTRENAMIENTO</option>
-                    <option value="EN OPERACIÓN">🟠 EN OPERACIÓN</option>
-                    <option value="NO DISPONIBLE">🔴 NO DISPONIBLE</option>
-                </select>
-            </div>
-            
-            <div class="menu-category">PANEL CENTRAL</div>
-            <div class="menu-item active" id="btnPersonal" onclick="switchTab('personal')" onmouseenter="playHover()"><span>📋</span> Personal Táctico</div>
-            <div class="menu-item" id="btnEscuadrones" onclick="switchTab('escuadrones')" onmouseenter="playHover()"><span>🧩</span> Escuadrones (Drag & Drop)</div>
-            <div class="menu-item" id="btnSolicitudes" onclick="switchTab('solicitudes')" onmouseenter="playHover()"><span>📝</span> Solicitudes</div>
-            <div class="menu-item" id="btnMapa" onclick="switchTab('mapa')" onmouseenter="playHover()"><span>🗺️</span> Mapa Estratégico</div>
-            <div class="menu-item" id="btnEstadisticas" onclick="switchTab('estadisticas')" onmouseenter="playHover()"><span>📊</span> Estadísticas</div>
-            <div class="menu-item" id="btnLicencias" onclick="switchTab('licencias')" onmouseenter="playHover()"><span>🪪</span> Licencias</div>
-            <div class="menu-item" id="btnHangar" onclick="switchTab('hangar')" onmouseenter="playHover()"><span>🛠️</span> Hangar / Flota</div>
-            <div class="menu-item" id="btnMisiones" onclick="switchTab('misiones')" onmouseenter="playHover()"><span>🎯</span> Operaciones</div>
-            <div class="menu-item" id="btnFach" onclick="switchTab('fach')" onmouseenter="playHover()"><span>✈️</span> Control Aéreo</div>
-            
-            <div class="menu-category">COMUNICACIÓN</div>
-            <div class="menu-item" id="btnRadiogramas" onclick="switchTab('radiogramas')" onmouseenter="playHover()"><span>✉️</span> Radiogramas <span id="badgeRadiogramas" style="display:none; color:var(--danger-red); margin-left:auto; font-size:10px; animation:crtFlicker 1s infinite; font-weight:bold;"></span></div>
-            <div class="menu-item" id="btnComunicados" onclick="switchTab('comunicados')" onmouseenter="playHover()"><span>📢</span> Comunicados Oficiales</div>
-            <div class="menu-item" id="btnCalendario" onclick="switchTab('calendario')" onmouseenter="playHover()"><span>📅</span> Calendario Entrenamientos</div>
-            
-            <div class="menu-category">COMANDO SUPERIOR</div>
-            <div class="menu-item" id="btnDocumentos" onclick="switchTab('documentos')" onmouseenter="playHover()"><span>🗃️</span> Inteligencia y Docs</div>
-            <div class="menu-item" id="btnAsuntosInternos" onclick="switchTab('asuntos')" onmouseenter="playHover()"><span>🕵️</span> Asuntos Internos</div>
-            <div class="menu-item menu-hidden" id="btnReclutamiento" onclick="switchTab('reclutamiento')" onmouseenter="playHover()"><span>📝</span> Reclutamiento</div>
-
-            <div class="menu-category">SISTEMA E INMERSIÓN</div>
-            <div class="menu-item" id="btnCRTToggle" onclick="toggleCRT()" onmouseenter="playHover()"><span>📺</span> Filtro CRT: <strong style="color:var(--danger-red); margin-left:5px;">OFF</strong></div>
-            <div class="menu-item" onclick="abrirAdminAuth()" onmouseenter="playHover()"><span style="color: var(--admin-blue);">🌐</span> Autoridad Admin</div>
-            <div class="menu-item menu-hidden" id="btnLogs" onclick="switchTab('logs')" onmouseenter="playHover()"><span>🧑‍💻</span> Registros SECRETO</div>
-            
-            <div class="menu-item btn-alert" id="btnDefcon" onclick="intentarCambioDefcon()" onmouseenter="playHover()"><span>🚨</span> DEFCON 5</div>
-
-            <button onclick="logout()" class="btn-tactical btn-logout" style="margin: 15px; background: rgba(218, 41, 28, 0.1); border-color: var(--danger-red); color: var(--danger-red); font-size:12px;">DESCONECTAR</button>
-        </div>
-
-        <div class="main-content" id="main-content-area">
-            
-            <div id="adminTools" class="glass-panel" style="display:none; padding: 30px; margin-bottom: 20px; border-color: var(--admin-blue);">
-                <h3 style="color: var(--admin-blue); margin-top: 0; letter-spacing: 2px; border-bottom: 1px solid var(--glass-border); padding-bottom:10px;">[ ACCESO CLASIFICADO - ADMINISTRADOR ]</h3>
-                
-                <p style="color: white; font-weight: bold; margin: 20px 0 10px; font-size: 14px;">MODIFICACIÓN DE EXPEDIENTES Y ACTIVOS</p>
-                <div class="admin-grid">
-                    <select id="targetSoldier" class="auth-input" style="margin:0;"></select>
-                    <select id="targetRank" class="auth-input" style="margin:0;"></select>
-                    <select id="targetDivision" class="auth-input" style="margin:0;">
-                        <option value="EJÉRCITO">EJÉRCITO</option>
-                        <option value="FACH">FACH</option>
-                        <option value="ARMADA">ARMADA</option>
-                        <option value="BOE">BOE</option>
-                    </select>
-                    <select id="targetEspecialidad" class="auth-input" style="margin:0;">
-                        <option value="Infantería">Infantería</option>
-                        <option value="Piloto">Piloto</option>
-                        <option value="Francotirador">Francotirador</option>
-                        <option value="Artillería de apoyo">Artillería de apoyo</option>
-                        <option value="Fuerzas especiales">Fuerzas especiales</option>
-                    </select>
-                    <select id="targetAeronave" class="auth-input" id="listaDesplegableAeronaves" style="margin:0;"></select>
-                    <button onclick="procesarCambiosAdmin()" class="btn-tactical" style="background: var(--admin-blue); color: black; border:none;">ACTUALIZAR</button>
-                </div>
-                
-                <div style="border-top: 1px dashed var(--glass-border); padding-top: 20px; margin-bottom: 25px;">
-                    <p style="color: var(--alert-amber); font-weight: bold; margin: 0 0 10px; font-size: 14px;">🎯 ASIGNACIÓN Y CONTROL DE OPERACIONES</p>
-                    <div class="admin-grid">
-                        <select id="targetSoldadoMision" class="auth-input" style="margin:0;"></select>
-                        <select id="tipoMision" class="auth-input" style="margin:0;">
-                            <option value="Reconocimiento">Reconocimiento</option>
-                            <option value="Combate">Combate</option>
-                            <option value="Entrenamiento">Entrenamiento</option>
-                        </select>
-                        <input type="text" id="objMision" class="auth-input" placeholder="OBJETIVO (Ej: Patrullaje Zona Sur)" style="margin:0;">
-                        <button onclick="asignarMision()" class="btn-tactical" style="background: var(--alert-amber); color: black; border:none;">DESPLEGAR</button>
-                        <button onclick="finalizarMision()" class="btn-tactical" style="background: transparent; color: white;">FINALIZAR</button>
-                    </div>
-                </div>
-
-                <div style="border-top: 1px dashed var(--glass-border); padding-top: 20px;">
-                    <p style="color: var(--danger-red); font-weight: bold; margin: 0 0 10px; font-size: 14px;">⚖️ SISTEMA DE SANCIONES DISCIPLINARIAS</p>
-                    <div class="admin-grid">
-                        <select id="targetSoldadoSancion" class="auth-input" style="margin:0;"></select>
-                        <select id="targetSancion" class="auth-input" style="margin:0;">
-                            <option value="Falta leve">Falta leve</option>
-                            <option value="Falta grave">Falta grave</option>
-                            <option value="Suspensión">Suspensión</option>
-                            <option value="Expulsión">Expulsión</option>
-                        </select>
-                        <input type="text" id="motivoSancion" class="auth-input" placeholder="MOTIVO INFRACCIÓN" style="margin:0;">
-                        
-                        <select id="duracionSancion" class="auth-input" style="margin:0;">
-                            <option value="" disabled selected>DURACIÓN...</option>
-                            <option value="1 MIN">1 MIN</option>
-                            <option value="5 MIN">5 MIN</option>
-                            <option value="10 MIN">10 MIN</option>
-                            <option value="30 MIN">30 MIN</option>
-                            <option value="1 HORA">1 HORA</option>
-                            <option value="2 HORAS">2 HORAS</option>
-                            <option value="12 HORAS">12 HORAS</option>
-                            <option value="24 HORAS">24 HORAS</option>
-                            <option value="1 SEMANA">1 SEMANA</option>
-                            <option value="1 MES">1 MES</option>
-                        </select>
-
-                        <button onclick="aplicarSancion()" class="btn-tactical" style="background: rgba(218,41,28,0.2); border-color: var(--danger-red); color: var(--danger-red);">SANCIONAR</button>
-                        <button onclick="quitarSanciones()" class="btn-tactical" style="background: transparent; border-color: var(--theme-color); color: var(--theme-color);">LIMPIAR EXPEDIENTE</button>
-                    </div>
-                </div>
-            </div>
-
-            <div id="panelCalificaciones" class="glass-panel" style="display:none; padding: 20px 30px; margin-bottom: 30px; border-color: #4df24d;">
-                <h3 style="color: #4df24d; margin-top: 0; margin-bottom: 15px; font-size: 14px; letter-spacing: 2px;">[ ⚙️ EVALUACIÓN DE PERSONAL - RANGO: TTE. CORONEL+ ]</h3>
-                <div class="calif-grid">
-                    <select id="evalSoldado" class="auth-input" style="margin:0;"></select>
-                    <select id="evalTiro" class="auth-input" style="margin:0;">
-                        <option value="Básico">Tiro: Básico</option>
-                        <option value="Calificado">Tiro: Calificado</option>
-                        <option value="Experto">Tiro: Experto</option>
-                    </select>
-                    <select id="evalFisico" class="auth-input" style="margin:0;">
-                        <option value="Regular">Físico: Regular</option>
-                        <option value="Buena">Físico: Buena</option>
-                        <option value="Excelente">Físico: Excelente</option>
-                    </select>
-                    <select id="evalPsico" class="auth-input" style="margin:0;">
-                        <option value="Observación">Psico: Observación</option>
-                        <option value="Apto">Psico: Apto</option>
-                        <option value="No apto">Psico: No apto</option>
-                    </select>
-                    <button onclick="guardarCalificacion()" class="btn-tactical" style="background: rgba(77,242,77,0.1); border-color: #4df24d; color: #4df24d;">EVALUAR</button>
-                </div>
-            </div>
-
-            <div id="seccionPersonal">
-                <h2 class="section-title"><span>📋</span> PERSONAL REGISTRADO</h2>
-                <div id="listaSoldados" class="responsive-grid"></div>
-            </div>
-
-            <div id="seccionEscuadrones">
-                <h2 class="section-title"><span>🧩</span> GESTOR DE ESCUADRONES TÁCTICOS</h2>
-                <p style="color: #888; font-size: 13px; margin-bottom: 25px; font-family: 'Share Tech Mono', monospace; letter-spacing: 1px;">Arrastre la tarjeta de un soldado hacia un escuadrón. Haga clic en la ⭐ para nombrar a un Líder.</p>
-                <div class="squad-board">
-                    <div class="squad-col" style="border-color: #555;">
-                        <div class="squad-header" style="color: #aaa;">DISPONIBLES EN BASE</div>
-                        <div class="squad-body" id="sq_base" ondragover="allowDropSquad(event)" ondrop="onDropSquad(event, 'base')"></div>
-                    </div>
-                    <div class="squad-col" style="border-color: var(--danger-red);">
-                        <div class="squad-header" style="color: var(--danger-red);">ESCUADRÓN ALPHA</div>
-                        <div class="squad-body" id="sq_alpha" ondragover="allowDropSquad(event)" ondrop="onDropSquad(event, 'alpha')"></div>
-                    </div>
-                    <div class="squad-col" style="border-color: var(--theme-color);">
-                        <div class="squad-header" style="color: var(--theme-color);">ESCUADRÓN BRAVO</div>
-                        <div class="squad-body" id="sq_bravo" ondragover="allowDropSquad(event)" ondrop="onDropSquad(event, 'bravo')"></div>
-                    </div>
-                    <div class="squad-col" style="border-color: var(--alert-amber);">
-                        <div class="squad-header" style="color: var(--alert-amber);">FUERZAS ESPECIALES</div>
-                        <div class="squad-body" id="sq_especial" ondragover="allowDropSquad(event)" ondrop="onDropSquad(event, 'especial')"></div>
-                    </div>
-                </div>
-            </div>
-            
-            <div id="seccionRadiogramas">
-                <h2 class="section-title"><span>✉️</span> RADIOGRAMAS ENCRIPTADOS (BANDEJA DE ENTRADA)</h2>
-                <p style="color: #888; font-size: 13px; margin-bottom: 25px; font-family: 'Share Tech Mono', monospace; letter-spacing: 1px;">SISTEMA P2P DE COMUNICACIÓN DIRECTA Y CLASIFICADA</p>
-                <div id="listaRadiogramas" class="responsive-grid"></div>
-            </div>
-
-            <div id="seccionSolicitudes">
-                <h2 class="section-title"><span>📝</span> TRAMITACIÓN DE SOLICITUDES</h2>
-                
-                <div class="glass-panel" style="padding: 25px; border-color: var(--theme-color); margin-bottom: 30px;">
-                    <h4 style="margin-top:0; color:var(--theme-color); font-size:16px;">NUEVA SOLICITUD AL MANDO SUPERIOR</h4>
-                    <div class="form-grid">
-                        <select id="solTipo" class="auth-input" style="margin:0;">
-                            <option value="Ascenso">🎖️ Solicitud de Ascenso</option>
-                            <option value="Cambio de Unidad">🔄 Cambio de Unidad / Especialidad</option>
-                            <option value="Licencia">🏖️ Licencia / Permiso de Ausencia</option>
-                        </select>
-                        <input type="text" id="solDetalle" class="auth-input" placeholder="Justificación y detalles de la solicitud..." style="margin:0;">
-                    </div>
-                    <button onclick="enviarSolicitud()" class="btn-tactical" style="background: rgba(0,229,255,0.1); color: var(--theme-color); border-color: var(--theme-color); width: 100%;">ENVIAR PETICIÓN AL MANDO</button>
-                </div>
-
-                <h3 style="color: var(--alert-amber); margin-top: 20px; font-weight:bold; letter-spacing:1px; display: none; border-bottom:1px solid var(--glass-border); padding-bottom:10px;" id="tituloGestorSolicitudes">BANDEJA DE REVISIÓN (MAYOR+)</h3>
-                <div id="listaSolicitudes" class="responsive-grid"></div>
-            </div>
-
-            <div id="seccionAsuntosInternos">
-                <h2 class="section-title"><span>🕵️</span> DEPARTAMENTO DE ASUNTOS INTERNOS</h2>
-                <p style="color: #888; font-size: 13px; margin-bottom: 25px; font-family: 'Share Tech Mono', monospace; letter-spacing: 1px;">BUZÓN DE DENUNCIAS ANÓNIMAS - CONFIDENCIALIDAD ABSOLUTA</p>
-                
-                <div class="glass-panel" style="padding: 25px; border-color: var(--danger-red); margin-bottom: 30px;">
-                    <h4 style="margin-top:0; color:var(--danger-red); font-size:16px;">EMITIR NUEVO REPORTE CLASIFICADO</h4>
-                    <div class="form-grid">
-                        <select id="denTipo" class="auth-input" style="margin:0;">
-                            <option value="Insubordinación">Insubordinación / Desacato</option>
-                            <option value="Traición">Traición / Espionaje</option>
-                            <option value="Negligencia">Negligencia en el Deber</option>
-                            <option value="Conducta Anti-Rol">Conducta Antirreglamentaria</option>
-                        </select>
-                        <input type="text" id="denImplicado" class="auth-input" placeholder="NOMBRE DEL IMPLICADO O UNIDAD..." style="margin:0;">
-                    </div>
-                    <textarea id="denDetalle" class="auth-input" rows="4" placeholder="Describa la situación detalladamente. Esta denuncia es 100% ANÓNIMA. Ni el sistema ni el alto mando registrarán su identidad..." style="margin-bottom:15px;"></textarea>
-                    <button onclick="enviarDenuncia()" class="btn-tactical" style="background: rgba(218,41,28,0.1); border-color: var(--danger-red); color: var(--danger-red); width: 100%;">ENVIAR REPORTE AL ALTO MANDO</button>
-                </div>
-
-                <h3 style="color: var(--danger-red); margin-top: 20px; font-weight:bold; letter-spacing:1px; display: none; border-bottom:1px solid var(--glass-border); padding-bottom:10px;" id="tituloGestorDenuncias">EXPEDIENTES ACTIVOS (ACCESO CORONEL+)</h3>
-                <div id="listaDenuncias" class="responsive-grid"></div>
-            </div>
-
-            <div id="seccionComunicados">
-                <h2 class="section-title"><span>📢</span> COMUNICADOS OFICIALES Y NOTICIAS</h2>
-                
-                <div class="glass-panel" id="panelAdminComunicados" style="padding: 25px; border-color: var(--alert-amber); margin-bottom: 30px; display: none;">
-                    <h4 style="margin-top:0; color:var(--alert-amber); font-size:16px;">EMITIR NUEVO COMUNICADO (CAPITÁN+)</h4>
-                    <div class="form-grid">
-                        <select id="comTipo" class="auth-input" style="margin:0;">
-                            <option value="Ascenso">🎖️ Ascenso General</option>
-                            <option value="Evento">📅 Evento Especial</option>
-                            <option value="Aviso">⚠️ Aviso Importante</option>
-                        </select>
-                        <input type="text" id="comTitulo" class="auth-input" placeholder="TÍTULO DEL COMUNICADO..." style="margin:0;">
-                    </div>
-                    <textarea id="comContenido" class="auth-input" rows="4" placeholder="Cuerpo del comunicado (Máximo detalle posible)..." style="margin-bottom:15px;"></textarea>
-                    <button onclick="publicarComunicado()" class="btn-tactical" style="background: rgba(255,180,0,0.1); border-color: var(--alert-amber); color: var(--alert-amber); width: 100%;">PUBLICAR EN RED GENERAL</button>
-                </div>
-
-                <div id="listaComunicados" style="display: grid; grid-template-columns: 1fr; gap: 15px;"></div>
-            </div>
-
-            <div id="seccionCalendario">
-                <h2 class="section-title"><span>📅</span> CALENDARIO DE ENTRENAMIENTOS</h2>
-                
-                <div class="glass-panel" id="panelAdminCalendario" style="padding: 25px; border-color: var(--theme-color); margin-bottom: 30px; display: none;">
-                    <h4 style="margin-top:0; color:var(--theme-color); font-size:16px;">PROGRAMAR NUEVO ENTRENAMIENTO</h4>
-                    <div class="admin-grid" style="grid-template-columns: 1fr 1fr 2fr auto;">
-                        <input type="date" id="calFecha" class="auth-input" style="margin:0;">
-                        <input type="time" id="calHora" class="auth-input" style="margin:0;">
-                        <select id="calTipo" class="auth-input" style="margin:0;">
-                            <option value="Entrenamiento Físico">Entrenamiento Físico</option>
-                            <option value="Prácticas de Tiro">Prácticas de Tiro</option>
-                            <option value="Simulación de Vuelo">Simulación de Vuelo</option>
-                            <option value="Tácticas de Escuadra">Tácticas de Escuadra</option>
-                            <option value="Operaciones Especiales (BOE)">Operaciones Especiales (BOE)</option>
-                            <option value="Maniobras Navales">Maniobras Navales</option>
-                        </select>
-                        <button onclick="programarEntrenamiento()" class="btn-tactical" style="background: var(--theme-color); color: black; border:none;">PROGRAMAR</button>
-                    </div>
-                </div>
-
-                <div id="listaCalendario" class="responsive-grid"></div>
-            </div>
-
-            <div id="seccionMapa">
-                <h2 class="section-title"><span>🗺️</span> MAPA ESTRATÉGICO GLOBAL (SAN ANDREAS)</h2>
-                <div class="map-layout" style="display: flex; gap: 15px; height: 65vh; min-height: 500px; width: 100%;">
-                    
-                    <div class="glass-panel map-tools" style="width: 70px; display: flex; flex-direction: column; align-items: center; padding: 20px 0; gap: 15px; z-index: 10; flex-shrink: 0; overflow-y: auto;">
-                        
-                        <div style="font-size: 10px; color: var(--theme-color); text-align: center; line-height: 1; font-weight: bold;">ZOOM</div>
-                        <button onclick="zoomMapa(0.4)" class="btn-tactical" style="padding: 0; width: 40px; height: 40px; display: flex; justify-content: center; align-items: center; font-size: 18px;" title="Acercar">➕</button>
-                        <button onclick="zoomMapa(-0.4)" class="btn-tactical" style="padding: 0; width: 40px; height: 40px; display: flex; justify-content: center; align-items: center; font-size: 18px;" title="Alejar">➖</button>
-                        <button onclick="resetZoomMapa()" class="btn-tactical" style="padding: 0; width: 40px; height: 40px; display: flex; justify-content: center; align-items: center; font-size: 18px;" title="Restaurar Tamaño">🔄</button>
-
-                        <div style="width: 100%; height: 1px; background: var(--glass-border); margin: 5px 0;"></div>
-
-                        <div style="font-size: 10px; color: var(--theme-color); text-align: center; line-height: 1; font-weight: bold;">ÍCONOS</div>
-                        <div class="drag-icon" draggable="true" data-icon="🚩" title="Bandera Aliada">🚩</div>
-                        <div class="drag-icon" draggable="true" data-icon="❌" title="Zona Hostil / Objetivo">❌</div>
-                        <div class="drag-icon" draggable="true" data-icon="⭕" title="Perímetro">⭕</div>
-                        <div class="drag-icon" draggable="true" data-icon="🛡️" title="Defensa">🛡️</div>
-                        <div class="drag-icon" draggable="true" data-icon="✈️" title="Apoyo Aéreo">✈️</div>
-                        <div class="drag-icon" draggable="true" data-icon="🚙" title="Unidad Terrestre">🚙</div>
-                        <div class="drag-icon" draggable="true" data-icon="🇨🇱" title="Fuerzas Chile">🇨🇱</div>
-                        <div class="drag-icon" draggable="true" data-icon="🇨🇴" title="Fuerzas Colombia">🇨🇴</div>
-                        <div class="drag-icon" draggable="true" data-icon="🇦🇷" title="Fuerzas Argentina">🇦🇷</div>
-                        
-                        <div id="drawingTools" style="display:none; width:100%; flex-direction:column; align-items:center; gap:10px;">
-                            <div style="width: 100%; height: 1px; background: var(--glass-border); margin: 5px 0;"></div>
-                            <div style="font-size: 10px; color: var(--theme-color); text-align: center; line-height: 1; font-weight: bold;">LÁPIZ</div>
-                            <button id="btnDrawToggle" onclick="toggleDrawMode()" class="btn-tactical" style="padding: 0; width: 40px; height: 40px; display: flex; justify-content: center; align-items: center; font-size: 18px;" title="Activar/Desactivar Lápiz">🖍️</button>
-                            <input type="color" id="drawColorPicker" value="#da291c" style="width: 30px; height: 30px; border: none; border-radius: 5px; cursor: pointer; background: transparent;" title="Color del trazo">
-                        </div>
-
-                        <div style="margin-top: auto; width: 100%; text-align: center;">
-                            <button id="btnLimpiarMapa" onclick="limpiarMapa()" class="btn-tactical" style="padding: 0; border-radius: 50%; width: 40px; height: 40px; background: rgba(255,59,59,0.1); border-color: var(--danger-red); color: var(--danger-red); display: inline-flex; justify-content: center; align-items: center; margin-top: 10px;" title="Limpiar Mapa Completo (Solo Oficiales Superiores)">🗑️</button>
-                        </div>
-                    </div>
-
-                    <div style="position: relative; flex: 1; border-radius: 12px; border: 1px solid var(--glass-border); overflow: hidden; display: flex;">
-                        
-                        <div class="glass-panel" style="position: absolute; top: 15px; right: 15px; z-index: 50; padding: 10px; display: none;" id="panelClima">
-                            <div style="font-size: 10px; color: var(--theme-color); margin-bottom: 5px; text-align:center; font-weight:bold;">CTRL CLIMA</div>
-                            <select id="mapTime" class="auth-input" style="padding: 5px; font-size: 11px; margin-bottom: 5px;" onchange="cambiarClima()">
-                                <option value="dia">☀️ DÍA</option>
-                                <option value="noche">🌙 NOCHE</option>
-                            </select>
-                            <select id="mapWeather" class="auth-input" style="padding: 5px; font-size: 11px; margin-bottom: 0;" onchange="cambiarClima()">
-                                <option value="despejado">☁️ DESPEJADO</option>
-                                <option value="lluvia">🌧️ LLUVIA</option>
-                                <option value="tormenta">🌪️ T. ARENA</option>
-                            </select>
-                        </div>
-
-                        <div id="mapViewport" style="flex: 1; overflow: auto; background: #020406; box-shadow: inset 0 0 30px rgba(0,0,0,0.8); position: relative;" class="fade-in">
-                            <div id="mapaEstrategico" style="position: relative; width: 1200px; height: 1200px; margin: auto; transition: width 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), height 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);">
-                                <div class="map-bg" style="position: absolute; inset: 0; background: url('mapagtasa.jpg') center/100% 100% no-repeat; opacity: 0.85; pointer-events: none; transition: filter 1s ease;"></div>
-                                <canvas id="mapCanvas" width="1200" height="1200" style="position: absolute; inset: 0; z-index: 8; pointer-events: none;"></canvas>
-                                <div id="mapWeatherOverlay" style="position: absolute; inset: 0; pointer-events: none; z-index: 9; visibility: hidden; transition: 1s ease;"></div>
-                            </div>
-                        </div>
-
-                        <button onclick="scrollMap(-250, 0)" class="map-nav-btn map-nav-left" title="Deslizar Izquierda">◀</button>
-                        <button onclick="scrollMap(250, 0)" class="map-nav-btn map-nav-right" title="Deslizar Derecha">▶</button>
-                        <button onclick="scrollMap(0, -250)" class="map-nav-btn map-nav-up" title="Deslizar Arriba">▲</button>
-                        <button onclick="scrollMap(0, 250)" class="map-nav-btn map-nav-down" title="Deslizar Abajo">▼</button>
-                    </div>
-                </div>
-                <div style="font-size: 10px; color: #666; margin-top: 10px; text-align: right;">Arrastre un ícono al mapa para posicionar. Doble clic para eliminar. Active el lápiz para dibujar (Solo Oficiales).</div>
-            </div>
-
-            <div id="seccionEstadisticas">
-                <h2 class="section-title"><span>📊</span> PANEL DE MANDO Y ESTADÍSTICAS</h2>
-                <div class="responsive-grid" style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));">
-                    <div class="glass-panel slide-up" style="padding: 40px 20px; text-align: center;">
-                        <div style="font-size: 55px; margin-bottom: 15px; filter: drop-shadow(0 0 10px var(--theme-dim));">🪖</div>
-                        <div style="color: white; font-weight: bold; font-size: 42px; text-shadow: 0 0 20px var(--theme-color);" id="statTotalSoldados">0</div>
-                        <div style="color: var(--theme-color); font-size: 13px; margin-top: 10px; font-weight: bold; letter-spacing: 2px;">TOTAL SOLDADOS ACTIVOS</div>
-                    </div>
-                    <div class="glass-panel slide-up" style="padding: 40px 20px; text-align: center; animation-delay: 0.1s; border-color: rgba(255, 180, 0, 0.2);">
-                        <div style="font-size: 55px; margin-bottom: 15px; filter: drop-shadow(0 0 10px rgba(255,180,0,0.3));">⭐</div>
-                        <div style="color: white; font-weight: bold; font-size: 42px; text-shadow: 0 0 20px var(--alert-amber);" id="statTotalOficiales">0</div>
-                        <div style="color: var(--alert-amber); font-size: 13px; margin-top: 10px; font-weight: bold; letter-spacing: 2px;">OFICIALES AL MANDO</div>
-                    </div>
-                    <div class="glass-panel slide-up" style="padding: 40px 20px; text-align: center; animation-delay: 0.2s; border-color: rgba(77, 144, 242, 0.2);">
-                        <div style="font-size: 55px; margin-bottom: 15px; filter: drop-shadow(0 0 10px rgba(77,144,242,0.3));">✈️</div>
-                        <div style="color: white; font-weight: bold; font-size: 42px; text-shadow: 0 0 20px var(--admin-blue);" id="statTotalAeronaves">0</div>
-                        <div style="color: var(--admin-blue); font-size: 13px; margin-top: 10px; font-weight: bold; letter-spacing: 2px;">AERONAVES EN FLOTA</div>
-                    </div>
-                </div>
-            </div>
-
-            <div id="seccionLicencias">
-                <h2 class="section-title"><span>🪪</span> GESTIÓN DE LICENCIAS TÁCTICAS</h2>
-                <div class="glass-panel" style="padding: 25px; border-color: var(--admin-blue); margin-bottom: 30px; display: none;" id="panelAdminLicencias">
-                    <h4 style="margin-top:0; color:var(--admin-blue); font-size:16px;">OTORGAR / MODIFICAR LICENCIAS (PANEL OFICIALES)</h4>
-                    <div class="admin-grid" style="grid-template-columns: 1fr 1fr 1fr auto;">
-                        <select id="targetSoldadoLicencia" class="auth-input" style="margin:0;"></select>
-                        <select id="tipoLicencia" class="auth-input" style="margin:0;">
-                            <option value="piloto">Licencia de Piloto</option>
-                            <option value="comando">Licencia de Comando</option>
-                            <option value="armamento">Licencia de Armamento</option>
-                        </select>
-                        <select id="estadoLicencia" class="auth-input" style="margin:0;">
-                            <option value="Activa">Activa</option>
-                            <option value="Suspendida">Suspendida</option>
-                            <option value="Revocada">Revocada</option>
-                            <option value="Ninguna">Eliminar Licencia</option>
-                        </select>
-                        <button onclick="actualizarLicencia()" class="btn-tactical" style="background: var(--admin-blue); color: black; border:none;">ACTUALIZAR</button>
-                    </div>
-                </div>
-                <div id="listaUsuariosLicencias" class="responsive-grid"></div>
-            </div>
-
-            <div id="seccionReclutamiento">
-                <h2 class="section-title"><span>📝</span> DEPARTAMENTO DE RECLUTAMIENTO</h2>
-                <div class="glass-panel" style="padding: 25px; border-color: var(--admin-blue); margin-bottom: 30px;">
-                    <h4 style="margin-top:0; color:var(--admin-blue); font-size:16px;">REGISTRAR NUEVO POSTULANTE</h4>
-                    <div class="form-grid" style="grid-template-columns: 1fr 1fr;">
-                        <input type="text" id="recNombre" class="auth-input" placeholder="NOMBRE COMPLETO DEL POSTULANTE" style="margin:0;">
-                        <select id="recDivision" class="auth-input" style="margin:0;">
-                            <option value="EJÉRCITO">EJÉRCITO</option>
-                            <option value="FACH">FACH</option>
-                            <option value="ARMADA">ARMADA</option>
-                            <option value="BOE">BOE</option>
-                        </select>
-                    </div>
-                    <textarea id="recNotas" class="auth-input" rows="2" placeholder="NOTAS DE ENTREVISTA / EXPERIENCIA PREVIA..." style="margin: 15px 0;"></textarea>
-                    <button onclick="registrarPostulante()" class="btn-tactical" style="background: var(--admin-blue); color: black; width: 100%; border:none;">INGRESAR A BASE DE DATOS DE EVALUACIÓN</button>
-                </div>
-                <h3 style="color: var(--alert-amber); margin-top: 20px; font-weight:normal; letter-spacing:1px;">POSTULACIONES PENDIENTES DE EVALUACIÓN</h3>
-                <div id="listaPostulantes" style="display: grid; grid-template-columns: 1fr; gap: 15px;"></div>
-            </div>
-
-            <div id="seccionFach">
-                <h2 class="section-title"><span>✈️</span> RED AERONÁUTICA - FACH</h2>
-                <div class="fach-layout" style="display: grid; grid-template-columns: 350px 1fr; gap: 20px; height: 85vh;">
-                    <div class="pilot-container glass-panel" style="padding: 15px; overflow-y: auto;">
-                        <div style="font-size: 12px; color: var(--alert-amber); padding-bottom: 10px; border-bottom: 1px solid var(--glass-border); margin-bottom: 20px; letter-spacing:1px;">▶ CONTACTOS ACTIVOS IDENTIFICADOS</div>
-                        <div style="font-size: 10px; color: #888; margin-bottom: 15px; letter-spacing:2px;">— PILOTOS COMANDANTES —</div><div id="listaComandante"></div>
-                        <div style="font-size: 10px; color: #888; margin: 25px 0 15px; letter-spacing:2px;">— PILOTOS INSTRUCTORES —</div><div id="listaInstructor"></div>
-                        <div style="font-size: 10px; color: #888; margin: 25px 0 15px; letter-spacing:2px;">— CADETES DE VUELO —</div><div id="listaCadete"></div>
-                    </div>
-                    <div class="flight-display glass-panel" id="mainDisplayFach" style="display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative;">
-                        <div class="radar-realista" style="width: 280px; height: 280px; margin-bottom: 40px; box-shadow: 0 0 40px rgba(0,229,255,0.1);">
-                            <div class="radar-sweep"></div>
-                            <div class="blip" style="top: 20%; left: 30%; animation-delay: 0.1s;"></div>
-                            <div class="blip" style="top: 80%; left: 70%; animation-delay: 1.5s;"></div>
-                            <div class="blip" style="top: 40%; left: 80%; animation-delay: 0.8s;"></div>
-                        </div>
-                        <div id="vPilot" style="font-size: 36px; color: white; letter-spacing: 4px; text-align: center; text-shadow: 0 0 15px var(--theme-dim);">SISTEMA EN ESPERA</div>
-                        <div id="vUnit" style="color: var(--theme-color); font-size: 20px; margin-top: 15px; border: 1px solid var(--theme-dim); padding: 8px 30px; background: rgba(0,229,255,0.05); border-radius: 6px;">SELECCIONE CONTACTO EN RED</div>
-                    </div>
-                </div>
-            </div>
-
-            <div id="seccionHangar">
-                <h2 class="section-title"><span>✈️</span> FLOTA AÉREA NACIONAL</h2>
-                <div id="listaHangarAereo" class="hangar-grid-new" style="margin-bottom: 50px;"></div>
-                <h2 class="section-title"><span>🚙</span> SISTEMA DE VEHÍCULOS TERRESTRES</h2>
-                <div id="listaHangarTerrestre" class="hangar-grid-new"></div>
-            </div>
-
-            <div id="seccionMisiones">
-                <h2 class="section-title"><span>🎯</span> ESTADO DE OPERACIONES ACTIVAS</h2>
-                <div id="listaMisiones" class="responsive-grid"></div>
-
-                <h2 class="section-title" style="margin-top: 50px; color: #888; border-color: #333;"><span>🗂️</span> HISTORIAL DE OPERACIONES PASADAS</h2>
-                <div id="listaHistorialMisiones" class="responsive-grid"></div>
-            </div>
-
-            <div id="seccionDocumentos">
-                <h2 class="section-title"><span>🗃️</span> INTELIGENCIA Y DOCUMENTOS CLASIFICADOS</h2>
-                <div class="glass-panel" id="panelSubirDoc" style="padding: 30px; border-color: var(--admin-blue); margin-bottom: 30px; display: none;">
-                    <h4 style="margin-top:0; color:var(--admin-blue); font-size:16px;">SUBIR NUEVO REPORTE O LEY TÁCTICA</h4>
-                    <div class="form-grid" style="grid-template-columns: 1fr 3fr;">
-                        <select id="docTipo" class="auth-input" style="margin:0;"><option value="REPORTE">REPORTE</option><option value="ORDEN">ORDEN TÁCTICA</option></select>
-                        <input type="text" id="docTitulo" class="auth-input" placeholder="TÍTULO DEL DOCUMENTO..." style="margin:0;">
-                    </div>
-                    <textarea id="docContenido" class="auth-input" rows="5" placeholder="REDACCIÓN DEL CONTENIDO CLASIFICADO..."></textarea>
-                    <button onclick="subirDocumento()" class="btn-tactical" style="background: var(--admin-blue); color: black; border:none;">ALMACENAR EN LA RED SECRETA</button>
-                </div>
-                <div id="listaDocumentos" style="display: grid; grid-template-columns: 1fr; gap: 15px;"></div>
-            </div>
-
-            <div id="seccionLogs">
-                <h2 class="section-title"><span>🧑‍💻</span> REGISTROS DEL SISTEMA (LOGS)</h2>
-                <div class="glass-panel" style="padding: 25px; height: 65vh; overflow-y: auto;" id="listaLogsContainer"></div>
-            </div>
-        </div>
-    </div> 
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, getDocs, addDoc, serverTimestamp, query, orderBy, limit, arrayUnion, onSnapshot, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-    const firebaseConfig = { apiKey: "AIzaSyBYfZSISbpVShSfEA70vY1bANiyy40uVP4", authDomain: "panel-chile.firebaseapp.com", projectId: "panel-chile", storageBucket: "panel-chile.firebasestorage.app", messagingSenderId: "124864601883", appId: "1:124864601883:web:839163be2060253f68bdbe" };
-    const app = initializeApp(firebaseConfig); const auth = getAuth(app); const db = getFirestore(app);
-
-    const RANGOS = ["Cabo 2°", "Cabo 1°", "Sargento 2°", "Sargento 1°", "Suboficial", "Suboficial Mayor", "Subteniente", "Teniente", "Capitán", "Mayor", "Teniente Coronel", "Coronel", "General de Brigada", "General de División", "General en Jefe"];
-    const OFICIALES = ["Subteniente", "Teniente", "Capitán", "Mayor", "Teniente Coronel", "Coronel", "General de Brigada", "General de División", "General en Jefe"];
-
-    const FLOTA_AEREA = [
-        { id: "F-22 Raptor", cant: 5, img: "f22.jpg" },
-        { id: "F-16 Falcon", cant: 1, img: "f16.jpg" },
-        { id: "C-130 Hércules", cant: 1, img: "AC130.jpg" },
-        { id: "UH-60 Black Hawk", cant: 3, img: "blackhawk.jpg" },
-        { id: "CH-47 Chinook", cant: 1, img: "chinook.jpg" },
-        { id: "AH-1 Cobra", cant: 1, img: "ah1.jpg" }
-    ];
-
-    const FLOTA_TERRESTRE = [
-        { id: "Carros Ligeros Blindados", cant: 2, img: "tanqueta.jpg" },
-        { id: "Leopard 2A4", cant: 2, img: "tanque.jpeg" },
-        { id: "M113", cant: 2, img: "m113.jpeg" },
-        { id: "Blindados de Transporte", cant: 2, img: "transporte.jpg" },
-        { id: "Vehículo de Recon. Toyota", cant: 4, img: "toyota.jpg" },
-        { id: "Humvee Táctico", cant: 7, img: "humvee.jpg" },
-        { id: "Lanza misiles", cant: 1, img: "lanzamisiles.jpg" }
-    ];
-
-    window.currentUserEmail = null; window.currentUserName = "Desconocido"; window.currentUserRank = ""; window.isAdmin = false; window.isObserver = false;
-    window.perfilActualEmail = ""; 
-    let windowUsersData = {};
-    window.cachedLogs = [];
-
-    // OPTIMIZACIÓN: CACHÉ DEL DOM (VIRTUAL DOM)
-    // Esto evita que el navegador recalcule todo el layout si el HTML no ha cambiado
-    const domCache = {};
-    const updateDOM = (id, newHTML) => {
-        if (domCache[id] !== newHTML) {
-            const el = document.getElementById(id);
-            if (el) {
-                el.innerHTML = newHTML;
-                domCache[id] = newHTML;
-            }
-        }
-    };
-
-    const sndHover = document.getElementById("sndHover"); const sndClick = document.getElementById("sndClick"); const sndAlert = document.getElementById("sndAlert"); const sndError = document.getElementById("sndError"); const sndStartup = document.getElementById("sndStartup");
-    window.playHover = () => { sndHover.currentTime = 0; sndHover.play().catch(()=>{}); };
-    window.playClick = () => { sndClick.currentTime = 0; sndClick.play().catch(()=>{}); };
-
-    window.showToast = (msg, type = "error") => {
-        const container = document.getElementById("toastContainer");
-        const toast = document.createElement("div");
-        toast.className = `toast toast-${type}`;
-        toast.innerHTML = type === 'error' ? `🛑 <span>${msg}</span>` : `✅ <span>${msg}</span>`;
-        container.appendChild(toast);
-        if(type === 'error') { sndError.currentTime = 0; sndError.play().catch(()=>{}); }
-        setTimeout(() => { toast.style.animation = "fadeOut 0.4s forwards"; setTimeout(() => toast.remove(), 400); }, 3000);
-    };
-
-    // OPTIMIZACIÓN DEL RELOJ: Se reduce la actualización del DOM usando el caché
-    setInterval(() => {
-        const now = new Date();
-        updateDOM('relojLocal', now.toLocaleTimeString('es-CL', { hour12: false }));
-        updateDOM('relojZulu', now.toISOString().substr(11, 8) + " ZULU");
-    }, 1000);
-
-    let crtOn = false;
-    window.toggleCRT = () => {
-        window.playClick();
-        crtOn = !crtOn;
-        const btn = document.getElementById("btnCRTToggle");
-        if(crtOn) {
-            document.body.classList.add("crt-on");
-            btn.innerHTML = "<span>📺</span> Filtro CRT: <strong style='color:#4df24d; margin-left:5px;'>ON</strong>";
-            btn.classList.add("active");
-        } else {
-            document.body.classList.remove("crt-on");
-            btn.innerHTML = "<span>📺</span> Filtro CRT: <strong style='color:var(--danger-red); margin-left:5px;'>OFF</strong>";
-            btn.classList.remove("active");
-        }
-    };
-
-    window.toggleNotas = () => {
-        window.playClick();
-        const panel = document.getElementById("panelNotasWidget");
-        panel.style.display = panel.style.display === "flex" ? "none" : "flex";
-    };
-
-    window.guardarNotas = async () => {
-        window.playClick();
-        const txt = document.getElementById("textoNotas").value;
-        try {
-            await updateDoc(doc(db, "usuarios", window.currentUserEmail), { notasPersonales: txt });
-            window.showToast("NOTAS GUARDADAS EN SISTEMA CLASIFICADO", "success");
-        } catch(e) { window.showToast("ERROR AL GUARDAR NOTAS", "error"); }
-    };
-
-    function generarGibberish(len) {
-        const chars = "%&$#@!?/\\*+=<>~ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-        let res = "";
-        for(let i=0; i<len; i++) res += chars.charAt(Math.floor(Math.random() * chars.length));
-        return res;
-    }
-
-    window.descifrarTexto = (btn) => {
-        window.playClick();
-        const container = btn.parentElement;
-        const rawText = container.querySelector('.raw-text').value;
-        const outputDiv = container.querySelector('.contenido-descifrado');
-        
-        btn.style.display = 'none';
-        outputDiv.style.display = 'block';
-        outputDiv.innerHTML = '';
-        
-        let i = 0;
-        const sndType = document.getElementById("sndTypewriter");
-        sndType.volume = 0.4;
-        sndType.play().catch(()=>{});
-        
-        const typeInterval = setInterval(() => {
-            if(i < rawText.length) {
-                outputDiv.innerHTML += rawText.charAt(i);
-                i++;
-            } else {
-                clearInterval(typeInterval);
-                sndType.pause();
-                sndType.currentTime = 0;
-            }
-        }, 15);
-    };
-
-    window.descifrarRadiograma = async (id, btn, realMsg) => {
-        window.playClick();
-        const container = btn.parentElement.querySelector('.msg-content');
-        btn.style.display = 'none';
-        
-        const sndType = document.getElementById("sndTypewriter");
-        sndType.volume = 0.4;
-        sndType.play().catch(()=>{});
-
-        let iter = 0;
-        let maxIter = 15;
-        let interval = setInterval(async () => {
-            iter++;
-            container.innerText = generarGibberish(realMsg.length);
-            container.classList.add("encrypted-text");
-            if(iter >= maxIter) {
-                clearInterval(interval);
-                container.innerText = realMsg;
-                container.classList.remove("encrypted-text");
-                sndType.pause();
-                sndType.currentTime = 0;
-                await updateDoc(doc(db, "radiogramas", id), { leido: true });
-            }
-        }, 60);
-    };
-
-    let isLoginMode = true;
-   // NUEVA FUNCION DE CAMBIO DE MODOS (LOGIN / REGISTRO)
-    window.setAuthMode = (mode) => {
-        window.playClick();
-        const tabIngresar = document.getElementById('tabIngresar');
-        const tabEnlistarse = document.getElementById('tabEnlistarse');
-        const boxNombre = document.getElementById('boxNombre');
-        const boxPais = document.getElementById('boxPais');
-        const boxEdad = document.getElementById('boxEdad');
-        const btnReg = document.getElementById('btnRegisterAction');
-        const btnLog = document.getElementById('btnLoginAction');
-        const titleMain = document.getElementById('authTitleMain');
-        const subtitle = document.getElementById('authSubtitle');
-        const footerWrap = document.getElementById('authFooterWrap');
-
-        if (mode === 'register') {
-            tabEnlistarse.classList.add('active');
-            tabIngresar.classList.remove('active');
-            boxNombre.style.display = 'block';
-            boxPais.style.display = 'block';
-            boxEdad.style.display = 'block';
-            btnReg.style.display = 'block';
-            btnLog.style.display = 'none';
-            titleMain.innerText = 'ENLISTARSE EN';
-            subtitle.innerText = '// REGÍSTRATE PARA DEFENDER LA PATRIA EN EL SERVIDOR MTA';
-            footerWrap.style.display = 'block';
-        } else {
-            tabIngresar.classList.add('active');
-            tabEnlistarse.classList.remove('active');
-            boxNombre.style.display = 'none';
-            boxPais.style.display = 'none';
-            boxEdad.style.display = 'none';
-            btnReg.style.display = 'none';
-            btnLog.style.display = 'block';
-            titleMain.innerText = 'SISTEMA DE MANDO';
-            subtitle.innerText = '// INGRESA TUS CREDENCIALES CLASIFICADAS';
-            footerWrap.style.display = 'none';
-        }
-    };
-    window.login = async () => { window.playClick(); const e = document.getElementById("userEmail").value; const p = document.getElementById("userPass").value; try { await signInWithEmailAndPassword(auth, e, p); registrarLog("INGRESO SISTEMA", `El correo ${e} inició conexión táctica.`); } catch { window.showToast("CREDENCIALES INVÁLIDAS", "error"); } };
-
-    window.register = async () => {
-        window.playClick();
-        const n = document.getElementById("regNombre").value.trim(); const e = document.getElementById("userEmail").value.trim(); const p = document.getElementById("userPass").value;
-        if (!n || !e || !p) return window.showToast("COMPLETE TODOS LOS CAMPOS PARA REGISTRO", "error");
-        try {
-            await createUserWithEmailAndPassword(auth, e, p);
-            await setDoc(doc(db, "usuarios", e), { 
-                nombre: n, 
-                rango: "Cabo 2°", 
-                division: "EJÉRCITO", 
-                especialidad: "Infantería", 
-                calTiro: "Básico",
-                calFisico: "Regular",
-                calPsico: "Observación",
-                estado: "ACTIVO", 
-                fechaCreacion: new Date().toLocaleDateString('es-CL'), 
-                sanciones: [], 
-                licencias: {}, 
-                misionActiva: null, 
-                aeronave: null,
-                notasPersonales: "",
-                escuadron: "base",
-                liderEscuadron: false
-            });
-            registrarLog("NUEVO INGRESO", `El soldado ${n} (${e}) ha sido registrado y dado de alta.`); window.showToast("EXPEDIENTE CREADO. BIENVENIDO AL SISTEMA.", "success");
-        } catch (error) { window.showToast("ERROR AL REGISTRAR: Verifica formato o clave.", "error"); }
-    };
-
-    let currentDefcon = 5;
-    window.intentarCambioDefcon = () => {
-        window.playClick();
-        const miIndice = RANGOS.indexOf(window.currentUserRank);
-        const indRequerido = RANGOS.indexOf("Teniente Coronel");
-        if (window.isAdmin || (miIndice >= indRequerido && !window.isObserver)) {
-            ejecutarCambioDefcon();
-        } else {
-            window.showToast("ACCESO DENEGADO. Rango insuficiente o Rol Observador.", "error");
-        }
-    };
-
-    function ejecutarCambioDefcon() {
-        currentDefcon--; if (currentDefcon < 1) currentDefcon = 5;
-        document.body.className = document.body.className.replace(/defcon-\d/g, '').trim(); document.body.classList.add(`defcon-${currentDefcon}`); document.getElementById('btnDefcon').innerHTML = `<span>🚨</span> NIVEL DEFCON ${currentDefcon}`;
-        if (currentDefcon === 1) { sndAlert.play(); registrarLog("ALERTA DEFCON", "Nivel máximo activado (DEFCON 1)."); } else { sndAlert.pause(); sndAlert.currentTime = 0; registrarLog("ESTADO DEFCON", `Cambio a DEFCON ${currentDefcon}.`); } window.showToast(`ESTADO DEFCON ACTUALIZADO A NIVEL ${currentDefcon}`, "success");
-    }
-
-    window.abrirAdminAuth = () => { window.playClick(); document.getElementById("modalAdminAuth").style.display = "flex"; document.getElementById("adminPassInput").value = ""; document.getElementById("adminPassInput").focus(); };
-    window.cerrarAdminAuth = () => { window.playClick(); document.getElementById("modalAdminAuth").style.display = "none"; };
-    window.verificarAdminAuth = () => { window.playClick(); if(document.getElementById("adminPassInput").value === "CHILE2026") { document.getElementById("modalAdminAuth").style.display = "none"; document.getElementById("adminTools").style.display = "block"; window.showToast("AUTENTICACIÓN EXITOSA. Protocolos desbloqueados.", "success"); } else { window.showToast("CÓDIGO DE AUTORIDAD INVÁLIDO.", "error"); } };
-
-    window.enviarSolicitud = async () => {
-        window.playClick();
-        const tipo = document.getElementById("solTipo").value;
-        const detalle = document.getElementById("solDetalle").value;
-        if(!detalle) return window.showToast("DEBE JUSTIFICAR SU SOLICITUD EN EL RECUADRO", "error");
-
-        try {
-            await addDoc(collection(db, "solicitudes"), { autor: window.currentUserName, email: window.currentUserEmail, rango: window.currentUserRank, tipo: tipo, detalle: detalle, estado: "Pendiente", fecha: new Date().toLocaleString('es-CL'), timestamp: serverTimestamp() });
-            registrarLog("NUEVA SOLICITUD", `Envió una petición formal de ${tipo}.`);
-            window.showToast("SOLICITUD ENVIADA AL MANDO", "success");
-            document.getElementById("solDetalle").value = "";
-            cargarSolicitudes();
-        } catch(e) { window.showToast("ERROR AL ENVIAR SOLICITUD", "error"); }
-    };
-
-    window.enviarDenuncia = async () => {
-        window.playClick();
-        const tipo = document.getElementById("denTipo").value;
-        const implicado = document.getElementById("denImplicado").value;
-        const detalle = document.getElementById("denDetalle").value;
-        if(!implicado || !detalle) return window.showToast("COMPLETE TODOS LOS CAMPOS", "error");
-
-        try {
-            await addDoc(collection(db, "asuntos_internos"), { tipo: tipo, implicado: implicado, detalle: detalle, fecha: new Date().toLocaleString('es-CL'), timestamp: serverTimestamp() });
-            registrarLog("ASUNTOS INTERNOS", `Se recibió una nueva denuncia clasificada en el buzón.`);
-            window.showToast("DENUNCIA ENVIADA DE FORMA ANÓNIMA", "success");
-            document.getElementById("denImplicado").value = "";
-            document.getElementById("denDetalle").value = "";
-            cargarDenuncias();
-        } catch(e) { window.showToast("ERROR AL ENVIAR DENUNCIA", "error"); }
-    };
-
-    window.enviarRadiograma = async () => {
-        window.playClick();
-        const texto = document.getElementById("p_radiograma_txt").value;
-        if(!texto || !window.perfilActualEmail) return window.showToast("MENSAJE VACÍO O DESTINATARIO INVÁLIDO", "error");
-        
-        try {
-            await addDoc(collection(db, "radiogramas"), {
-                emisorEmail: window.currentUserEmail,
-                emisorNombre: window.currentUserName,
-                emisorRango: window.currentUserRank,
-                receptorEmail: window.perfilActualEmail,
-                mensaje: texto,
-                leido: false,
-                fecha: new Date().toLocaleString('es-CL'),
-                timestamp: serverTimestamp()
-            });
-            window.showToast("RADIOGRAMA TRANSMITIDO CON ÉXITO", "success");
-            document.getElementById("p_radiograma_txt").value = "";
-            document.getElementById("p_radiograma_form").style.display = "none";
-            document.getElementById("p_radiograma_container").firstElementChild.style.display = "block";
-        } catch(e) { window.showToast("ERROR EN TRANSMISIÓN", "error"); }
-    };
-
-    async function cargarSolicitudes() {
-        const q = query(collection(db, "solicitudes"), orderBy("timestamp", "desc"), limit(30));
-        const snap = await getDocs(q);
-        let count = 0;
-        
-        const isGestor = window.isAdmin || (RANGOS.indexOf(window.currentUserRank) >= RANGOS.indexOf("Mayor") && !window.isObserver);
-        if(isGestor) {
-            const titulo = document.getElementById("tituloGestorSolicitudes");
-            if(titulo) titulo.style.display = "block";
-        }
-
-        let htmlStr = "";
-        snap.forEach(docSnap => {
-            const d = docSnap.data();
-            if (d.email === window.currentUserEmail || isGestor || window.isObserver) {
-                count++;
-                let estadoColor = d.estado === "Aprobada" ? "#4df24d" : (d.estado === "Rechazada" ? "var(--danger-red)" : "var(--alert-amber)");
-                
-                let botones = "";
-                if (isGestor && d.estado === "Pendiente") {
-                    botones = `
-                        <div style="display:flex; gap:10px; margin-top:15px; border-top:1px dashed var(--glass-border); padding-top:10px;">
-                            <button onclick="responderSolicitud('${docSnap.id}', 'Aprobada')" class="btn-tactical" style="background:rgba(77,242,77,0.1); border-color:#4df24d; color:#4df24d; padding: 5px 15px; font-size:11px;">✔️ APROBAR</button>
-                            <button onclick="responderSolicitud('${docSnap.id}', 'Rechazada')" class="btn-tactical" style="background:rgba(218,41,28,0.1); border-color:var(--danger-red); color:var(--danger-red); padding: 5px 15px; font-size:11px;">✖️ RECHAZAR</button>
-                        </div>
-                    `;
-                }
-
-                htmlStr += `
-                    <div class="glass-panel slide-up" style="padding: 20px; border-left: 4px solid ${estadoColor};">
-                        <div style="display:flex; justify-content:space-between; align-items: flex-start;">
-                            <div>
-                                <strong style="color:white; font-size:16px; letter-spacing:1px;">${d.tipo.toUpperCase()}</strong>
-                                <div style="font-size:11px; color:var(--theme-color); font-family:'Share Tech Mono'; margin-top:3px;">DE: ${d.rango} ${d.autor}</div>
-                            </div>
-                            <div style="text-align:right;">
-                                <span style="font-size:10px; font-weight:bold; padding:4px 8px; border-radius:4px; background:rgba(255,255,255,0.05); border:1px solid ${estadoColor}; color:${estadoColor};">${d.estado.toUpperCase()}</span>
-                                <div style="font-size:10px; color:#666; margin-top:5px;">${d.fecha.split(',')[0]}</div>
-                            </div>
-                        </div>
-                        <div style="margin-top:12px; color:#ccc; font-size:13px; line-height: 1.5;">"${d.detalle}"</div>
-                        ${botones}
-                    </div>
-                `;
-            }
-        });
-        
-        const finalHtml = count === 0 ? "<div style='color:#555; font-style:italic; padding: 20px;'>No hay solicitudes en su bandeja de entrada.</div>" : htmlStr;
-        updateDOM("listaSolicitudes", finalHtml);
-    }
-
-    async function cargarDenuncias() {
-        const isAltoMando = window.isAdmin || window.isObserver || (RANGOS.indexOf(window.currentUserRank) >= RANGOS.indexOf("Coronel"));
-        const titulo = document.getElementById("tituloGestorDenuncias");
-        
-        if(isAltoMando) {
-            if(titulo) titulo.style.display = "block";
-            const q = query(collection(db, "asuntos_internos"), orderBy("timestamp", "desc"), limit(30));
-            const snap = await getDocs(q);
-            let htmlStr = ""; let count = 0;
-            
-            snap.forEach(docSnap => {
-                count++;
-                const d = docSnap.data();
-                let btnEliminar = window.isAdmin ? `<button onclick="eliminarDenuncia('${docSnap.id}')" class="btn-tactical" style="margin-top: 15px; font-size: 10px; padding: 4px 10px; background:transparent; border-color:#555; color:#888;">ARCHIVAR / CERRAR CASO</button>` : "";
-                
-                htmlStr += `
-                    <div class="glass-panel slide-up" style="padding: 20px; border-left: 4px solid var(--danger-red);">
-                        <div style="display:flex; justify-content:space-between; align-items: flex-start;">
-                            <div>
-                                <strong style="color:var(--danger-red); font-size:16px; letter-spacing:1px;">[ANÓNIMO] - ${d.tipo.toUpperCase()}</strong>
-                                <div style="font-size:12px; color:white; margin-top:3px;">IMPLICADO: <span style="color:var(--alert-amber); font-weight:bold;">${d.implicado}</span></div>
-                            </div>
-                            <div style="font-size:10px; color:#666;">${d.fecha}</div>
-                        </div>
-                        <div style="margin-top:12px; color:#ccc; font-size:13px; line-height: 1.5; border-top: 1px dashed var(--glass-border); padding-top:10px;">"${d.detalle}"</div>
-                        ${btnEliminar}
-                    </div>
-                `;
-            });
-            
-            const finalHtml = count === 0 ? "<div style='color:#555; font-style:italic; padding: 20px;'>No hay expedientes activos en Asuntos Internos.</div>" : htmlStr;
-            updateDOM("listaDenuncias", finalHtml);
-        } else {
-            if(titulo) titulo.style.display = "none";
-            updateDOM("listaDenuncias", "");
-        }
-    }
-
-    function iniciarSyncRadiogramas() {
-        const q = query(collection(db, "radiogramas"), orderBy("timestamp", "desc"), limit(50));
-        onSnapshot(q, (snap) => {
-            let unread = 0;
-            let htmlStr = "";
-            
-            snap.forEach(docSnap => {
-                const d = docSnap.data();
-                if(d.receptorEmail === window.currentUserEmail) {
-                    if(!d.leido) unread++;
-                    
-                    let bg = d.leido ? "rgba(255,255,255,0.02)" : "rgba(0,229,255,0.1)";
-                    let border = d.leido ? "var(--glass-border)" : "var(--theme-color)";
-                    
-                    let encryptedTxt = d.leido ? d.mensaje : generarGibberish(d.mensaje.length);
-                    let textClass = d.leido ? "" : "encrypted-text";
-                    let btnHtml = d.leido ? "" : `<button onclick="descifrarRadiograma('${docSnap.id}', this, \`${d.mensaje.replace(/'/g, "&#39;").replace(/"/g, "&quot;")}\`)" class="btn-tactical" style="margin-top:15px; font-size:11px; width:100%; border-color:var(--theme-color); color:var(--theme-color);">🔓 INICIAR DESENCRIPTACIÓN DE DATOS</button>`;
-
-                    htmlStr += `
-                        <div class="glass-panel slide-up" style="padding: 20px; border-left: 4px solid ${border}; background: ${bg};">
-                            <div style="display:flex; justify-content:space-between; border-bottom:1px dashed ${border}; padding-bottom:10px; margin-bottom:15px;">
-                                <div>
-                                    <strong style="color:var(--theme-color); font-size:16px; letter-spacing:1px;">TRANSMISIÓN ENTRANTE</strong><br>
-                                    <span style="font-size:11px; color:#aaa; font-family:'Share Tech Mono';">ORIGEN: ${d.emisorRango.toUpperCase()} ${d.emisorNombre.toUpperCase()}</span>
-                                </div>
-                                <div style="font-size:10px; color:#888;">${d.fecha}</div>
-                            </div>
-                            <div class="msg-content ${textClass}" style="font-family:'Share Tech Mono'; color:#ddd; font-size:14px; line-height:1.6; word-wrap: break-word;">${encryptedTxt}</div>
-                            ${btnHtml}
-                        </div>
-                    `;
-                }
-            });
-            
-            const finalHtml = htmlStr === "" ? "<div style='color:#555; font-style:italic; padding: 20px; text-align:center; grid-column:1/-1;'>BANDEJA DE ENTRADA VACÍA. NO HAY TRANSMISIONES ACTIVAS.</div>" : htmlStr;
-            updateDOM("listaRadiogramas", finalHtml);
-            
-            const badge = document.getElementById("badgeRadiogramas");
-            if(badge) {
-                if(unread > 0) {
-                    badge.style.display = "inline-block";
-                    badge.innerText = `[${unread} NUEVO]`;
-                    sndAlert.volume = 0.2; 
-                } else {
-                    badge.style.display = "none";
-                }
-            }
-        });
-    }
-
-    window.responderSolicitud = async (id, estado) => {
-        window.playClick();
-        try {
-            await updateDoc(doc(db, "solicitudes", id), { estado: estado });
-            registrarLog("RESOLUCIÓN TÁCTICA", `Marcó una solicitud como ${estado}.`);
-            window.showToast(`SOLICITUD ${estado.toUpperCase()}`, estado === 'Aprobada' ? 'success' : 'error');
-            cargarSolicitudes();
-        } catch(e) { window.showToast("ERROR AL RESPONDER", "error"); }
-    };
-
-    window.eliminarDenuncia = async (id) => {
-        window.playClick();
-        try {
-            await deleteDoc(doc(db, "asuntos_internos", id));
-            window.showToast("EXPEDIENTE ARCHIVADO Y DESTRUIDO", "success");
-            cargarDenuncias();
-        } catch(e) { window.showToast("ERROR AL ARCHIVAR", "error"); }
-    }
-
-    window.publicarComunicado = async () => {
-        window.playClick();
-        const tipo = document.getElementById("comTipo").value;
-        const titulo = document.getElementById("comTitulo").value;
-        const contenido = document.getElementById("comContenido").value;
-
-        if(!titulo || !contenido) return window.showToast("COMPLETE TODOS LOS CAMPOS", "error");
-
-        try {
-            await addDoc(collection(db, "comunicados"), {
-                tipo: tipo,
-                titulo: titulo,
-                contenido: contenido,
-                autor: window.currentUserName,
-                rangoAutor: window.currentUserRank,
-                fecha: new Date().toLocaleString('es-CL'),
-                timestamp: serverTimestamp()
-            });
-            registrarLog("NUEVO COMUNICADO", `Emitió un comunicado tipo ${tipo}: ${titulo}`);
-            window.showToast("COMUNICADO PUBLICADO CON ÉXITO", "success");
-            document.getElementById("comTitulo").value = "";
-            document.getElementById("comContenido").value = "";
-            cargarComunicados();
-        } catch(e) { window.showToast("ERROR AL PUBLICAR COMUNICADO", "error"); }
-    };
-
-    async function cargarComunicados() {
-        const q = query(collection(db, "comunicados"), orderBy("timestamp", "desc"), limit(30));
-        const snap = await getDocs(q);
-        let count = 0;
-
-        let htmlStr = "";
-        snap.forEach(docSnap => {
-            count++;
-            const d = docSnap.data();
-            let borderColor = "var(--theme-color)";
-            if(d.tipo === "Ascenso") borderColor = "#4df24d";
-            if(d.tipo === "Aviso") borderColor = "var(--danger-red)";
-            if(d.tipo === "Evento") borderColor = "var(--admin-blue)";
-
-            htmlStr += `
-                <div class="glass-panel slide-up" style="padding: 20px; border-left: 4px solid ${borderColor};">
-                    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 10px;">
-                        <div>
-                            <span style="font-size:10px; padding:3px 8px; border-radius:4px; background:rgba(255,255,255,0.1); color:${borderColor}; font-weight:bold; letter-spacing:1px; margin-bottom:8px; display:inline-block;">${d.tipo.toUpperCase()}</span>
-                            <h3 style="margin:0; color:white; font-size:20px; letter-spacing:1px;">${d.titulo}</h3>
-                        </div>
-                        <div style="text-align:right;">
-                            <div style="font-size:11px; color:#aaa; font-family:'Share Tech Mono';">${d.fecha}</div>
-                            <div style="font-size:11px; color:var(--alert-amber); margin-top:4px;">EMITIDO POR: ${d.rangoAutor} ${d.autor}</div>
-                        </div>
-                    </div>
-                    <button onclick="descifrarTexto(this)" class="btn-tactical" style="margin-top: 15px; font-size: 11px; padding: 6px 15px; border-color:${borderColor}; color:${borderColor};">📡 RECIBIR TRANSMISIÓN</button>
-                    <div class="contenido-descifrado" style="color:#ddd; font-size:14px; line-height:1.6; border-top:1px dashed var(--glass-border); padding-top:12px; display:none; white-space: pre-wrap; margin-top: 15px;"></div>
-                    <textarea class="raw-text" style="display:none;">${d.contenido.replace(/'/g, "&#39;").replace(/"/g, "&quot;")}</textarea>
-                </div>
-            `;
-        });
-
-        const finalHtml = count === 0 ? "<div style='color:#555; font-style:italic; padding: 20px; text-align:center;'>No hay comunicados recientes en la red.</div>" : htmlStr;
-        updateDOM("listaComunicados", finalHtml);
-    }
-
-    window.switchTab = (tab) => {
-        window.playClick();
-        ["seccionPersonal", "seccionEstadisticas", "seccionFach", "seccionMisiones", "seccionHangar", "seccionDocumentos", "seccionLogs", "seccionLicencias", "seccionReclutamiento", "seccionMapa", "seccionCalendario", "seccionComunicados", "seccionSolicitudes", "seccionAsuntosInternos", "seccionRadiogramas", "seccionEscuadrones"].forEach(id => {
-            const el = document.getElementById(id); if(el) { el.style.display = 'none'; el.classList.remove('fade-in'); }
-        });
-        document.querySelectorAll('.menu-item').forEach(el => el.classList.remove('active'));
-        
-        let targetId = "seccionPersonal"; let btnId = "btnPersonal";
-        if(tab === 'radiogramas') { targetId = 'seccionRadiogramas'; btnId = 'btnRadiogramas'; }
-        if(tab === 'solicitudes') { targetId = 'seccionSolicitudes'; btnId = 'btnSolicitudes'; }
-        if(tab === 'comunicados') { targetId = 'seccionComunicados'; btnId = 'btnComunicados'; }
-        if(tab === 'estadisticas') { targetId = 'seccionEstadisticas'; btnId = 'btnEstadisticas'; }
-        if(tab === 'fach') { targetId = 'seccionFach'; btnId = 'btnFach'; }
-        if(tab === 'misiones') { targetId = 'seccionMisiones'; btnId = 'btnMisiones'; }
-        if(tab === 'hangar') { targetId = 'seccionHangar'; btnId = 'btnHangar'; }
-        if(tab === 'documentos') { targetId = 'seccionDocumentos'; btnId = 'btnDocumentos'; }
-        if(tab === 'logs') { targetId = 'seccionLogs'; btnId = 'btnLogs'; }
-        if(tab === 'licencias') { targetId = 'seccionLicencias'; btnId = 'btnLicencias'; }
-        if(tab === 'reclutamiento') { targetId = 'seccionReclutamiento'; btnId = 'btnReclutamiento'; cargarReclutamiento(); }
-        if(tab === 'mapa') { targetId = 'seccionMapa'; btnId = 'btnMapa'; }
-        if(tab === 'calendario') { targetId = 'seccionCalendario'; btnId = 'btnCalendario'; }
-        if(tab === 'asuntos') { targetId = 'seccionAsuntosInternos'; btnId = 'btnAsuntosInternos'; cargarDenuncias(); }
-        if(tab === 'escuadrones') { targetId = 'seccionEscuadrones'; btnId = 'btnEscuadrones'; }
-        
-        const targetEl = document.getElementById(targetId);
-        if(targetEl) {
-            targetEl.style.display = 'block';
-            void targetEl.offsetWidth; 
-            targetEl.classList.add('fade-in');
-        }
-        const targetBtn = document.getElementById(btnId);
-        if(targetBtn) targetBtn.classList.add('active');
-    };
-
-    window.cambiarClima = async () => {
-        window.playClick();
-        const time = document.getElementById('mapTime').value;
-        const weather = document.getElementById('mapWeather').value;
-        await setDoc(doc(db, "mapa_config", "estado"), { time: time, weather: weather, timestamp: serverTimestamp() });
-        registrarLog("SISTEMA SATELITAL", `Cambió las condiciones del mapa a ${time.toUpperCase()} / ${weather.toUpperCase()}.`);
-    };
-
-    function iniciarSyncClima() {
-        onSnapshot(doc(db, "mapa_config", "estado"), (docSnap) => {
-            if(docSnap.exists()) {
-                const data = docSnap.data();
-                aplicarFiltrosClima(data.time, data.weather);
-                const pTime = document.getElementById('mapTime');
-                const pWeather = document.getElementById('mapWeather');
-                if(pTime) pTime.value = data.time;
-                if(pWeather) pWeather.value = data.weather;
-            }
-        });
-    }
-
-    function aplicarFiltrosClima(time, weather) {
-        const bg = document.querySelector('.map-bg');
-        const overlay = document.getElementById('mapWeatherOverlay');
-        if(!bg || !overlay) return;
-
-        let filter = ""; let overlayCss = ""; let overlayOp = 0; let overlayVis = "hidden";
-
-        if (time === 'noche') filter += "brightness(0.3) sepia(0.4) hue-rotate(180deg) ";
-        else filter += "brightness(0.9) ";
-
-        if (weather === 'lluvia') {
-            filter += "grayscale(0.4) blur(1px) ";
-            overlayCss = "repeating-linear-gradient(160deg, transparent, transparent 15px, rgba(255,255,255,0.2) 15px, rgba(255,255,255,0.2) 16px)";
-            overlayOp = time === 'noche' ? 0.3 : 0.6;
-            overlayVis = "visible";
-        } else if (weather === 'tormenta') {
-            filter += "sepia(0.8) hue-rotate(-15deg) contrast(0.8) blur(1px) ";
-            overlayCss = "rgba(194, 178, 128, 0.5)";
-            overlayOp = 1;
-            overlayVis = "visible";
-        }
-
-        // OPTIMIZACIÓN: Si el clima es normal, apagamos por completo la capa
-        bg.style.filter = filter.trim() || "none";
-        overlay.style.background = overlayCss || "transparent";
-        overlay.style.opacity = overlayOp;
-        overlay.style.visibility = overlayVis;
-    }
-
-    let isDrawingModeActive = false;
-    window.toggleDrawMode = () => {
-        window.playClick();
-        isDrawingModeActive = !isDrawingModeActive;
-        const btn = document.getElementById("btnDrawToggle");
-        const canvas = document.getElementById("mapCanvas");
-        if(isDrawingModeActive) {
-            btn.style.background = "var(--theme-color)";
-            btn.style.color = "#000";
-            canvas.style.pointerEvents = "auto";
-            canvas.style.cursor = "crosshair";
-            window.showToast("LÁPIZ TÁCTICO ACTIVADO", "success");
-        } else {
-            btn.style.background = "transparent";
-            btn.style.color = "white";
-            canvas.style.pointerEvents = "none";
-            window.showToast("LÁPIZ TÁCTICO DESACTIVADO", "error");
-        }
-    };
-
-    function inicializarPizarra() {
-        const mapCanvas = document.getElementById('mapCanvas');
-        if(!mapCanvas) return;
-        const ctx = mapCanvas.getContext('2d');
-        let isDrawing = false;
-        let currentStroke = [];
-
-        const getCoords = (e) => {
-            const rect = mapCanvas.getBoundingClientRect();
-            const scaleX = mapCanvas.width / rect.width;
-            const scaleY = mapCanvas.height / rect.height;
-            let clientX = e.clientX; let clientY = e.clientY;
-            if(e.touches && e.touches.length > 0) { clientX = e.touches[0].clientX; clientY = e.touches[0].clientY; }
-            return { x: (clientX - rect.left) * scaleX, y: (clientY - rect.top) * scaleY };
-        };
-
-        const startDraw = (e) => {
-            if (!isDrawingModeActive) return;
-            isDrawing = true;
-            const coords = getCoords(e);
-            currentStroke = [coords];
-            ctx.beginPath();
-            ctx.moveTo(coords.x, coords.y);
-        };
-
-        const draw = (e) => {
-            if (!isDrawing || !isDrawingModeActive) return;
-            e.preventDefault(); 
-            const coords = getCoords(e);
-            currentStroke.push(coords);
-            ctx.lineTo(coords.x, coords.y);
-            ctx.strokeStyle = document.getElementById("drawColorPicker").value;
-            ctx.lineWidth = 4;
-            ctx.lineCap = 'round';
-            ctx.lineJoin = 'round';
-            ctx.stroke();
-        };
-
-        const stopDraw = async () => {
-            if (!isDrawing) return;
-            isDrawing = false;
-            if (currentStroke.length > 1) {
-                try {
-                    await addDoc(collection(db, "mapa_dibujos"), {
-                        color: document.getElementById("drawColorPicker").value,
-                        points: currentStroke,
-                        timestamp: serverTimestamp()
-                    });
-                } catch(err) { console.error("Error al guardar trazo:", err); }
-            }
-            currentStroke = [];
-        };
-
-        mapCanvas.addEventListener('mousedown', startDraw);
-        mapCanvas.addEventListener('mousemove', draw);
-        mapCanvas.addEventListener('mouseup', stopDraw);
-        mapCanvas.addEventListener('mouseleave', () => { if (isDrawing) stopDraw(); });
-
-        mapCanvas.addEventListener('touchstart', startDraw, {passive: false});
-        mapCanvas.addEventListener('touchmove', draw, {passive: false});
-        mapCanvas.addEventListener('touchend', stopDraw);
-    }
-
-    function iniciarSyncDibujos() {
-        onSnapshot(collection(db, "mapa_dibujos"), (snapshot) => {
-            const canvas = document.getElementById('mapCanvas');
-            if(!canvas) return;
-            const ctx = canvas.getContext('2d');
-            ctx.clearRect(0, 0, canvas.width, canvas.height); 
-            
-            snapshot.forEach((docSnap) => {
-                const data = docSnap.data();
-                if(data.points && data.points.length > 0) {
-                    ctx.beginPath();
-                    ctx.moveTo(data.points[0].x, data.points[0].y);
-                    for(let i = 1; i < data.points.length; i++) {
-                        ctx.lineTo(data.points[i].x, data.points[i].y);
-                    }
-                    ctx.strokeStyle = data.color || '#da291c';
-                    ctx.lineWidth = 4;
-                    ctx.lineCap = 'round';
-                    ctx.lineJoin = 'round';
-                    ctx.stroke();
-                }
-            });
-        });
-    }
-
-    window.allowDropSquad = (e) => { e.preventDefault(); };
-    window.dragStartSquad = (e, email) => { e.dataTransfer.setData("email", email); };
-    
-    window.onDropSquad = async (e, squadId) => {
-        e.preventDefault();
-        window.playClick();
-        const email = e.dataTransfer.getData("email");
-        if(!email) return;
-        const isAltoMando = window.isAdmin || (RANGOS.indexOf(window.currentUserRank) >= RANGOS.indexOf("Subteniente") && !window.isObserver);
-        if(!isAltoMando) return window.showToast("ACCESO DENEGADO. Solo Oficiales pueden organizar tropas.", "error");
-
-        try {
-            await updateDoc(doc(db, "usuarios", email), { 
-                escuadron: squadId,
-                liderEscuadron: false 
-            });
-            registrarLog("ESCUADRONES", `Movió a un soldado al escuadrón ${squadId.toUpperCase()}.`);
-            cargarDatos();
-        } catch(err) { window.showToast("ERROR AL MOVER SOLDADO", "error"); }
-    };
-
-    window.setSquadLeader = async (email, squadId) => {
-        window.playClick();
-        try {
-            const updates = [];
-            for(let userEmail in windowUsersData) {
-                let u = windowUsersData[userEmail];
-                if(u.escuadron === squadId && u.liderEscuadron && userEmail !== email) {
-                    updates.push(updateDoc(doc(db, "usuarios", userEmail), { liderEscuadron: false }));
-                }
-            }
-            updates.push(updateDoc(doc(db, "usuarios", email), { liderEscuadron: true }));
-            await Promise.all(updates);
-            
-            registrarLog("MANDO ESCUADRA", `Designó a un nuevo líder del escuadrón ${squadId.toUpperCase()}.`);
-            window.showToast("LÍDER ASIGNADO AL ESCUADRÓN", "success");
-            cargarDatos();
-        } catch(err) { window.showToast("ERROR AL ASIGNAR LÍDER", "error"); }
-    };
-
-    onAuthStateChanged(auth, async (user) => {
-        if (user) {
-            sndStartup.play().catch(()=>{});
-            window.currentUserEmail = user.email;
-            const snap = await getDoc(doc(db, "usuarios", user.email));
-            if (snap.exists()) {
-                const data = snap.data();
-                window.currentUserName = data.nombre; 
-                window.currentUserRank = data.rango; 
-                window.isAdmin = (data.rango === "General en Jefe");
-                window.isObserver = (data.rango === "Administrador"); 
-                
-                document.getElementById("loginScreen").style.display = "none";
-                
-                if(window.isObserver) {
-                    updateDOM("userName", `[INTELIGENCIA] ${data.nombre}`);
-                    document.getElementById("userName").style.color = "var(--admin-neon)";
-                    document.getElementById("userName").style.textShadow = "0 0 10px var(--admin-neon)";
-                    updateDOM("userRank", "AUDITORÍA DEL COMANDO");
-                    document.getElementById("userRank").style.color = "var(--admin-neon)";
-                } else {
-                    updateDOM("userName", data.nombre);
-                    updateDOM("userRank", window.currentUserRank);
-                }
-                
-                if(data.estado) document.getElementById("myStatus").value = data.estado;
-                if(data.notasPersonales) document.getElementById("textoNotas").value = data.notasPersonales;
-                
-                updateDOM("targetAeronave", `<option value="SIN ASIGNAR">-- SIN AERONAVE --</option>` + FLOTA_AEREA.map(n => `<option value="${n.id}">${n.id}</option>`).join(""));
-                
-                if (window.isAdmin) {
-                    document.getElementById("btnLogs").classList.remove("menu-hidden");
-                }
-
-                if (window.isAdmin || (RANGOS.indexOf(window.currentUserRank) >= RANGOS.indexOf("Capitán") && !window.isObserver)) {
-                    const pAdminCom = document.getElementById("panelAdminComunicados");
-                    if(pAdminCom) pAdminCom.style.display = "block";
-                }
-                
-                if (window.isAdmin || (OFICIALES.includes(window.currentUserRank) && !window.isObserver)) {
-                    document.getElementById("btnReclutamiento").classList.remove("menu-hidden"); 
-                    document.getElementById("panelAdminLicencias").style.display = "block";
-                    document.getElementById("panelAdminCalendario").style.display = "block";
-                }
-
-                if (window.isAdmin || (RANGOS.indexOf(window.currentUserRank) > RANGOS.indexOf("Subteniente") && !window.isObserver)) {
-                    document.getElementById("panelSubirDoc").style.display = "block";
-                }
-
-                if (window.isAdmin || (RANGOS.indexOf(window.currentUserRank) >= RANGOS.indexOf("Teniente Coronel") && !window.isObserver)) {
-                    document.getElementById("panelCalificaciones").style.display = "block";
-                    document.getElementById("panelClima").style.display = "block";
-                }
-
-                if (window.isAdmin || (RANGOS.indexOf(window.currentUserRank) >= RANGOS.indexOf("Subteniente") && !window.isObserver)) {
-                    document.getElementById("drawingTools").style.display = "flex";
-                }
-                
-                cargarLogsBase(); cargarDatos(); cargarDocumentos(); cargarHangar(); cargarCalendario(); cargarComunicados(); cargarSolicitudes(); cargarHistorialMisiones(); cargarDenuncias(); if(window.isAdmin) cargarLogsVisual();
-                
-                iniciarSyncMapa();
-                inicializarPizarra();
-                iniciarSyncDibujos();
-                iniciarSyncClima();
-                iniciarSyncRadiogramas();
-            }
-        } else { document.getElementById("loginScreen").style.display = "flex"; }
-    });
-
-    window.updateMyStatus = async () => { if(!window.currentUserEmail) return; await updateDoc(doc(db, "usuarios", window.currentUserEmail), { estado: document.getElementById("myStatus").value }); cargarDatos(); };
-    async function registrarLog(accion, detalle) { try { await addDoc(collection(db, "logs"), { accion: accion, detalle: detalle, autor: window.currentUserName, fechaFormato: new Date().toLocaleString('es-CL'), timestamp: serverTimestamp() }); cargarLogsBase(); if(window.isAdmin) cargarLogsVisual(); } catch(e) {} }
-    async function cargarLogsBase() { const q = query(collection(db, "logs"), orderBy("timestamp", "desc"), limit(100)); const snap = await getDocs(q); window.cachedLogs = []; snap.forEach(docSnap => { window.cachedLogs.push(docSnap.data()); }); }
-
-    window.procesarCambiosAdmin = async () => {
-        window.playClick();
-        const email = document.getElementById("targetSoldier").value;
-        const rango = document.getElementById("targetRank").value;
-        const division = document.getElementById("targetDivision").value;
-        const especialidad = document.getElementById("targetEspecialidad").value;
-        const aeronave = document.getElementById("targetAeronave").value;
-
-        if(!email) return window.showToast("SELECCIONE UN SOLDADO", "error");
-
-        try {
-            await updateDoc(doc(db, "usuarios", email), {
-                rango: rango,
-                division: division,
-                especialidad: especialidad,
-                aeronave: aeronave === "SIN ASIGNAR" ? null : aeronave
-            });
-            registrarLog("MODIFICACIÓN DE EXPEDIENTE", `Modificó datos de ${email}: ${rango} / ${division}`);
-            window.showToast("EXPEDIENTE ACTUALIZADO", "success");
-            cargarDatos();
-        } catch(e) {
-            window.showToast("ERROR AL ACTUALIZAR EXPEDIENTE", "error");
-        }
-    };
-
-    window.asignarMision = async () => {
-        window.playClick();
-        const email = document.getElementById("targetSoldadoMision").value;
-        const tipo = document.getElementById("tipoMision").value;
-        const obj = document.getElementById("objMision").value;
-
-        if(!email || !obj) return window.showToast("COMPLETE LOS DATOS DE LA MISIÓN", "error");
-
-        try {
-            await updateDoc(doc(db, "usuarios", email), {
-                misionActiva: { tipo: tipo, detalle: obj, fechaInicio: new Date().toLocaleString('es-CL') },
-                estado: "EN OPERACIÓN"
-            });
-            registrarLog("OPERACIÓN ASIGNADA", `Desplegó a ${email} en misión de ${tipo}: ${obj}`);
-            window.showToast("MISIÓN ASIGNADA Y SOLDADO DESPLEGADO", "success");
-            document.getElementById("objMision").value = "";
-            cargarDatos();
-        } catch(e) {
-            window.showToast("ERROR AL ASIGNAR MISIÓN", "error");
-        }
-    };
-
-    window.finalizarMision = async () => {
-        window.playClick();
-        const email = document.getElementById("targetSoldadoMision").value;
-        if(!email) return window.showToast("SELECCIONE UN SOLDADO", "error");
-
-        const userData = windowUsersData[email];
-        if(!userData || !userData.misionActiva) return window.showToast("EL SOLDADO NO TIENE MISIÓN ACTIVA", "error");
-
-        try {
-            await addDoc(collection(db, "misiones_pasadas"), {
-                tipo: userData.misionActiva.tipo,
-                detalle: userData.misionActiva.detalle,
-                fechaInicio: userData.misionActiva.fechaInicio || "Desconocida",
-                fechaFin: new Date().toLocaleString('es-CL'),
-                rango: userData.rango,
-                soldado: userData.nombre,
-                division: userData.division,
-                timestamp: serverTimestamp()
-            });
-
-            await updateDoc(doc(db, "usuarios", email), {
-                misionActiva: null,
-                estado: "EN BASE"
-            });
-            
-            registrarLog("OPERACIÓN FINALIZADA", `Finalizó la misión de ${email}`);
-            window.showToast("MISIÓN FINALIZADA Y ARCHIVADA", "success");
-            cargarDatos();
-            cargarHistorialMisiones();
-        } catch(e) {
-            window.showToast("ERROR AL FINALIZAR MISIÓN", "error");
-        }
-    };
-
-    async function cargarDatos() {
-        try {
-            const snap = await getDocs(collection(db, "usuarios"));
-            
-            let strPer = "", strLic = "", strCom = "", strIns = "", strCad = "", strMis = "";
-            let strSelS = '<option value="">SELECCIONAR...</option>';
-            let strSelMis = '<option value="">SELECCIONAR...</option>';
-            let strSelLic = '<option value="">SELECCIONAR SOLDADO...</option>';
-            let strSelSanc = '<option value="">SELECCIONAR SOLDADO PARA SANCIÓN...</option>';
-            let strSelEval = '<option value="">SELECCIONAR SOLDADO...</option>';
-
-            const myRankIndex = window.isObserver ? -1 : RANGOS.indexOf(window.currentUserRank);
-            let allowedRanks = RANGOS;
-            if (window.currentUserRank !== "General en Jefe" && myRankIndex > 0) {
-                allowedRanks = RANGOS.slice(0, myRankIndex);
-            } else if (myRankIndex === 0 && window.currentUserRank !== "General en Jefe") {
-                allowedRanks = [RANGOS[0]]; 
-            }
-            
-            let allowedRanksHtml = allowedRanks.map(r => `<option value="${r}">${r}</option>`).join("");
-            if (window.isAdmin || (myRankIndex >= RANGOS.indexOf("Coronel") && !window.isObserver)) {
-                allowedRanksHtml += `<option value="Administrador" style="color:var(--admin-neon); font-weight:bold;">Administrador (Observador)</option>`;
-            }
-            updateDOM("targetRank", allowedRanksHtml);
-            
-            windowUsersData = {};
-            let totalSoldadosCount = 0; let totalOficialesCount = 0; let totalAeronavesCount = FLOTA_AEREA.reduce((acc, a) => acc + a.cant, 0);
-            
-            let sq = { base: "", alpha: "", bravo: "", especial: "" };
-            let isAltoMandoSquad = window.isAdmin || (RANGOS.indexOf(window.currentUserRank) >= RANGOS.indexOf("Subteniente") && !window.isObserver);
-
-            snap.forEach(docSnap => {
-                try {
-                    const d = docSnap.data(); const email = docSnap.id;
-                    windowUsersData[email] = d;
-                    
-                    const nombreSeguro = d.nombre ? d.nombre.toUpperCase() : "SOLDADO DESCONOCIDO";
-                    const rangoSeguro = d.rango ? d.rango : "Cabo 2°";
-                    const divUpper = (d.division || 'EJÉRCITO').toUpperCase();
-                    const aeronaveSafe = d.aeronave || "SIN ASIGNAR";
-                    const estadoSeguro = d.estado || "ACTIVO";
-                    const especialidadSegura = d.especialidad || "Infantería"; 
-                    
-                    const cTiro = d.calTiro || "Básico";
-                    const cFis = d.calFisico || "Regular";
-                    const cPsi = d.calPsico || "Observación";
-                    
-                    let isRolAdmin = rangoSeguro === "Administrador";
-
-                    totalSoldadosCount++;
-                    if (OFICIALES.includes(rangoSeguro) || isRolAdmin) totalOficialesCount++;
-                    
-                    const optionHTML = `<option value="${email}">${nombreSeguro}</option>`;
-                    strSelS += optionHTML; strSelMis += optionHTML; strSelLic += optionHTML; strSelSanc += optionHTML; strSelEval += optionHTML;
-
-                    let divColor = "var(--theme-color)"; 
-                    let panelClass = "glass-panel slide-up";
-                    let titleColor = "white";
-                    let textShadow = "none";
-                    let borderFoto = "var(--theme-dim)";
-
-                    if (isRolAdmin) {
-                        panelClass += " mando-admin-glow";
-                        divColor = "var(--admin-neon)";
-                        titleColor = "var(--admin-neon)";
-                        textShadow = "0 0 10px var(--admin-neon)";
-                        borderFoto = "var(--admin-neon)";
-                    } else {
-                        if (divUpper === "EJÉRCITO") { panelClass += " glow-ejercito"; divColor = "var(--ejercito-color)"; borderFoto = "var(--ejercito-color)"; }
-                        else if (divUpper === "ARMADA") { panelClass += " glow-armada"; divColor = "var(--armada-color)"; borderFoto = "var(--armada-color)"; }
-                        else if (divUpper === "FACH") { panelClass += " glow-fach"; divColor = "var(--fach-color)"; borderFoto = "var(--fach-color)"; }
-                        else if (divUpper === "BOE") { panelClass += " glow-boe"; divColor = "var(--boe-color)"; borderFoto = "var(--boe-color)"; }
-                    }
-
-                    let iconEstado = "🔴";
-                    if (estadoSeguro === "ACTIVO" || estadoSeguro === "Online") iconEstado = "🟢";
-                    else if (estadoSeguro === "EN BASE") iconEstado = "🟡";
-                    else if (estadoSeguro === "EN ENTRENAMIENTO") iconEstado = "🔵";
-                    else if (estadoSeguro === "EN OPERACIÓN" || estadoSeguro === "En misión") iconEstado = "🟠";
-
-                    // GESTIÓN DE ESCUADRONES HTML
-                    if(!isRolAdmin) {
-                        let targetSq = d.escuadron || "base";
-                        if(!sq.hasOwnProperty(targetSq)) targetSq = "base";
-                        
-                        let leaderBtn = "";
-                        if (targetSq !== "base" && isAltoMandoSquad) {
-                            leaderBtn = `<button onclick="setSquadLeader('${email}', '${targetSq}')" style="background:transparent; border:none; color: ${d.liderEscuadron ? 'var(--alert-amber)' : '#555'}; cursor:pointer; font-size:16px; transition:0.2s; filter:drop-shadow(0 0 5px ${d.liderEscuadron ? 'rgba(255,180,0,0.5)' : 'transparent'});" title="Asignar Líder">⭐</button>`;
-                        } else if (d.liderEscuadron && targetSq !== "base") {
-                            leaderBtn = `<span style="color:var(--alert-amber); font-size:16px; filter:drop-shadow(0 0 5px rgba(255,180,0,0.5));" title="Líder de Escuadra">⭐</span>`;
-                        }
-                        
-                        let sqBorderClass = d.liderEscuadron && targetSq !== 'base' ? "squad-item is-leader" : "squad-item";
-                        
-                        sq[targetSq] += `
-                            <div class="${sqBorderClass}" draggable="${isAltoMandoSquad}" ondragstart="dragStartSquad(event, '${email}')">
-                                <div>
-                                    <div style="font-weight:bold; color:white; font-size:12px;">${nombreSeguro}</div>
-                                    <div style="font-size:10px; color:${divColor}; font-family:'Share Tech Mono';">${rangoSeguro.toUpperCase()}</div>
-                                </div>
-                                ${leaderBtn}
-                            </div>
-                        `;
-                    }
-
-                    const alertaSancion = (d.sanciones && d.sanciones.length > 0) ? `<div style="font-size:11px; color:var(--danger-red); margin-top:5px; font-weight:bold; background:rgba(218,41,28,0.1); padding:2px 6px; border-radius:3px; display:inline-block;">⚠️ ${d.sanciones.length} SANCIÓN(ES) ACTIVA(S)</div>` : '';
-                    const objMisionString = d.misionActiva ? encodeURIComponent(JSON.stringify(d.misionActiva)) : 'null';
-                    const fCrea = d.fechaCreacion || "01/01/2026";
-
-                    strPer += `
-                        <div class="${panelClass}" onmouseenter="playHover()" onclick="abrirPerfilCompleto('${email}', '${nombreSeguro}', '${rangoSeguro}', '${divUpper}', '${aeronaveSafe}', '${fCrea}', '${objMisionString}', '${especialidadSegura}', '${cTiro}', '${cFis}', '${cPsi}')" 
-                             style="padding: 20px; display: flex; gap: 20px; align-items: center; cursor:pointer;">
-                            <div style="width: 60px; height: 60px; background: url('https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png') center/cover no-repeat; border-radius: 8px; border: 2px solid ${borderFoto}; box-shadow: 0 0 15px rgba(0,0,0,0.5);"></div>
-                            <div>
-                                <div style="font-weight:bold; color:${titleColor}; text-shadow:${textShadow}; font-size:18px; letter-spacing:1px;">${iconEstado} ${nombreSeguro}</div>
-                                <div style="font-size:12px; color:${divColor}; margin-top:3px; letter-spacing:1px; font-family:'Share Tech Mono';">${rangoSeguro.toUpperCase()} // ${divUpper}</div>
-                                ${alertaSancion}
-                            </div>
-                        </div>`;
-
-                    const lic = d.licencias || {};
-                    const getLicBadge = (tipo, val) => {
-                        if(!val || val === "Ninguna") return '';
-                        const cssColor = val === 'Activa' ? '#4df24d' : (val === 'Suspendida' ? 'var(--alert-amber)' : 'var(--danger-red)');
-                        return `<span style="border: 1px solid ${cssColor}; color: ${cssColor}; background: rgba(0,0,0,0.5); padding: 3px 6px; border-radius: 4px; font-size:10px; margin-right:5px; display:inline-block; font-weight:bold;">${tipo.toUpperCase()}: ${val.toUpperCase()}</span>`;
-                    };
-                    const licHTML = (lic.piloto || lic.comando || lic.armamento) ? (getLicBadge("Piloto", lic.piloto) + getLicBadge("Comando", lic.comando) + getLicBadge("Armamento", lic.armamento)) : `<span style="color:#555; font-size:10px; font-style:italic;">SIN LICENCIAS ASIGNADAS</span>`;
-
-                    strLic += `
-                        <div class="glass-panel slide-up" style="padding: 20px;">
-                            <div style="margin-bottom:15px; border-bottom:1px solid var(--glass-border); padding-bottom:10px;"><strong style="color:white; font-size:18px; letter-spacing:1px;">${nombreSeguro}</strong> <span style="font-size:11px; color:var(--theme-color); font-family:'Share Tech Mono';">[${rangoSeguro}]</span></div>
-                            <div>${licHTML}</div>
-                        </div>`;
-
-                    if (divUpper === "FACH" && !isRolAdmin) {
-                        let cat = (rangoSeguro.includes("General") || rangoSeguro === "Coronel") ? "comandante" : (["Capitán", "Mayor", "Teniente Coronel"].includes(rangoSeguro) ? "instructor" : "cadete");
-                        const itemHtml = `<div class="glass-panel" style="padding: 10px; margin-bottom: 10px; display: grid; grid-template-columns: 40px 1fr; align-items: center; gap: 10px; cursor:pointer;" onclick="updateDOM('vPilot', '${nombreSeguro}'); updateDOM('vUnit', '${aeronaveSafe}'); window.playClick();">
-                                          <div style="border-radius:6px; font-size:20px; background:rgba(0,0,0,0.5); border:1px solid var(--admin-blue); text-align:center; padding:5px;">${cat === 'comandante' ? '🦅' : (cat === 'instructor' ? '✈️' : '🪖')}</div>
-                                          <div><div style="color:var(--admin-blue); font-size:10px; font-weight:bold; font-family:'Share Tech Mono'; letter-spacing:1px;">[${aeronaveSafe}]</div><div style="font-size:13px; color:white; font-weight:bold;">${nombreSeguro}</div></div></div>`;
-                        if (cat === "comandante") strCom += itemHtml; else if (cat === "instructor") strIns += itemHtml; else strCad += itemHtml;
-                    }
-
-                    if(d.misionActiva && d.misionActiva.tipo && !isRolAdmin) {
-                        let mColor = d.misionActiva.tipo === "Combate" ? "var(--danger-red)" : (d.misionActiva.tipo === "Reconocimiento" ? "var(--admin-blue)" : "var(--theme-color)");
-                        strMis += `
-                            <div class="glass-panel slide-up" style="border-left: 4px solid ${mColor}; padding: 25px;">
-                                <div style="display:flex; justify-content: space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:10px;"><strong style="color: ${mColor}; font-size:22px; letter-spacing:1px;">OP: ${d.misionActiva.tipo.toUpperCase()}</strong><span style="font-size: 11px; color: white; background:rgba(255,255,255,0.1); padding:4px 8px; border-radius:4px;">ASIGNADO: ${nombreSeguro}</span></div>
-                                <div style="color: #ddd; margin-top: 15px; font-size: 15px; line-height:1.6;">> OBJETIVO TÁCTICO:<br><span style="color:white; font-weight:bold;">${d.misionActiva.detalle || 'Sin detalles'}</span></div>
-                            </div>`;
-                    }
-                } catch (errLoop) { console.error("Error aislando perfil:", errLoop); }
-            });
-            
-            // INYECCIÓN CON DOM CACHE
-            updateDOM("listaSoldados", strPer);
-            updateDOM("listaUsuariosLicencias", strLic);
-            updateDOM("listaComandante", strCom);
-            updateDOM("listaInstructor", strIns);
-            updateDOM("listaCadete", strCad);
-            updateDOM("listaMisiones", strMis === "" ? "<div style='color:#555; font-style:italic; padding: 20px;'>No hay operaciones activas en este momento.</div>" : strMis);
-            
-            updateDOM("sq_base", sq.base);
-            updateDOM("sq_alpha", sq.alpha);
-            updateDOM("sq_bravo", sq.bravo);
-            updateDOM("sq_especial", sq.especial);
-
-            updateDOM("targetSoldier", strSelS);
-            updateDOM("targetSoldadoMision", strSelMis);
-            updateDOM("targetSoldadoLicencia", strSelLic);
-            updateDOM("targetSoldadoSancion", strSelSanc);
-            updateDOM("evalSoldado", strSelEval);
-
-            document.getElementById("statTotalSoldados").innerText = totalSoldadosCount;
-            document.getElementById("statTotalOficiales").innerText = totalOficialesCount;
-            document.getElementById("statTotalAeronaves").innerText = totalAeronavesCount;
-            
-        } catch(errorGlobal) { console.error("Error global:", errorGlobal); }
-    }
-
-    async function cargarHistorialMisiones() {
-        const q = query(collection(db, "misiones_pasadas"), orderBy("timestamp", "desc"), limit(20));
-        const snap = await getDocs(q);
-        let htmlStr = ""; let count = 0;
-        snap.forEach(docSnap => {
-            count++;
-            const d = docSnap.data();
-            htmlStr += `
-                <div class="glass-panel slide-up" style="border-left: 4px solid #555; padding: 20px; opacity: 0.85;">
-                    <div style="display:flex; justify-content: space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:8px;">
-                        <strong style="color: #aaa; font-size:16px; letter-spacing:1px;">✔️ OP FINALIZADA: ${d.tipo.toUpperCase()}</strong>
-                        <span style="font-size: 10px; color: #888; font-family:'Share Tech Mono';">INICIO: ${d.fechaInicio} | FIN: ${d.fechaFin}</span>
-                    </div>
-                    <div style="color: #bbb; margin-top: 12px; font-size: 14px; line-height: 1.5;">
-                        <span style="color:var(--theme-color);">[AGENTE ASIGNADO]:</span> ${d.rango} ${d.soldado} (${d.division})<br>
-                        <span style="color:var(--alert-amber);">[REPORTE DE OBJETIVO]:</span> ${d.detalle}
-                    </div>
-                </div>`;
-        });
-        const finalHtml = count === 0 ? "<div style='color:#555; font-style:italic; padding: 20px;'>El archivo histórico de operaciones está vacío.</div>" : htmlStr;
-        updateDOM("listaHistorialMisiones", finalHtml);
-    }
-
-    function getColorTiro(v) { return v==="Experto"?"#4df24d":v==="Calificado"?"#ffb400":"#aaa"; }
-    function getColorFisico(v) { return v==="Excelente"?"#4df24d":v==="Buena"?"#ffb400":"#aaa"; }
-    function getColorPsico(v) { return v==="Apto"?"#4df24d":v==="Observación"?"#ffb400":"#da291c"; }
-
-    window.abrirPerfilCompleto = (email, nombre, rango, division, unidad, fCreacion, objMisionRaw, especialidad, cTiro, cFis, cPsi) => {
-        window.playClick(); 
-        
-        window.perfilActualEmail = email; // TRACKEO PARA EL RADIOGRAMA
-        
-        const isRolAdmin = (rango === "Administrador");
-        const isRestricted = RANGOS.indexOf(window.currentUserRank) <= RANGOS.indexOf("Subteniente") && email !== window.currentUserEmail && !window.isObserver;
-
-        document.getElementById("p_id").classList.remove("censurado-bar");
-        document.getElementById("p_unidad").classList.remove("censurado-bar");
-        document.getElementById("p_creacion").classList.remove("censurado-bar");
-        document.getElementById("p_mision").classList.remove("censurado-bar");
-        document.getElementById("p_tiro").classList.remove("censurado-bar");
-        document.getElementById("p_fisico").classList.remove("censurado-bar");
-        document.getElementById("p_psico").classList.remove("censurado-bar");
-        document.getElementById("p_foto").classList.remove("censurado-blur");
-        let selloExistente = document.getElementById("sello_clasificado");
-        if (selloExistente) selloExistente.remove();
-
-        updateDOM("p_nombre", nombre);
-        updateDOM("p_rango", rango);
-        updateDOM("p_division", division || 'EJÉRCITO');
-
-        if (isRolAdmin) {
-            document.getElementById("p_nombre").style.color = "var(--admin-neon)";
-            document.getElementById("p_nombre").style.textShadow = "0 0 15px var(--admin-neon)";
-            document.getElementById("p_rango").style.color = "var(--admin-neon)";
-            document.getElementById("p_foto").style.borderColor = "var(--admin-neon)";
-            document.getElementById("p_foto").style.boxShadow = "0 0 20px rgba(182, 102, 255, 0.4)";
-        } else {
-            document.getElementById("p_nombre").style.color = "white";
-            document.getElementById("p_nombre").style.textShadow = "none";
-            document.getElementById("p_rango").style.color = "var(--alert-amber)";
-            
-            let bColor = "var(--theme-dim)";
-            if (division === "EJÉRCITO") bColor = "var(--ejercito-color)";
-            else if (division === "ARMADA") bColor = "var(--armada-color)";
-            else if (division === "FACH") bColor = "var(--fach-color)";
-            else if (division === "BOE") bColor = "var(--boe-color)";
-            
-            document.getElementById("p_foto").style.borderColor = bColor;
-            document.getElementById("p_foto").style.boxShadow = `0 10px 20px rgba(0,0,0,0.5)`;
-        }
-
-        let insigniasHTML = "";
-        const getOnClick = (desc) => `onclick="updateDOM('p_insignia_desc', '<span style=\\'color:white;\\'>INFO:</span> ${desc}'); window.playClick();"`;
-
-        if(isRolAdmin) {
-            insigniasHTML += `<div class="insignia insignia-glow" style="color:var(--admin-neon); border-color:var(--admin-neon);" data-tooltip="Auditor de Inteligencia" ${getOnClick('Acceso total a la red clasificada. El portador de esta medalla no puede ser censurado ni restringido en la visualización de documentos o expedientes.')}>👁️</div>`;
-        } else {
-            insigniasHTML += `<div class="insignia insignia-float" style="color:var(--theme-color); border-color:var(--theme-color);" data-tooltip="Servicio Activo" ${getOnClick('Medalla base otorgada por pertenecer al servicio activo de las Fuerzas Armadas.')}>🎖️</div>`;
-            if(RANGOS.indexOf(rango) >= RANGOS.indexOf("Subteniente")) {
-                insigniasHTML += `<div class="insignia insignia-glow" style="color:var(--alert-amber); border-color:var(--alert-amber);" data-tooltip="Oficial al Mando" ${getOnClick('Insignia de Oficial. Otorga autoridad para dar órdenes tácticas y liderar tropas en terreno.')}>⭐</div>`;
-            }
-            if(especialidad === "Fuerzas especiales") {
-                insigniasHTML += `<div class="insignia insignia-spin" style="color:#b666ff; border-color:#b666ff;" data-tooltip="Operador B.O.E." ${getOnClick('Distintivo de las Fuerzas Especiales. Entrenado en guerra asimétrica y rescate táctico.')}>⚡</div>`;
-            }
-            if(especialidad === "Piloto") {
-                insigniasHTML += `<div class="insignia insignia-float" style="color:var(--admin-blue); border-color:var(--admin-blue);" data-tooltip="Alas de Piloto" ${getOnClick('Licencia de vuelo avanzada. Capacitado para operar aeronaves militares y combate aéreo.')}>🦅</div>`;
-            }
-            if(cTiro === "Experto") {
-                insigniasHTML += `<div class="insignia insignia-glow" style="color:#4df24d; border-color:#4df24d;" data-tooltip="Tirador Experto" ${getOnClick('Calificación máxima en el polígono de tiro. Precisión letal confirmada en combate.')}>🎯</div>`;
-            }
-        }
-        
-        updateDOM("p_insignias", insigniasHTML);
-        updateDOM("p_insignia_desc", "[ INFO. MEDALLA: ESPERANDO SELECCIÓN ]");
-        
-        // CONTROLES DE RADIOGRAMA
-        const btnRadio = document.getElementById("p_radiograma_container");
-        if(email !== window.currentUserEmail && !isRolAdmin) {
-            btnRadio.style.display = "block";
-            btnRadio.firstElementChild.style.display = "block";
-            document.getElementById("p_radiograma_form").style.display = "none";
-        } else {
-            btnRadio.style.display = "none";
-        }
-
-        if (isRestricted) {
-            updateDOM("p_unidad", "█████████");
-            document.getElementById("p_unidad").classList.add("censurado-bar");
-            
-            updateDOM("p_creacion", "██/██/████");
-            document.getElementById("p_creacion").classList.add("censurado-bar");
-            
-            updateDOM("p_id", "CHL-██████-███");
-            document.getElementById("p_id").classList.add("censurado-bar");
-            
-            updateDOM("p_mision", "[ INFO. CLASIFICADA ]");
-            document.getElementById("p_mision").style.color = "var(--danger-red)";
-            document.getElementById("p_mision").classList.add("censurado-bar");
-
-            updateDOM("p_especialidades", `<span class="esp-tag esp-default censurado-bar" style="border:none; color:#050a0f;">████████</span>`);
-            
-            updateDOM("p_tiro", "████");
-            document.getElementById("p_tiro").style.color = "#050a0f";
-            document.getElementById("p_tiro").classList.add("censurado-bar");
-
-            updateDOM("p_fisico", "████");
-            document.getElementById("p_fisico").style.color = "#050a0f";
-            document.getElementById("p_fisico").classList.add("censurado-bar");
-
-            updateDOM("p_psico", "████");
-            document.getElementById("p_psico").style.color = "#050a0f";
-            document.getElementById("p_psico").classList.add("censurado-bar");
-
-            document.getElementById("p_foto").classList.add("censurado-blur");
-            document.getElementById("p_insignias").style.display = "none";
-            const descBox = document.getElementById("p_insignia_desc");
-            if(descBox) descBox.style.display = "none";
-            btnRadio.style.display = "none";
-            document.getElementById("p_foto").parentElement.insertAdjacentHTML('beforeend', '<div id="sello_clasificado" class="sello-clasificado">ACCESO RESTRINGIDO</div>');
-        } else {
-            updateDOM("p_unidad", unidad);
-            updateDOM("p_creacion", fCreacion);
-            updateDOM("p_id", "CHL-" + email.substring(0,6).toUpperCase() + "-" + Math.floor(Math.random()*10000));
-            document.getElementById("p_insignias").style.display = "flex";
-            const descBox = document.getElementById("p_insignia_desc");
-            if(descBox) descBox.style.display = "flex";
-            
-            let misionTexto = isRolAdmin ? "MONITOREANDO LA RED" : "DISPONIBLE EN BASE"; 
-            let mColor = isRolAdmin ? "var(--admin-neon)" : "var(--theme-color)";
-            
-            if (objMisionRaw !== 'null' && objMisionRaw !== 'undefined' && !isRolAdmin) { 
-                try { 
-                    const m = JSON.parse(decodeURIComponent(objMisionRaw)); 
-                    misionTexto = `[EN OPERACIÓN: ${m.tipo.toUpperCase()}] ${m.detalle}`; mColor = "var(--alert-amber)";
-                } catch(e) {} 
-            }
-            updateDOM("p_mision", misionTexto);
-            document.getElementById("p_mision").style.color = mColor;
-
-            let claseColor = "esp-default";
-            let icono = "🎖️";
-            if(especialidad === "Piloto") { claseColor = "esp-piloto"; icono = "✈️"; }
-            else if(especialidad === "Francotirador") { claseColor = "esp-francotirador"; icono = "🎯"; }
-            else if(especialidad === "Artillería de apoyo") { claseColor = "esp-artilleria"; icono = "💥"; }
-            else if(especialidad === "Infantería") { claseColor = "esp-infanteria"; icono = "🪖"; }
-            else if(especialidad === "Fuerzas especiales") { claseColor = "esp-fuerzas"; icono = "⚡"; }
-
-            updateDOM("p_especialidades", `<span class="esp-tag ${claseColor}">${icono} ${especialidad}</span>`);
-
-            updateDOM("p_tiro", cTiro.toUpperCase());
-            document.getElementById("p_tiro").style.color = getColorTiro(cTiro);
-
-            updateDOM("p_fisico", cFis.toUpperCase());
-            document.getElementById("p_fisico").style.color = getColorFisico(cFis);
-
-            updateDOM("p_psico", cPsi.toUpperCase());
-            document.getElementById("p_psico").style.color = getColorPsico(cPsi);
-        }
-
-        document.getElementById("perfilModal").style.display = "flex";
-    };
-    
-    window.cerrarPerfil = () => { window.playClick(); document.getElementById("perfilModal").style.display = "none"; };
-
-    window.guardarCalificacion = async () => {
-        window.playClick();
-        const email = document.getElementById("evalSoldado").value;
-        const tiro = document.getElementById("evalTiro").value;
-        const fisico = document.getElementById("evalFisico").value;
-        const psico = document.getElementById("evalPsico").value;
-
-        if(!email) return window.showToast("SELECCIONE UN SOLDADO PARA EVALUAR", "error");
-
-        if (window.isAdmin || (RANGOS.indexOf(window.currentUserRank) >= RANGOS.indexOf("Teniente Coronel") && !window.isObserver)) {
+    <script>
+        // --- EFECTO DE SONIDO (WEB AUDIO API) ---
+        // Genera un sutil pitido electrónico al interactuar para ambientación táctica sin saturar
+        let audioCtx = null;
+        function playTacticalBeep(freq = 800, duration = 0.04, type = 'sine') {
             try {
-                await updateDoc(doc(db, "usuarios", email), { calTiro: tiro, calFisico: fisico, calPsico: psico });
-                registrarLog("EVALUACIÓN DE PERSONAL", `Actualizó calificaciones de ${email}: Tiro [${tiro}], Físico [${fisico}], Psicológico [${psico}].`);
-                window.showToast("CALIFICACIONES ACTUALIZADAS", "success");
-                cargarDatos();
-            } catch(e) { window.showToast("ERROR AL GUARDAR", "error"); }
-        } else {
-            window.showToast("ACCESO DENEGADO. Rango insuficiente.", "error");
-        }
-    };
-
-    window.actualizarLicencia = async () => {
-        window.playClick();
-        const email = document.getElementById("targetSoldadoLicencia").value; const tipoLic = document.getElementById("tipoLicencia").value; const estadoLic = document.getElementById("estadoLicencia").value;
-        if(!email) return window.showToast("SELECCIONE UN SOLDADO", "error");
-        
-        const currentLicencias = windowUsersData[email].licencias || {};
-        if(estadoLic === "Ninguna") delete currentLicencias[tipoLic]; else currentLicencias[tipoLic] = estadoLic;
-
-        try { await updateDoc(doc(db, "usuarios", email), { licencias: currentLicencias }); registrarLog("LICENCIA ACTUALIZADA", `Modificó licencia de ${tipoLic} a ${estadoLic} para ${email}.`); window.showToast("SISTEMA DE LICENCIAS ACTUALIZADO.", "success"); cargarDatos(); } 
-        catch(e) { window.showToast("ERROR AL ACTUALIZAR LICENCIA.", "error"); }
-    };
-
-    window.aplicarSancion = async () => {
-        window.playClick();
-        const email = document.getElementById("targetSoldadoSancion").value; const tipo = document.getElementById("targetSancion").value; const motivo = document.getElementById("motivoSancion").value; const duracion = document.getElementById("duracionSancion").value;
-        if(!email || !motivo || !duracion) return window.showToast("COMPLETE TODOS LOS CAMPOS DE SANCIÓN", "error");
-
-        const nuevaSancion = { tipo: tipo, motivo: motivo, duracion: duracion, fecha: new Date().toLocaleDateString('es-CL'), sancionador: window.currentUserName };
-        try {
-            await updateDoc(doc(db, "usuarios", email), { sanciones: arrayUnion(nuevaSancion) });
-            registrarLog("SANCIÓN APLICADA", `Sancionó a ${email} (${tipo}) por: ${motivo}`);
-            window.showToast("SANCIÓN APLICADA A EXPEDIENTE", "success"); document.getElementById("motivoSancion").value = ""; document.getElementById("duracionSancion").value = ""; cargarDatos();
-        } catch(error) { window.showToast("ERROR AL APLICAR SANCIÓN", "error"); }
-    };
-
-    window.quitarSanciones = async () => {
-        window.playClick();
-        const email = document.getElementById("targetSoldadoSancion").value;
-        if(!email) return window.showToast("SELECCIONE UN SOLDADO DE LA LISTA", "error");
-        try { await updateDoc(doc(db, "usuarios", email), { sanciones: [] }); registrarLog("SANCIÓN REMOVIDA", `Limpió el expediente de sanciones disciplinarias de ${email}.`); window.showToast("EXPEDIENTE LIMPIADO SATISFACTORIAMENTE", "success"); cargarDatos(); } 
-        catch(e) { window.showToast("ERROR AL LIMPIAR EXPEDIENTE", "error"); }
-    };
-
-    window.registrarPostulante = async () => {
-        window.playClick();
-        const nombre = document.getElementById("recNombre").value; const division = document.getElementById("recDivision").value; const notas = document.getElementById("recNotas").value;
-        if(!nombre) return window.showToast("EL NOMBRE DEL POSTULANTE ES OBLIGATORIO.", "error");
-
-        try {
-            await addDoc(collection(db, "reclutamiento"), { nombre: nombre, division: division, notas: notas, estado: "Pendiente", fecha: new Date().toLocaleString('es-CL'), timestamp: serverTimestamp() });
-            window.showToast("POSTULANTE REGISTRADO EN LA BASE DE DATOS.", "success"); document.getElementById("recNombre").value = ""; document.getElementById("recNotas").value = ""; cargarReclutamiento();
-        } catch(e) { window.showToast("ERROR AL REGISTRAR POSTULANTE.", "error"); }
-    };
-
-    async function cargarReclutamiento() {
-        const q = query(collection(db, "reclutamiento"), orderBy("timestamp", "desc"));
-        const snap = await getDocs(q); 
-        let htmlStr = ""; let count = 0;
-
-        snap.forEach(docSnap => {
-            const d = docSnap.data(); if(d.estado !== "Pendiente") return; count++;
-            htmlStr += `
-                <div class="glass-panel slide-up" style="padding: 20px; display: flex; justify-content: space-between; align-items: center;">
-                    <div><div style="color:white; font-weight:bold; font-size:18px; letter-spacing:1px;">${d.nombre}</div><div style="color:var(--admin-blue); font-size:12px; font-family:'Share Tech Mono'; margin:5px 0;">División de Interés: ${d.division}</div><div style="color:#aaa; font-size:13px; max-width: 500px; line-height:1.5;">${d.notas || 'Sin observaciones'}</div></div>
-                    <div style="display: flex; gap: 10px;"><button onclick="evaluarPostulante('${docSnap.id}', 'Aprobado', '${d.nombre}')" class="btn-tactical" style="background: rgba(77,242,77,0.1); border-color: #4df24d; color: #4df24d;">APROBAR</button><button onclick="evaluarPostulante('${docSnap.id}', 'Rechazado', '${d.nombre}')" class="btn-tactical" style="background: rgba(218,41,28,0.1); border-color: var(--danger-red); color: var(--danger-red);">RECHAZAR</button></div>
-                </div>`;
-        });
-        const finalHtml = count === 0 ? "<div style='color:#555; font-style:italic; padding: 20px; text-align:center;'>No hay postulaciones pendientes de evaluación.</div>" : htmlStr;
-        updateDOM("listaPostulantes", finalHtml);
-    }
-
-    window.evaluarPostulante = async (id, estado, nombre) => { window.playClick(); try { await updateDoc(doc(db, "reclutamiento", id), { estado: estado }); registrarLog("RECLUTAMIENTO", `Postulante ${nombre} fue ${estado.toUpperCase()}.`); window.showToast(`POSTULANTE ${estado.toUpperCase()}`, estado === 'Aprobado' ? 'success' : 'error'); cargarReclutamiento(); } catch (e) { window.showToast("ERROR AL EVALUAR POSTULANTE", "error"); } };
-
-    function cargarHangar() {
-        let hAereoHTML = ""; let hTerrHTML = "";
-        const generarCard = (v) => `
-            <div class="hangar-card-new glass-panel slide-up">
-                <div class="img-wrapper"><div class="hangar-img" style="background-image: url('${v.img}');"></div></div>
-                <div style="padding: 20px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--glass-border);">
-                    <div style="color: #fff; font-weight: bold; font-size: 16px; letter-spacing:1px;">${v.id}</div><div style="background: var(--admin-blue); color: #000; font-weight: bold; padding: 6px 12px; border-radius: 4px; font-family:'Share Tech Mono';">CANT: ${v.cant}</div>
-                </div>
-            </div>`;
-        FLOTA_AEREA.forEach(v => { hAereoHTML += generarCard(v); }); FLOTA_TERRESTRE.forEach(v => { hTerrHTML += generarCard(v); });
-        
-        updateDOM("listaHangarAereo", hAereoHTML);
-        updateDOM("listaHangarTerrestre", hTerrHTML);
-    }
-
-    async function cargarDocumentos() {
-        const q = query(collection(db, "documentos"), orderBy("timestamp", "desc"), limit(20)); 
-        const snap = await getDocs(q); 
-        let htmlStr = "";
-        const isRestricted = RANGOS.indexOf(window.currentUserRank) <= RANGOS.indexOf("Subteniente") && !window.isObserver;
-
-        snap.forEach(docSnap => {
-            const d = docSnap.data(); 
-            const color = d.tipo === "ORDEN" ? "var(--danger-red)" : "var(--admin-blue)";
-            
-            if (isRestricted) {
-                htmlStr += `
-                <div class="glass-panel slide-up" style="padding: 25px; border-left: 4px solid var(--danger-red); position: relative; overflow: hidden;">
-                    <div style="display:flex; justify-content:space-between; font-size:11px; color:#aaa; font-family:'Share Tech Mono'; margin-bottom:10px;">
-                        <span style="color:var(--danger-red); font-weight:bold; font-size:14px; letter-spacing:1px;">[ ACCESO DENEGADO ]</span>
-                        <span class="censurado-bar">██/██/████ | AUTOR: ██████</span>
-                    </div>
-                    <div style="color:white; font-weight:bold; font-size:20px; margin:10px 0; letter-spacing:1px;" class="censurado-bar">██████████████████████</div>
-                    <button onclick="descifrarTexto(this)" class="btn-tactical" style="margin-top: 10px; font-size: 11px; padding: 6px 15px; border-color:var(--danger-red); color:var(--danger-red);">🔓 INTENTAR DESCIFRAR</button>
-                    <div class="contenido-descifrado censurado-blur" style="color:#ddd; font-size:15px; line-height:1.6; padding-top:10px; border-top:1px dashed var(--glass-border); display:none; margin-top:15px;"></div>
-                    <textarea class="raw-text" style="display:none;">████████ ██████ ███████████ ███ █████████ ████ ███████ █████ ████████ ███████ ██████████.</textarea>
-                    <div class="sello-clasificado" style="font-size: 16px; top: 50%; opacity: 0.9;">INFO. CLASIFICADA</div>
-                </div>`;
-            } else {
-                htmlStr += `
-                <div class="glass-panel slide-up" style="padding: 25px; border-left: 4px solid ${color};">
-                    <div style="display:flex; justify-content:space-between; font-size:11px; color:#aaa; font-family:'Share Tech Mono'; margin-bottom:10px;">
-                        <span style="color:${color}; font-weight:bold; font-size:14px; letter-spacing:1px;">[${d.tipo}]</span>
-                        <span>FECHA: ${d.fecha} | AUTOR: ${d.autor}</span>
-                    </div>
-                    <div style="color:white; font-weight:bold; font-size:20px; margin:10px 0; letter-spacing:1px;">${d.titulo.toUpperCase()}</div>
-                    <button onclick="descifrarTexto(this)" class="btn-tactical" style="margin-top: 10px; font-size: 11px; padding: 6px 15px; border-color:${color}; color:${color};">🔓 DESCIFRAR ARCHIVO</button>
-                    <div class="contenido-descifrado" style="color:#ddd; font-size:14px; line-height:1.6; border-top:1px dashed var(--glass-border); padding-top:12px; display:none; white-space: pre-wrap; margin-top: 15px;"></div>
-                    <textarea class="raw-text" style="display:none;">${d.contenido.replace(/'/g, "&#39;").replace(/"/g, "&quot;")}</textarea>
-                </div>`;
+                if (!audioCtx) {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+                const osc = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+                
+                osc.type = type;
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                
+                gainNode.gain.setValueAtTime(0.02, audioCtx.currentTime); // Volumen muy bajo para no saturar
+                gainNode.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + duration);
+                
+                osc.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+                
+                osc.start();
+                osc.stop(audioCtx.currentTime + duration);
+            } catch (e) {
+                console.log("Audio no soportado o bloqueado aún.");
             }
+        }
+
+        // Configuración Inicial del Mapa (Centrado en Burkina Faso / Uagadugú)
+        const uagaCoords = [12.3714, -1.5197];
+        const map = L.map('map', {
+            zoomControl: true,
+            maxZoom: 18,
+            minZoom: 6
+        }).setView(uagaCoords, 9);
+
+        // Capa de Mapa Oscura Estilo Militar (CartoDB DarkMatter)
+        const darkTiles = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; OpenStreetMap &copy; CARTO',
+            subdomains: 'abcd',
+            maxZoom: 20
+        }).addTo(map);
+
+        // --- CAPAS GRUPO (LAYERS) ---
+        const zonesGroup = L.layerGroup().addTo(map);
+        const locationsGroup = L.layerGroup().addTo(map);
+        const attacksGroup = L.layerGroup().addTo(map);
+        const intelligenceGroup = L.layerGroup().addTo(map);
+
+        // --- DEFINICIÓN DE ZONAS DE CONTROL DEL TERRITORIO ---
+        // Zona Norte (Roja): Muy peligrosa, control insurgente
+        const northZone = L.polygon([
+            [15.1, -5.5], [15.1, 2.5], [12.9, 2.5], [12.9, -5.5]
+        ], {
+            color: '#ff4a4a', weight: 1, fillColor: '#ff4a4a', fillOpacity: 0.15
+        }).addTo(zonesGroup);
+        northZone.bindPopup("<div class='popup-title'>🔴 ZONA NORTE - INSURGENTE</div><p>Control insurgente casi total. Patrullas escasas, pueblos abandonados y campamentos terroristas activos. Fronteras con Malí y Níger críticas.</p>");
+
+        // Zona Centro (Naranja): Control compartido, atentados activos
+        const centerZone = L.polygon([
+            [12.9, -5.5], [12.9, 2.5], [11.8, 2.5], [11.8, -5.5]
+        ], {
+            color: '#ffaa00', weight: 1, fillColor: '#ffaa00', fillOpacity: 0.1
+        }).addTo(zonesGroup);
+        centerZone.bindPopup("<div class='popup-title'>🟠 ZONA CENTRO - CONTROL COMPARTIDO</div><p>Mucha presencia policial y retenes, pero con alto riesgo de atentados terroristas y ataques sorpresa.</p>");
+
+        // Zona Sur (Verde): Estable, Gobierno controla casi todo
+        const southZone = L.polygon([
+            [11.8, -5.5], [11.8, 2.5], [9.4, 2.5], [9.4, -5.5]
+        ], {
+            color: '#00ff66', weight: 1, fillColor: '#00ff66', fillOpacity: 0.08
+        }).addTo(zonesGroup);
+        southZone.bindPopup("<div class='popup-title'>🟢 ZONA SUR - CONTROL GUBERNAMENTAL</div><p>Territorio más tranquilo y bajo control del Estado. Fronteras con Ghana, Benín y Costa de Marfil estables.</p>");
+
+        // Radio de Cobertura Aérea / Vigilancia Drone (300 km desde la capital)
+        const airCoverage = L.circle(uagaCoords, {
+            radius: 300000,
+            color: '#47a3ff',
+            weight: 1,
+            dashArray: '5, 8',
+            fillColor: '#47a3ff',
+            fillOpacity: 0.02,
+            interactive: false
+        }).addTo(zonesGroup);
+
+        // --- MARCADORES Y PUNTOS CLAVE ---
+        
+        // Iconos Genéricos Básicos usando DivIcon para mantener todo nativo y estilizado
+        function createTacticalIcon(color, text = '•') {
+            return L.divIcon({
+                className: 'tactical-div-icon',
+                html: `<div style="background: ${color}; width: 12px; height: 12px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 8px ${color}; display:flex; align-items:center; justify-content:center; color:white; font-size:8px;"></div>`,
+                iconSize: [12, 12],
+                iconAnchor: [6, 6]
+            });
+        }
+
+        // 1. OBJETIVO DE ALTA PRIORIDAD: Abdul Rahman Al-Karim (95 km al norte)
+        const abdulCoords = [13.2250, -1.1500];
+        const hvtMarker = L.marker(abdulCoords, {
+            icon: L.divIcon({
+                html: `<div style="background: #ff0000; width: 16px; height: 16px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 12px #ff0000; animation: pulse 1s infinite;"></div>`,
+                iconSize: [16, 16],
+                iconAnchor: [8, 8]
+            })
+        }).addTo(intelligenceGroup);
+
+        hvtMarker.bindPopup(`
+            <div class='popup-title' style='color:#ff4a4a;'>🎯 BLANCO EN LA MIRA</div>
+            <table class='popup-table'>
+                <tr><td class='lbl'>Objetivo:</td><td class='val'>Abdul Rahman Al-Karim</td></tr>
+                <tr><td class='lbl'>Ubicación:</td><td class='val'>Zona Montañosa (95km Norte)</td></tr>
+                <tr><td class='lbl'>Defensas:</td><td class='val'>40-60 Insurgentes, Torres, Sacos de Arena, Camionetas</td></tr>
+                <tr><td class='lbl'>Certeza:</td><td class='val' style='color:#ff4a4a;'>90% Confirmado por Drones EE.UU.</td></tr>
+            </table>
+        `);
+
+        // 2. INFRAESTRUCTURA DE LA CAPITAL (UAGADUGÚ)
+        const locationsData = [
+            { name: "Aeropuerto Int. / Base Cóndor (Chile)", coords: [12.3532, -1.5121], color: "#47a3ff", desc: "Base Temporal 'Cóndor' de las FF.AA Chilenas. Aloja 520 efectivos, hangar para 2 C-130H, helipuerto para 4 Bell 412EP, centro de mando, hospital de campaña, combustible y municiones." },
+            { name: "Embajada de EE.UU.", coords: [12.3620, -1.4980], color: "#ffffff", desc: "Operación de 50 operadores tácticos. Controlan los 2 drones MQ-9 Reaper que ejecutan vigilancia continua sobre el Sahel." },
+            { name: "Embajada de Francia", coords: [12.3710, -1.5050], color: "#ffffff", desc: "Despliegue de 80 operadores especiales y 2 helicópteros Airbus H225M Caracal." },
+            { name: "Embajada de Alemania", coords: [12.3670, -1.5010], color: "#ffffff", desc: "Zona protegida de la delegación diplomática alemana." },
+            { name: "Palacio Presidencial (Kosyam)", coords: [12.3320, -1.5140], color: "#00ff66", desc: "Sede del Gobierno de Burkina Faso. Alta seguridad local." },
+            { name: "Ministerio de Defensa", coords: [12.3780, -1.5150], color: "#00ff66", desc: "Coordinación central de las operaciones de movilización DEFCON 1." },
+            { name: "Cuartel General del Ejército", coords: [12.3760, -1.5120], color: "#00ff66", desc: "Centro de comando militar de las fuerzas locales (3.500 tropas en la ciudad)." },
+            { name: "Hospital Principal", coords: [12.3630, -1.5280], color: "#00ffff", desc: "Centro médico civil y militar saturado por los recientes atentados." }
+        ];
+
+        locationsData.forEach(loc => {
+            const marker = L.marker(loc.coords, { icon: createTacticalIcon(loc.color) }).addTo(locationsGroup);
+            marker.bindPopup(`
+                <div class='popup-title'>📍 ${loc.name}</div>
+                <p style='font-size:12px; line-height:1.4; color:#bcffff;'>${loc.desc}</p>
+            `);
+            marker.on('mouseover', () => playTacticalBeep(600, 0.03));
         });
-        updateDOM("listaDocumentos", htmlStr);
-    }
 
-    window.subirDocumento = async () => { window.playClick(); const tipo = document.getElementById("docTipo").value; const titulo = document.getElementById("docTitulo").value; const cont = document.getElementById("docContenido").value; if(!titulo || !cont) return window.showToast("COMPLETE TODOS LOS CAMPOS", "error"); await addDoc(collection(db, "documentos"), { tipo: tipo, titulo: titulo, contenido: cont, autor: window.currentUserName, fecha: new Date().toLocaleString('es-CL'), timestamp: serverTimestamp() }); registrarLog("DOCUMENTO SUBIDO", `Subió un(a) ${tipo} titulado: ${titulo}`); document.getElementById("docTitulo").value = ""; document.getElementById("docContenido").value = ""; cargarDocumentos(); window.showToast("DOCUMENTO ARCHIVADO", "success"); };
-    
-    async function cargarLogsVisual() { 
-        let htmlStr = ""; 
-        window.cachedLogs.forEach(d => { 
-            htmlStr += `<div style="font-size: 13px; border-bottom: 1px solid var(--glass-border); padding: 12px 0; color: #bbb; font-family:'Share Tech Mono';"><span style="color: var(--theme-color); margin-right: 10px;">[${d.fechaFormato || '---'}]</span><strong style="color: var(--admin-blue);">${d.autor}:</strong> <span style="color:white;">[${d.accion}]</span> ${d.detalle}</div>`; 
-        }); 
-        updateDOM("listaLogsContainer", htmlStr);
-    }
+        // 3. PUNTOS DE LOS ATENTADOS RECIENTES
+        const attack1 = L.marker([12.3650, -1.4920], {
+            icon: L.divIcon({
+                html: `<div style="color: #ff4a4a; font-size: 20px; font-weight:bold; text-shadow: 0 0 5px #000;">💥</div>`,
+                iconSize: [20, 20], iconAnchor: [10, 10]
+            })
+        }).addTo(attacksGroup);
+        attack1.bindPopup(`
+            <div class='popup-title' style='color:#ff4a4a;'>💥 ATENTADO 1: EMBAJADA DE CHILE</div>
+            <table class='popup-table'>
+                <tr><td class='lbl'>Fecha/Hora:</td><td class='val'>23 Junio - 08:10</td></tr>
+                <tr><td class='lbl'>Resultado:</td><td class='val' style='color:#ff4a4a;'>40 Muertos / 12 Heridos</td></tr>
+                <tr><td class='lbl'>Estado:</td><td class='val'>Perímetro de 200m en doble contención militar.</td></tr>
+            </table>
+        `);
 
-    window.logout = () => signOut(auth).then(() => location.reload());
-</script>
+        const attack2 = L.marker([12.3685, -1.5110], {
+            icon: L.divIcon({
+                html: `<div style="color: #ffaa00; font-size: 20px; font-weight:bold; text-shadow: 0 0 5px #000;">💥</div>`,
+                iconSize: [20, 20], iconAnchor: [10, 10]
+            })
+        }).addTo(attacksGroup);
+        attack2.bindPopup(`
+            <div class='popup-title' style='color:#ffaa00;'>💥 ATENTADO 2: ATAQUE COORDINADO</div>
+            <table class='popup-table'>
+                <tr><td class='lbl'>Fecha/Hora:</td><td class='val'>24 Junio - 09:15</td></tr>
+                <tr><td class='lbl'>Zonas:</td><td class='val'>Hotel Internacional, Centro Comercial, Residencial de extranjeros</td></tr>
+                <tr><td class='lbl'>Resultado:</td><td class='val' style='color:#ff4a4a;'>78 Muertos / 150 Heridos</td></tr>
+            </table>
+        `);
+
+        // --- INTERACTIVIDAD DESDE EL SIDEBAR ---
+        document.getElementById('card-hvt').addEventListener('click', () => {
+            playTacticalBeep(900, 0.1, 'sawtooth');
+            map.setView(abdulCoords, 12);
+            hvtMarker.openPopup();
+        });
+
+        document.getElementById('card-chile').addEventListener('click', () => {
+            playTacticalBeep(500, 0.06);
+            map.setView([12.3532, -1.5121], 13);
+        });
+
+        document.getElementById('card-atentado1').addEventListener('click', () => {
+            playTacticalBeep(400, 0.08);
+            map.setView([12.3650, -1.4920], 15);
+            attack1.openPopup();
+        });
+
+        document.getElementById('card-atentado2').addEventListener('click', () => {
+            playTacticalBeep(400, 0.08);
+            map.setView([12.3685, -1.5110], 14);
+            attack2.openPopup();
+        });
+
+        // Control de Capas (Filtros)
+        const baseMaps = { "Mapa Táctico Nocturno": darkTiles };
+        const overlayMaps = {
+            "🔴/🟠/🟢 Zonas de Control": zonesGroup,
+            "📍 Infraestructura y Bases": locationsGroup,
+            "💥 Atentados Recientes": attacksGroup,
+            "🎯 Inteligencia HVT": intelligenceGroup
+        };
+        L.control.layers(baseMaps, overlayMaps, { collapsed: false }).addTo(map);
+
+        // Sonidos generales al interactuar con marcadores
+        map.on('popupopen', () => playTacticalBeep(700, 0.04));
+
+    </script>
 </body>
 </html>
