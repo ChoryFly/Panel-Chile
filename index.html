@@ -12,6 +12,7 @@
             --text-color: #ecf0f1;
             --danger-color: #c0392b;
             --success-color: #27ae60;
+            --radar-green: #00ff66;
         }
 
         body {
@@ -75,7 +76,7 @@
 
         /* Contenedor Principal */
         .main-content {
-            flex-1: 1;
+            flex: 1;
             width: calc(100% - 280px);
             padding: 30px;
             box-sizing: border-box;
@@ -137,6 +138,77 @@
             background-color: rgba(212, 175, 55, 0.05);
         }
 
+        /* MÓDULO DEL MAPA TÁCTICO RECONSTRUIDO */
+        .map-container {
+            position: relative;
+            width: 100%;
+            height: 550px;
+            background-color: #0d1317;
+            border: 2px solid var(--secondary-color);
+            border-radius: 8px;
+            overflow: hidden;
+            background-image: 
+                linear-gradient(rgba(0, 255, 102, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 102, 0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+            box-shadow: inset 0 0 30px rgba(0,0,0,0.8);
+        }
+
+        .map-radar-line {
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(to bottom, rgba(0, 255, 102, 0), rgba(0, 255, 102, 0.5), rgba(0, 255, 102, 0));
+            top: 0;
+            animation: scan 4s linear infinite;
+        }
+
+        .map-marker {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background-color: var(--radar-green);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 15px var(--radar-green);
+        }
+
+        .map-marker::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 2px solid var(--radar-green);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+            top: -2px;
+            left: -2px;
+            box-sizing: content-box;
+        }
+
+        .marker-label {
+            position: absolute;
+            left: 20px;
+            top: -5px;
+            white-space: nowrap;
+            background-color: rgba(17, 23, 26, 0.85);
+            padding: 4px 8px;
+            border: 1px solid var(--secondary-color);
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-family: monospace;
+        }
+
+        @keyframes scan {
+            0% { top: 0%; }
+            100% { top: 100%; }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(3); opacity: 0; }
+        }
+
         /* Panel de Altos Mandos */
         .admin-box {
             background-color: rgba(192, 57, 43, 0.1);
@@ -179,6 +251,7 @@
     <div class="sidebar">
         <h2>MANDO CONJUNTO</h2>
         <button class="nav-btn active" onclick="switchSection('resumen')">Resumen Operativo</button>
+        <button class="nav-btn" onclick="switchSection('mapa')">🗺️ Mapa Táctico</button>
         <button class="nav-btn" onclick="switchSection('fach')">Sección FACh</button>
         <button class="nav-btn" onclick="switchSection('armada')">Escuadra Naval</button>
         <button class="nav-btn" onclick="switchSection('sueldos')">Escala de Sueldos</button>
@@ -211,6 +284,36 @@
                 </div>
             </div>
             <p>Las líneas logísticas terrestres y aéreas permanecen bajo monitoreo constante. La extracción polimetálica del plan Escudo Dorado continúa sin interrupciones en el sector norte.</p>
+        </div>
+
+        <!-- SECCIÓN RECONSTRUIDA: MAPA TÁCTICO -->
+        <div id="mapa" class="content-section">
+            <h3>Teatro de Operaciones Transcontinental</h3>
+            <p>Monitoreo de radar de posiciones de unidades aéreas y despliegue terrestre de la Brigada Lautaro.</p>
+            
+            <div class="map-container">
+                <div class="map-radar-line"></div>
+                
+                <!-- Marcador Base Cóndor -->
+                <div class="map-marker" style="top: 65%; left: 50%;">
+                    <div class="marker-label"><span style="color: var(--accent-color);">[HQ]</span> Base Cóndor (Burkina Faso)</div>
+                </div>
+
+                <!-- Marcador Frontera Malí -->
+                <div class="map-marker" style="top: 40%; left: 35%; background-color: var(--danger-color); box-shadow: 0 0 15px var(--danger-color);">
+                    <div class="marker-label">Sección Avance Malí (BOE)</div>
+                </div>
+
+                <!-- Marcador Frontera Níger -->
+                <div class="map-marker" style="top: 45%; left: 70%; background-color: var(--danger-color); box-shadow: 0 0 15px var(--danger-color);">
+                    <div class="marker-label">Sección Avance Níger (Mowag)</div>
+                </div>
+
+                <!-- Marcador Órbita A-10 -->
+                <div class="map-marker" style="top: 52%; left: 48%; background-color: #2980b9; box-shadow: 0 0 15px #2980b9;">
+                    <div class="marker-label">⚡ Órbita CAS: A-10 Warthog</div>
+                </div>
+            </div>
         </div>
 
         <!-- SECCIÓN: SECCIÓN FACH -->
@@ -348,7 +451,6 @@
 
     <!-- SCRIPT TÁCTICO: SONIDO HOVER Y NAVEGACIÓN -->
     <script>
-        // Configuración del sintetizador de audio para evitar archivos externos y saturación
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
         function playSoftBeep() {
@@ -357,29 +459,24 @@
                 const gain = audioCtx.createGain();
                 
                 osc.type = 'sine';
-                osc.frequency.setValueAtTime(900, audioCtx.currentTime); // Frecuencia limpia
-                gain.gain.setValueAtTime(0.02, audioCtx.currentTime);    // Volumen ultra bajo no molesto
+                osc.frequency.setValueAtTime(900, audioCtx.currentTime); 
+                gain.gain.setValueAtTime(0.02, audioCtx.currentTime);    // Sonido sutil no saturante
                 
                 osc.connect(gain);
                 gain.connect(audioCtx.destination);
                 
                 osc.start();
-                // Duración muy corta (0.03 segundos) para que no se sature al pasar rápido
                 gain.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 0.03);
                 osc.stop(audioCtx.currentTime + 0.03);
-            } catch (e) {
-                // Previene errores en navegadores que bloquean el audio antes de interactuar
-            }
+            } catch (e) {}
         }
 
-        // Asignar el sonido hover a todos los botones y filas de tablas de forma masiva
         document.querySelectorAll('.nav-btn, .data-table tr').forEach(element => {
             element.addEventListener('mouseenter', () => {
-                playSoftBeep();
+                playSoftBeep(); // Implementado correctamente
             });
         });
 
-        // Función de navegación del panel
         function switchSection(sectionId) {
             document.querySelectorAll('.content-section').forEach(section => {
                 section.classList.remove('active');
@@ -390,9 +487,9 @@
 
             document.getElementById(sectionId).classList.add('active');
             
-            // Actualizar título dinámico
             const titles = {
                 'resumen': 'Resumen Operativo',
+                'mapa': 'Mapa Táctico de Operaciones',
                 'fach': 'Sección FACh - Fuerza de Tarea',
                 'armada': 'Escuadra Naval - Despliegue Atlántico',
                 'sueldos': 'Escala Salarial General',
@@ -400,7 +497,6 @@
             };
             document.getElementById('panel-title').innerText = titles[sectionId];
             
-            // Buscar botón correspondiente para marcarlo activo
             event.currentTarget.classList.add('active');
         }
     </script>
