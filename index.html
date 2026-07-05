@@ -55,7 +55,7 @@
 
         /* SIDEBAR */
         .sidebar {
-            width: 450px; /* Panel más ancho para el General en Jefe */
+            width: 450px; 
             background-color: var(--sidebar-bg);
             border-right: 2px solid var(--border-color);
             display: flex;
@@ -101,6 +101,7 @@
             border-radius: 4px;
             border-left: 3px solid #47a3ff;
             transition: background 0.2s;
+            cursor: default;
         }
         .meta-item:hover {
             background: #232b35;
@@ -137,6 +138,11 @@
             overflow-y: auto;
             padding: 20px;
         }
+        /* Scrollbar Sidebar */
+        .sidebar-content::-webkit-scrollbar { width: 6px; }
+        .sidebar-content::-webkit-scrollbar-track { background: var(--sidebar-bg); }
+        .sidebar-content::-webkit-scrollbar-thumb { background: #47a3ff; border-radius: 3px; }
+
         .section-title {
             font-size: 14px;
             color: #47a3ff;
@@ -172,14 +178,15 @@
             background: var(--card-bg);
             border: 1px solid var(--border-color);
             color: var(--text-main);
-            padding: 6px 10px;
+            padding: 8px 10px;
             border-radius: 4px;
-            font-size: 11px;
+            font-size: 12px;
             cursor: pointer;
             width: 100%;
             text-align: left;
-            margin-bottom: 5px;
+            margin-bottom: 6px;
             transition: all 0.2s;
+            font-weight: bold;
         }
         .admin-btn:hover {
             background: #ffaa00;
@@ -210,14 +217,6 @@
         }
         .label { color: var(--text-muted); width: 45%; }
         .value { color: var(--text-main); font-weight: 500; width: 55%; text-align: right; }
-        
-        .badge {
-            font-size: 11px;
-            padding: 2px 6px;
-            border-radius: 3px;
-            font-weight: bold;
-        }
-        .badge-green { background: rgba(0,255,102,0.15); color: #00ff66; border: 1px solid #00ff66; }
 
         .payroll-table {
             width: 100%;
@@ -239,6 +238,7 @@
             flex: 1;
             height: 100%;
             background-color: var(--bg-color);
+            z-index: 1;
         }
 
         /* POPUPS AVANZADOS */
@@ -249,7 +249,7 @@
             border-radius: 6px;
             font-size: 12px;
             box-shadow: 0 4px 25px rgba(0,0,0,0.9);
-            width: 420px !important; /* Más ancho para información extendida */
+            width: 420px !important; 
             max-width: 450px;
         }
         .leaflet-popup-tip {
@@ -269,7 +269,6 @@
             overflow-y: auto;
             padding-right: 5px;
         }
-        /* Scrollbar personalizado para el popup */
         .popup-scroll-area::-webkit-scrollbar { width: 6px; }
         .popup-scroll-area::-webkit-scrollbar-track { background: var(--card-bg); }
         .popup-scroll-area::-webkit-scrollbar-thumb { background: #47a3ff; border-radius: 3px; }
@@ -351,7 +350,7 @@
             100% { transform: translateX(-100%); }
         }
 
-        /* Marcador de radar suave para la base de Chile */
+        /* Marcador de radar interactivo */
         .radar-marker {
             width: 16px;
             height: 16px;
@@ -384,11 +383,11 @@
                 <h1>📡 MANDO ESTRATÉGICO <span class="defcon-badge">GLOBAL</span></h1>
                 <button class="theme-toggle" id="themeToggle">☀️ Modo Día</button>
                 <div class="meta-grid">
-                    <div class="meta-item" onmouseover="playHoverSound()">
+                    <div class="meta-item" onmouseenter="playHoverSound()">
                         <div class="meta-label">📅 Fecha Actual</div>
                         <div class="meta-val">5 JUL 2026</div>
                     </div>
-                    <div class="meta-item" onmouseover="playHoverSound()">
+                    <div class="meta-item" onmouseenter="playHoverSound()">
                         <div class="meta-label">🌍 Frente Sahel</div>
                         <div class="meta-val">Consolidado 50%</div>
                     </div>
@@ -398,16 +397,17 @@
             <div class="sidebar-content">
                 
                 <!-- PANEL DEL GENERAL EN JEFE -->
-                <div class="admin-panel">
+                <div class="admin-panel" id="adminPanel">
                     <div class="admin-panel-title">🛡️ PANEL DE ADMIN - GENERAL EN JEFE</div>
-                    <button class="admin-btn" onmouseover="playHoverSound()" onclick="map.flyTo([12.3532, -1.5121], 6)">📍 Ir a Zona Autónoma Sahel (Burkina Faso)</button>
-                    <button class="admin-btn" onmouseover="playHoverSound()" onclick="map.flyTo([49.0, 31.0], 5)">📍 Ir a Frente Europa del Este (Ucrania/Rusia)</button>
-                    <button class="admin-btn" onmouseover="playHoverSound()" onclick="map.flyTo([31.0, 35.0], 6)">📍 Ir a Frente Medio Oriente (Israel/Irán)</button>
-                    <button class="admin-btn" onmouseover="playHoverSound()" onclick="map.flyTo([35.0, 120.0], 4)">📍 Ir a Frente Asia-Pacífico (China/Corea)</button>
+                    <button class="admin-btn" onmouseenter="playHoverSound()" onclick="map.flyTo([12.3532, -1.5121], 6)">📍 Ir a Zona Autónoma Sahel (Burkina Faso)</button>
+                    <button class="admin-btn" onmouseenter="playHoverSound()" onclick="map.flyTo([49.0, 31.0], 5)">📍 Ir a Frente Europa del Este (Ucrania/Rusia)</button>
+                    <button class="admin-btn" onmouseenter="playHoverSound()" onclick="map.flyTo([31.0, 35.0], 6)">📍 Ir a Frente Medio Oriente (Israel/Irán)</button>
+                    <button class="admin-btn" onmouseenter="playHoverSound()" onclick="map.flyTo([35.0, 120.0], 4)">📍 Ir a Frente Asia-Pacífico (China/Corea)</button>
+                    <button class="admin-btn" onmouseenter="playHoverSound()" onclick="map.flyTo([-33.4, -70.6], 5)">📍 Ir a Comando Central (Chile)</button>
                 </div>
 
                 <div class="section-title">🎯 BASE LOGÍSTICA CÓNDOR (SAHEL)</div>
-                <div class="intel-card" id="card-chile" style="border-left: 4px solid #00ff66;" onmouseover="playHoverSound()">
+                <div class="intel-card" onmouseenter="playHoverSound()" style="border-left: 4px solid #00ff66;">
                     <div class="intel-row">
                         <span class="value" style="color: #00ff66; font-weight: bold; width: 100%; text-align: left;">REPORTE EN TIEMPO REAL</span>
                     </div>
@@ -417,16 +417,15 @@
                     <div class="intel-row"><span class="label">Bajas Combate:</span><span class="value">0 Muertos / 0 Heridos</span></div>
                 </div>
 
-                <!-- NÓMINA MILITAR ACTUALIZADA ESTRICTA -->
-                <div class="section-title">💼 NÓMINA DE COMBATE (CORREGIDA)</div>
-                <div class="intel-card" style="border-left: 4px solid #ffaa00;" onmouseover="playHoverSound()">
+                <!-- NÓMINA MILITAR ESTRICTA -->
+                <div class="section-title">💼 NÓMINA DE COMBATE</div>
+                <div class="intel-card" onmouseenter="playHoverSound()" style="border-left: 4px solid #ffaa00;">
                     <div class="intel-row" style="border-bottom: 1px solid var(--border-color); padding-bottom: 5px; margin-bottom: 8px;">
                         <span class="label">Fondo Soberano:</span>
                         <span class="value" style="color: #ffaa00; font-weight: bold;">FONDOS APROBADOS</span>
                     </div>
                     <div style="max-height: 250px; overflow-y: auto; padding-right: 5px;">
                         <table class="payroll-table">
-                            <!-- Datos estrictamente extraídos de la orden de corrección del usuario -->
                             <tr><td>Cabo 2°</td><td style="text-align: right; color: #00ff66;">$3.800</td></tr>
                             <tr><td>Cabo 1°</td><td style="text-align: right; color: #00ff66;">$3.800</td></tr>
                             <tr><td>Sargento 2°</td><td style="text-align: right; color: #00ff66;">$4.000</td></tr>
@@ -455,9 +454,9 @@
     <!-- TICKER DE NOTICIAS -->
     <div class="ticker-wrap">
         <div class="ticker">
-            <span class="green">🟢 GENERAL EN JEFE:</span> Panel de control global operativo. Todas las capas de África, Europa, Aliados y nóminas están activas. Pase el mouse por los puntos para oír el ping de radar. ••• 
-            <span class="blue">🤝 ALIANZA AEPS:</span> Mando Conjunto del Pacífico reporta operatividad total. ••• 
-            <span class="red">🟥 FRENTE UCRANIA:</span> Reportes de combate intensivo en el este. ••• 
+            <span class="green">🟢 GENERAL EN JEFE:</span> Panel de control global inicializado con éxito. Capas de África, Europa, Aliados y nóminas renderizadas. Pase el cursor por los marcadores para inspección. ••• 
+            <span class="blue">🤝 ALIANZA AEPS:</span> Mando Conjunto reporta operatividad total. ••• 
+            <span class="red">🟥 FRENTE UCRANIA:</span> Combate intensivo en el este. ••• 
             <span class="orange">🚁 SAHEL CHILENO:</span> Extracción minera al 100%, seguridad fronteriza sin alteraciones.
         </div>
     </div>
@@ -466,31 +465,46 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
     
     <script>
-        // SISTEMA DE AUDIO (HOVER SUAVE PARA NO SATURAR)
+        // SISTEMA DE AUDIO (HOVER SUAVE)
         let audioCtx = null;
         function playHoverSound() {
             try {
-                if (!audioCtx) { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
-                if (audioCtx.state === 'suspended') { audioCtx.resume(); }
+                if (!audioCtx) { 
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)(); 
+                }
+                if (audioCtx.state === 'suspended') { 
+                    audioCtx.resume(); 
+                }
                 const osc = audioCtx.createOscillator();
                 const gainNode = audioCtx.createGain();
-                osc.type = 'sine'; // Tono muy suave
-                osc.frequency.setValueAtTime(800, audioCtx.currentTime); // Frecuencia media
-                // Volumen bajísimo (0.01) y muy corto (0.03s) para que no sea molesto
-                gainNode.gain.setValueAtTime(0.01, audioCtx.currentTime);
-                gainNode.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.03);
+                
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(600, audioCtx.currentTime); 
+                
+                // Volumen ajustado para no saturar
+                gainNode.gain.setValueAtTime(0.015, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.05);
+                
                 osc.connect(gainNode);
                 gainNode.connect(audioCtx.destination);
+                
                 osc.start();
-                osc.stop(audioCtx.currentTime + 0.03);
-            } catch (e) { console.log("Audio desactivado o bloqueado por el navegador."); }
+                osc.stop(audioCtx.currentTime + 0.05);
+            } catch (e) {
+                // Silencioso si el navegador bloquea
+            }
         }
 
-        // INICIALIZACIÓN DEL MAPA
-        const map = L.map('map', { zoomControl: true, maxZoom: 18, minZoom: 2 }).setView([12.0, -1.5], 4); // Iniciamos centrado en el Atlántico/África para ver todo
+        // 1. INICIALIZACIÓN DEL MAPA (Centrado para ver América, África y Europa simultáneamente)
+        const map = L.map('map', { zoomControl: true, maxZoom: 18, minZoom: 2 }).setView([15.0, -25.0], 3);
 
-        const darkTiles = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { attribution: '&copy; CARTO', subdomains: 'abcd', maxZoom: 20 });
-        const lightTiles = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { attribution: '&copy; CARTO', subdomains: 'abcd', maxZoom: 20 });
+        const darkTiles = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { 
+            attribution: '&copy; CARTO', subdomains: 'abcd', maxZoom: 20 
+        });
+        const lightTiles = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { 
+            attribution: '&copy; CARTO', subdomains: 'abcd', maxZoom: 20 
+        });
+        
         darkTiles.addTo(map);
 
         // MODO DÍA/NOCHE
@@ -500,24 +514,34 @@
             isLightMode = !isLightMode;
             document.body.classList.toggle('light-mode');
             if (isLightMode) {
-                map.removeLayer(darkTiles); lightTiles.addTo(map);
-                e.target.innerHTML = '🌙 Modo Noche'; e.target.style.background = '#2c3e50';
+                map.removeLayer(darkTiles); 
+                lightTiles.addTo(map);
+                e.target.innerHTML = '🌙 Modo Noche'; 
+                e.target.style.background = '#2c3e50';
             } else {
-                map.removeLayer(lightTiles); darkTiles.addTo(map);
-                e.target.innerHTML = '☀️ Modo Día'; e.target.style.background = '#47a3ff';
+                map.removeLayer(lightTiles); 
+                darkTiles.addTo(map);
+                e.target.innerHTML = '☀️ Modo Día'; 
+                e.target.style.background = '#47a3ff';
             }
         });
 
-        // CREACIÓN DE GRUPOS DE CAPAS (TODAS AÑADIDAS AL MAPA POR DEFECTO PARA QUE NO FALTEN)
+        // 2. CREACIÓN DE GRUPOS DE CAPAS
+        // Al añadirlas explícitamente a map al declararlas, evitamos que Leaflet las oculte en la carga
         const chileGroup = L.layerGroup().addTo(map);
         const sahelGroup = L.layerGroup().addTo(map);
-        const globalWarsGroup = L.layerGroup().addTo(map);
         const alliesGroup = L.layerGroup().addTo(map);
+        const globalWarsGroup = L.layerGroup().addTo(map);
 
-        // FUNCIÓN GENERADORA DE ICONOS
+        // FUNCIONES DE INTERFAZ DEL MAPA
         function createIcon(color, isRadar = false) {
             if(isRadar) {
-                return L.divIcon({ className: 'tactical-div-icon', html: `<div class="radar-marker"></div>`, iconSize: [16, 16], iconAnchor: [8, 8] });
+                return L.divIcon({ 
+                    className: 'tactical-div-icon', 
+                    html: `<div class="radar-marker"></div>`, 
+                    iconSize: [16, 16], 
+                    iconAnchor: [8, 8] 
+                });
             }
             return L.divIcon({
                 className: 'tactical-div-icon',
@@ -526,7 +550,6 @@
             });
         }
 
-        // GENERADOR DE CONTENIDO HTML PARA POPUPS EXTENDIDOS
         function buildPopupExtendido(data) {
             let bajasHtml = '';
             if (data.bajas) {
@@ -553,50 +576,56 @@
         }
 
         function createMarker(data, group, isRadar = false) {
-            const marker = L.marker(data.coords, { icon: createIcon(data.color, isRadar) }).addTo(group);
+            const marker = L.marker(data.coords, { icon: createIcon(data.color, isRadar) });
             marker.bindPopup(buildPopupExtendido(data));
-            // Sonido al pasar el mouse
-            marker.on('mouseover', function(e) {
-                playHoverSound();
-            });
-            return marker;
+            
+            // Asignación de sonido al marcador
+            marker.on('mouseover', function() { playHoverSound(); });
+            
+            // Añadir al grupo especificado
+            marker.addTo(group);
         }
 
         // =========================================================================
-        // 1. CHILE Y SU ZONA AUTÓNOMA EN EL SAHEL (ÁFRICA)
+        // DATOS DE MAPA: CHILE Y SAHEL (ÁFRICA)
         // =========================================================================
         
-        // Polígonos de la zona controlada en Burkina Faso
-        L.polygon([[15.1, -5.5], [15.1, 2.5], [12.9, 2.5], [12.9, -5.5]], { color: '#00ff66', weight: 1, fillColor: '#00ff66', fillOpacity: 0.2 }).addTo(sahelGroup);
-        L.polygon([[12.9, -5.5], [12.9, 2.5], [11.8, 2.5], [11.8, -5.5]], { color: '#47a3ff', weight: 1, fillColor: '#47a3ff', fillOpacity: 0.1 }).addTo(sahelGroup);
+        // Polígonos Zona Autónoma de Burkina Faso
+        L.polygon([[15.1, -5.5], [15.1, 2.5], [12.9, 2.5], [12.9, -5.5]], { 
+            color: '#00ff66', weight: 1, fillColor: '#00ff66', fillOpacity: 0.2 
+        }).addTo(sahelGroup);
+        
+        L.polygon([[12.9, -5.5], [12.9, 2.5], [11.8, 2.5], [11.8, -5.5]], { 
+            color: '#47a3ff', weight: 1, fillColor: '#47a3ff', fillOpacity: 0.1 
+        }).addTo(sahelGroup);
 
-        const chileBases = [
+        const chileData = [
             {
-                coords: [-33.4372, -70.6506], color: "#00ff66", titulo: "🟢 COMANDO CENTRAL (Santiago de Chile)",
-                estado: "Mando Supremo - DEFCON 4", 
+                coords: [-33.4372, -70.6506], color: "#00ff66", titulo: "🟢 COMANDO CENTRAL (Santiago, Chile)",
+                estado: "Mando Supremo", 
                 terrestre: "80.000 Activos. Tanques Leopard 2A4CHL, Marder 1A3.",
                 naval: "Fragatas Tipo 23, Submarinos Scorpene.",
                 aereo: "30x F-16 (Block 50/MLU), 5x A-10 Thunderbolt II, 8x C-130H, 2x KC-135.",
-                helos: "22x Bell 412/Huey, 16x AS365 Dauphin, UH-60M en África.",
-                misiles: "Sistemas NASAMS, Barak 8, Spike LR2, AMRAAM AIM-120C.",
+                helos: "22x Bell 412/Huey, 16x AS365 Dauphin, UH-60M.",
+                misiles: "NASAMS, Barak 8, Spike LR2, AMRAAM AIM-120C.",
                 moral: "100% - Logística Operativa Global.",
                 bajas: { muertos: "0", heridos: "0" }
             },
             {
-                coords: [12.3532, -1.5121], color: "#00ff66", titulo: "📍 BASE LOGÍSTICA CÓNDOR (Uagadugú, África)",
-                estado: "Ocupación Militar Soberana - Operación Estabilización", 
-                terrestre: "2.000 Efectivos (Brigada BOE Lautaro, Infantería de Marina). Vehículos Mowag Piranha.",
+                coords: [12.3532, -1.5121], color: "#00ff66", titulo: "📍 BASE LOGÍSTICA CÓNDOR (Uagadugú)",
+                estado: "Ocupación Militar Soberana", 
+                terrestre: "2.000 Efectivos (Brigada BOE Lautaro, Infantería de Marina). Mowag Piranha.",
                 naval: "Apoyo satelital naval remoto.",
                 aereo: "Puente aéreo ininterrumpido C-130H desde Chile.",
                 helos: "2x Sikorsky UH-60M Black Hawk, 4x Bell 412EP.",
-                misiles: "Defensa AA portátil, radares tácticos Escudo Cóndor.",
-                moral: "Alta. Minas aseguradas. Salarios escala combate activos.",
+                misiles: "Defensa AA portátil, radares tácticos.",
+                moral: "Alta. Minas aseguradas. Salarios activos.",
                 bajas: { muertos: "0", heridos: "0" }
             },
             {
-                coords: [13.2500, -1.1500], color: "#ffaa00", titulo: "🎯 OP. MARTILLO DE ARENA (Frontera Níger/Malí)",
+                coords: [13.2500, -1.1500], color: "#ffaa00", titulo: "🎯 OP. MARTILLO DE ARENA (Frontera Níger)",
                 estado: "Objetivo Hostil Aniquilado", 
-                terrestre: "Comandos de la BOE Lautaro en patrulla profunda.",
+                terrestre: "Comandos BOE Lautaro en patrulla profunda.",
                 naval: "N/A",
                 aereo: "Cobertura de Drones de Reconocimiento.",
                 helos: "Inserción táctica completada por UH-60M.",
@@ -605,138 +634,138 @@
                 bajas: { muertos: "0 (Chilenos) / 35+ (Insurgentes)", heridos: "0 (Chilenos)" }
             }
         ];
-        chileBases.forEach(b => createMarker(b, chileGroup, true)); // True para ponerles la animación de radar
+        chileData.forEach(d => createMarker(d, chileGroup, true)); // True = radar visual effect
 
         // =========================================================================
-        // 2. PAÍSES ALIADOS (ALIANZA AEPS)
+        // DATOS DE MAPA: ALIADOS AEPS
         // =========================================================================
-        const aliados = [
+        const alliesData = [
             {
-                coords: [38.8951, -77.0364], color: "#00ffff", titulo: "🇺🇸 ESTADOS UNIDOS (Pentágono)",
+                coords: [38.8951, -77.0364], color: "#00ffff", titulo: "🇺🇸 ESTADOS UNIDOS",
                 estado: "Apoyo a Chile en África / Liderazgo OTAN",
                 terrestre: "1.328.000 Activos. Abrams M1A2, Bradley M2A4.",
                 naval: "11 Portaaviones de Propulsión Nuclear, 68 Submarinos.",
-                aereo: "Flota F-35A/B/C, F-22 Raptor, B-21 Raider, B-52.",
+                aereo: "Flota F-35A/B/C, F-22 Raptor, B-21 Raider.",
                 helos: "AH-64E Apache, UH-60M Black Hawk, CH-47F.",
-                misiles: "Minuteman III (ICBM), Patriot PAC-3, THAAD, Tomahawk.",
-                moral: "Tensión política interna, pero logística robusta.",
-                bajas: { muertos: "0 (en conflictos actuales directos)", heridos: "0" }
+                misiles: "Minuteman III (ICBM), Patriot PAC-3, THAAD.",
+                moral: "Logística robusta y permanente.",
+                bajas: { muertos: "0", heridos: "0" }
             },
             {
-                coords: [51.5074, -0.1278], color: "#00ffff", titulo: "🇬🇧 REINO UNIDO (Mando Londres)",
-                estado: "Aliado AEPS / Proveedor Ucrania",
+                coords: [51.5074, -0.1278], color: "#00ffff", titulo: "🇬🇧 REINO UNIDO",
+                estado: "Aliado AEPS / Proveedor de Ucrania",
                 terrestre: "142.000 Activos. Challenger 2/3.",
                 naval: "2 Portaaviones Clase Queen Elizabeth.",
                 aereo: "Eurofighter Typhoon FGR4, F-35B Lightning.",
                 helos: "AH-64E Apache, Chinook HC6.",
-                misiles: "Trident D5 Nuclear, misiles de crucero Storm Shadow.",
-                moral: "Estable, alta presión industrial militar.",
+                misiles: "Trident D5 Nuclear, misiles Storm Shadow.",
+                moral: "Estable, alta presión industrial.",
                 bajas: { muertos: "0", heridos: "0" }
             },
             {
                 coords: [-15.8267, -47.9218], color: "#00ffff", titulo: "🇧🇷 BRASIL",
-                estado: "Socio Sudamericano AEPS / Inspección en Base Cóndor",
+                estado: "Socio Sudamericano AEPS",
                 terrestre: "334.000 Activos. Leopard 1A5, Guaraní.",
                 naval: "Submarinos Clase Riachuelo, NAM Atlântico.",
                 aereo: "F-39 Gripen, Embraer KC-390, Super Tucano.",
-                helos: "EC725 Caracal, AH-2 Sabre (Mi-35).",
+                helos: "EC725 Caracal, AH-2 Sabre.",
                 misiles: "ASTROS II, Misil Antibuque Mansup.",
-                moral: "Excelente cooperación táctica con Chile.",
+                moral: "Excelente cooperación con Chile.",
                 bajas: { muertos: "0", heridos: "0" }
             },
             {
-                coords: [35.6895, 139.6917], color: "#00ffff", titulo: "🇯🇵 JAPÓN (SDF)",
+                coords: [35.6895, 139.6917], color: "#00ffff", titulo: "🇯🇵 JAPÓN",
                 estado: "Contención en Asia-Pacífico",
                 terrestre: "247.000 Activos. Type 10 Tanks.",
-                naval: "Destructores Portahelicópteros Clase Izumo (F-35).",
+                naval: "Destructores Portahelicópteros Clase Izumo.",
                 aereo: "F-35A, F-15J, Mitsubishi F-2.",
                 helos: "AH-64D, UH-60JA.",
                 misiles: "Type 12 (Defensa Costera), SM-3 Block IIA.",
-                moral: "Alerta máxima por maniobras Chinas y Norcoreanas.",
+                moral: "Alerta máxima en el mar del este.",
                 bajas: { muertos: "0", heridos: "0" }
             }
         ];
-        aliados.forEach(a => createMarker(a, alliesGroup));
+        alliesData.forEach(a => createMarker(a, alliesGroup));
 
         // =========================================================================
-        // 3. FRENTES DE GUERRA GLOBALES (EXTENDIDOS)
+        // DATOS DE MAPA: FRENTES DE GUERRA GLOBALES
         // =========================================================================
-        const guerras = [
+        const warData = [
             {
-                coords: [50.4501, 30.5234], color: "#47a3ff", titulo: "🟦 UCRANIA (Kiev / Frente Este)",
-                estado: "Guerra de Desgaste (Defensa Activa)",
-                terrestre: "900.000 Efectivos (Movilización total). Leopard 2, Abrams, T-64BV.",
-                naval: "Flota de drones marinos Magura V5 (Mar Negro).",
-                aereo: "Escuadrones F-16AM/BM, MiG-29, Su-24M.",
-                helos: "Mi-8, Mi-24 (uso limitado por guerra antiaérea).",
-                misiles: "ATACMS (EE.UU.), Storm Shadow, HIMARS, Patriot PAC-3.",
-                moral: "Fatiga extrema en infantería, pero alta resiliencia nacional.",
-                bajas: { muertos: "Estimado: 75.000 - 100.000+", heridos: "250.000+" }
+                coords: [50.4501, 30.5234], color: "#47a3ff", titulo: "🟦 UCRANIA",
+                estado: "Defensa Activa",
+                terrestre: "900.000 Efectivos. Leopard 2, Abrams, T-64BV.",
+                naval: "Flota de drones marinos Magura V5.",
+                aereo: "F-16AM/BM, MiG-29, Su-24M.",
+                helos: "Mi-8, Mi-24.",
+                misiles: "ATACMS, Storm Shadow, HIMARS, Patriot PAC-3.",
+                moral: "Fatiga extrema de combate.",
+                bajas: { muertos: "Est. 75.000 - 100.000+", heridos: "250.000+" }
             },
             {
-                coords: [55.7558, 37.6173], color: "#ff4a4a", titulo: "🟥 RUSIA (Mando Moscú)",
-                estado: "Ofensiva Sostenida (Economía de Guerra)",
-                terrestre: "1.320.000 Activos. T-90M, T-72B3, artillería masiva.",
-                naval: "Flota del Mar Negro (mermada), Flota del Norte intacta.",
-                aereo: "Su-35S, Su-34, Tu-95MS, cazas MiG-31K.",
-                helos: "Ka-52 Alligator, Mi-28NM (Operaciones de caza de blindados).",
-                misiles: "Iskander-M, Kinzhal (Hipersónico), Kalibr, FAB-3000 con UMPK.",
-                moral: "Estabilizada mediante salarios altos y censura estricta.",
-                bajas: { muertos: "Estimado: 130.000 - 150.000+", heridos: "400.000+" }
+                coords: [55.7558, 37.6173], color: "#ff4a4a", titulo: "🟥 RUSIA",
+                estado: "Ofensiva Sostenida",
+                terrestre: "1.320.000 Activos. T-90M, T-72B3.",
+                naval: "Flota del Mar Negro, Flota del Norte.",
+                aereo: "Su-35S, Su-34, Tu-95MS, MiG-31K.",
+                helos: "Ka-52 Alligator, Mi-28NM.",
+                misiles: "Iskander-M, Kinzhal, Kalibr, FAB-3000.",
+                moral: "Economía de guerra sostenida.",
+                bajas: { muertos: "Est. 130.000 - 150.000+", heridos: "400.000+" }
             },
             {
-                coords: [39.0194, 125.7381], color: "#ff4a4a", titulo: "🟥 COREA DEL NORTE (Pyongyang)",
-                estado: "Proveedor de Guerra a Rusia / Alta Tensión Fronteriza",
-                terrestre: "1.280.000 Activos (Ejército Popular de Corea).",
-                naval: "Submarinos diésel, mini-submarinos de infiltración.",
-                aereo: "Fuerza aérea obsoleta (MiG-29 tempranos, Il-28).",
-                helos: "MD 500 (obtenidos ilícitamente), Mi-2.",
-                misiles: "ICBM Hwasong-17, Misiles tácticos KN-23 (enviados a Rusia).",
-                moral: "Fanatismo de Estado absoluto.",
-                bajas: { muertos: "0 (Directas)", heridos: "0" }
-            },
-            {
-                coords: [39.9042, 116.4074], color: "#ffaa00", titulo: "🟧 CHINA (Beijing)",
-                estado: "Guerra Fría Comercial / Presión sobre Taiwán",
-                terrestre: "2.035.000 Activos (EPL). Type 99A.",
-                naval: "3 Portaaviones (Liaoning, Shandong, Fujian), mayor flota naval en números.",
-                aereo: "J-20 Mighty Dragon (Stealth), J-16, Bombarderos H-6K.",
-                helos: "Z-10 (Ataque), Z-20 (Transporte táctico).",
-                misiles: "DF-41 (ICBM), DF-21D (Carrier Killer), DF-17 Hipersónico.",
-                moral: "Alta. Preparación a largo plazo para contingencia en Taiwán.",
+                coords: [39.0194, 125.7381], color: "#ff4a4a", titulo: "🟥 COREA DEL NORTE",
+                estado: "Proveedor de Munición",
+                terrestre: "1.280.000 Activos.",
+                naval: "Submarinos diésel.",
+                aereo: "MiG-29 tempranos, Il-28.",
+                helos: "MD 500, Mi-2.",
+                misiles: "Hwasong-17, KN-23.",
+                moral: "Fanatismo de Estado.",
                 bajas: { muertos: "0", heridos: "0" }
             },
             {
-                coords: [31.0461, 34.8516], color: "#ffaa00", titulo: "🟧 ISRAEL (Tel Aviv / Frente Gaza-Líbano)",
-                estado: "Conflicto Multifrente Abierto",
-                terrestre: "170.000 Activos + 350.000 Reservistas. Merkava Mk IV, Namer.",
+                coords: [39.9042, 116.4074], color: "#ffaa00", titulo: "🟧 CHINA",
+                estado: "Presión sobre Taiwán",
+                terrestre: "2.035.000 Activos (EPL). Type 99A.",
+                naval: "3 Portaaviones (Liaoning, Shandong, Fujian).",
+                aereo: "J-20 Mighty Dragon, J-16, Bombarderos H-6K.",
+                helos: "Z-10, Z-20.",
+                misiles: "DF-41, DF-21D (Carrier Killer), DF-17 Hipersónico.",
+                moral: "Alta preparación logística.",
+                bajas: { muertos: "0", heridos: "0" }
+            },
+            {
+                coords: [31.0461, 34.8516], color: "#ffaa00", titulo: "🟧 ISRAEL",
+                estado: "Conflicto Multifrente",
+                terrestre: "170.000 Activos + 350.000 Reservistas. Merkava Mk IV.",
                 naval: "Corbetas Sa'ar 6, Submarinos Clase Dolphin.",
                 aereo: "F-35I Adir, F-15I Ra'am, F-16I Sufa.",
                 helos: "AH-64D Apache Longbow, CH-53 Yas'ur.",
-                misiles: "Iron Dome (Cúpula de Hierro), Arrow 3, David's Sling.",
-                moral: "Sociedad militarizada en estado de emergencia constante.",
-                bajas: { muertos: "1.600+ (Militar/Civil combinado)", heridos: "12.000+" }
+                misiles: "Iron Dome, Arrow 3, David's Sling.",
+                moral: "Emergencia civil constante.",
+                bajas: { muertos: "1.600+", heridos: "12.000+" }
             },
             {
-                coords: [35.6892, 51.3890], color: "#ff4a4a", titulo: "🟥 IRÁN (Teherán)",
-                estado: "Guerra Proxy y Tensiones Directas",
-                terrestre: "610.000 Activos (Guardia Revolucionaria IRGC y Artesh).",
-                naval: "Lanchas rápidas de ataque en enjambre, drones navales.",
-                aereo: "F-14 Tomcat (Legado), Su-35 (Adquisición rusa reciente).",
+                coords: [35.6892, 51.3890], color: "#ff4a4a", titulo: "🟥 IRÁN",
+                estado: "Guerra Proxy",
+                terrestre: "610.000 Activos (IRGC y Artesh).",
+                naval: "Lanchas rápidas de ataque.",
+                aereo: "F-14 Tomcat, Su-35.",
                 helos: "AH-1J SeaCobra, Mi-17.",
-                misiles: "Fattah (Hipersónico), Kheibar, Drones Kamikaze Shahed-136.",
-                moral: "Mando consolidado, tensión socioeconómica civil fuerte.",
-                bajas: { muertos: "Clasificado (Altos mandos IRGC eliminados)", heridos: "N/A" }
+                misiles: "Fattah, Kheibar, Shahed-136.",
+                moral: "Mando consolidado.",
+                bajas: { muertos: "Clasificado", heridos: "N/A" }
             }
         ];
-        guerras.forEach(g => createMarker(g, globalWarsGroup));
+        warData.forEach(w => createMarker(w, globalWarsGroup));
 
-        // CONTROL DE CAPAS PARA PODER FILTRAR (PERO TODAS ESTÁN ON POR DEFECTO)
+        // CONTROLES DEL MAPA
         const overlays = {
-            "🟢 Operaciones Chile (Sahel/Nacional)": chileGroup,
-            "🟩 Zonas Sahel (África)": sahelGroup,
-            "🤝 Aliados Globales (AEPS)": alliesGroup,
-            "🔴/🟧 Frentes de Guerra (Rusia/Israel/etc)": globalWarsGroup
+            "🟢 Operaciones Chile": chileGroup,
+            "🟩 Zonas Sahel (Burkina)": sahelGroup,
+            "🤝 Aliados (AEPS)": alliesGroup,
+            "🔴 Frentes Globales": globalWarsGroup
         };
         L.control.layers(null, overlays, { collapsed: false }).addTo(map);
 
