@@ -1,4 +1,4 @@
-html_content = """<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -40,10 +40,20 @@ html_content = """<!DOCTYPE html>
             background-color: var(--bg-color);
             color: var(--text-main);
             display: flex;
+            flex-direction: column; /* Cambiado para acomodar el ticker */
             height: 100vh;
             overflow: hidden;
             transition: background-color 0.3s, color 0.3s;
         }
+        
+        /* Contenedor principal para mantener el mapa y el sidebar juntos */
+        .main-container {
+            display: flex;
+            flex: 1;
+            height: calc(100vh - 30px);
+            overflow: hidden;
+        }
+
         /* Sidebar Layout */
         .sidebar {
             width: 420px;
@@ -179,6 +189,22 @@ html_content = """<!DOCTYPE html>
         .badge-green { background: rgba(0,255,102,0.15); color: #00ff66; border: 1px solid #00ff66; }
         .badge-blue { background: rgba(71,163,255,0.15); color: #47a3ff; border: 1px solid #47a3ff; }
 
+        /* Estilos Nómina Militar */
+        .payroll-table {
+            width: 100%;
+            color: var(--text-main);
+            font-size: 12px;
+            border-collapse: collapse;
+            margin-top: 5px;
+        }
+        .payroll-table td {
+            padding: 3px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .payroll-table tr:last-child td {
+            border-bottom: none;
+        }
+
         /* Map Container */
         #map {
             flex: 1;
@@ -229,190 +255,255 @@ html_content = """<!DOCTYPE html>
             font-weight: 500;
         }
 
-        /* Controls layer customization */
         .leaflet-control-layers {
             background: var(--card-bg) !important;
             color: var(--text-main) !important;
             border: 1px solid var(--border-color) !important;
             border-radius: 6px !important;
         }
+
+        /* Estilos del Ticker (Cinta de Noticias) */
+        .ticker-wrap {
+            width: 100%;
+            background-color: #050608;
+            border-top: 2px solid #232b35;
+            height: 30px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.5);
+            z-index: 2000;
+        }
+        .ticker {
+            white-space: nowrap;
+            color: #00ff66;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 13px;
+            font-weight: bold;
+            padding-left: 100%;
+            animation: ticker 35s linear infinite;
+        }
+        .ticker span.red { color: #ff4a4a; }
+        .ticker span.blue { color: #47a3ff; }
+        @keyframes ticker {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-100%); }
+        }
     </style>
 </head>
 <body>
+    
+    <div class="main-container">
+        <!-- SIDEBAR DE CONTROL TÁCTICO -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h1>📡 PANEL DE SITUACIÓN <span class="defcon-badge">DEFCON 1</span></h1>
+                <button class="theme-toggle" id="themeToggle">☀️ Modo Día</button>
+                <div class="meta-grid">
+                    <div class="meta-item">
+                        <div class="meta-label">📅 Fecha de Operación</div>
+                        <div class="meta-val">24 JUN 2027</div>
+                    </div>
+                    <div class="meta-item">
+                        <div class="meta-label">🕒 Hora Local</div>
+                        <div class="meta-val">18:30</div>
+                    </div>
+                    <div class="meta-item">
+                        <div class="meta-label">🌍 País Objetivo</div>
+                        <div class="meta-val">Burkina Faso</div>
+                    </div>
+                    <div class="meta-item">
+                        <div class="meta-label">🏛️ Estado de Alerta</div>
+                        <div class="meta-val" style="color: #ff4a4a;">Ejército Movilizado</div>
+                    </div>
+                </div>
+            </div>
 
-    <!-- SIDEBAR DE CONTROL TÁCTICO -->
-    <div class="sidebar">
-        <div class="sidebar-header">
-            <h1>📡 PANEL DE SITUACIÓN <span class="defcon-badge">DEFCON 1</span></h1>
-            <button class="theme-toggle" id="themeToggle">☀️ Modo Día</button>
-            <div class="meta-grid">
-                <div class="meta-item">
-                    <div class="meta-label">📅 Fecha de Operación</div>
-                    <div class="meta-val">24 JUN 2027</div>
+            <div class="sidebar-content">
+
+                <div class="section-title">🌍 Panorama Global Actual</div>
+                <div class="intel-card" id="card-global-ru" style="border-left: 4px solid #ff4a4a;">
+                    <div class="intel-row">
+                        <span class="value" style="color: #ff4a4a; font-weight: bold;">🇷🇺 Rusia vs 🇺🇦 Ucrania</span>
+                        <span class="badge badge-red">Pelea Activa</span>
+                    </div>
+                    <div class="intel-row">
+                        <span class="label">Muertes Totales Est.:</span>
+                        <span class="value" style="color: #ff4a4a;">360.000+</span>
+                    </div>
                 </div>
-                <div class="meta-item">
-                    <div class="meta-label">🕒 Hora Local</div>
-                    <div class="meta-val">18:30</div>
+                
+                <div class="intel-card" id="card-global-il" style="border-left: 4px solid #ff4a4a;">
+                    <div class="intel-row">
+                        <span class="value" style="color: #ff4a4a; font-weight: bold;">🇮🇱 Israel vs 🇮🇷 Irán</span>
+                        <span class="badge badge-red">Pelea Activa</span>
+                    </div>
+                    <div class="intel-row">
+                        <span class="label">Muertes Totales Est.:</span>
+                        <span class="value" style="color: #ff4a4a;">15.100+</span>
+                    </div>
                 </div>
-                <div class="meta-item">
-                    <div class="meta-label">🌍 País Objetivo</div>
-                    <div class="meta-val">Burkina Faso</div>
+
+                <div class="intel-card" id="card-global-cl" style="border-left: 4px solid #00ff66;">
+                    <div class="intel-row">
+                        <span class="value" style="color: #00ff66; font-weight: bold;">🇨🇱 República de Chile</span>
+                        <span class="badge badge-green">Neutral / Estable</span>
+                    </div>
+                    <div class="intel-row">
+                        <span class="label">Estado Actual:</span>
+                        <span class="value">Guerra vs Bolivia Finalizada</span>
+                    </div>
                 </div>
-                <div class="meta-item">
-                    <div class="meta-label">🏛️ Estado de Alerta</div>
-                    <div class="meta-val" style="color: #ff4a4a;">Ejército Movilizado</div>
+
+                <div class="section-title">🎯 Objetivo de Alta Prioridad (HVT)</div>
+                <div class="intel-card" id="card-hvt" style="border-left: 4px solid #ff4a4a;">
+                    <div class="intel-row">
+                        <span class="label">Objetivo:</span>
+                        <span class="value" style="color: #ff4a4a; font-weight: bold;">Abdul Rahman Al-Karim</span>
+                    </div>
+                    <div class="intel-row">
+                        <span class="label">Rol:</span>
+                        <span class="value">Líder Frente Liberación Sahel</span>
+                    </div>
+                    <div class="intel-row">
+                        <span class="label">Última Ubicación:</span>
+                        <span class="value">Campamento Norte (95 km de la Capital)</span>
+                    </div>
+                    <div class="intel-row">
+                        <span class="label">Certeza Inteligencia:</span>
+                        <span class="badge badge-red">90% Probabilidad</span>
+                    </div>
+                </div>
+
+                <div class="section-title">🛡️ Fuerza Desplegada (Chile)</div>
+                <div class="intel-card" id="card-chile" style="border-left: 4px solid #47a3ff;">
+                    <div class="intel-row">
+                        <span class="label">Base Operativa:</span>
+                        <span class="value">Base Temporal "Cóndor" (Aeropuerto)</span>
+                    </div>
+                    <div class="intel-row">
+                        <span class="label">Efectivos Totales:</span>
+                        <span class="value">520 Militares</span>
+                    </div>
+                    <div class="intel-row">
+                        <span class="label">Brigada Lautaro:</span>
+                        <span class="value">300 (Alpha: 100 | Bravo: 100 | Charlie: 100)</span>
+                    </div>
+                    <div class="intel-row">
+                        <span class="label">Unidades de Apoyo:</span>
+                        <span class="value">220 (Logística, Médicos, Intel, Coms)</span>
+                    </div>
+                    <div class="intel-row">
+                        <span class="label">Medios Aéreos:</span>
+                        <span class="value">2 C-130H Hercules | 4 Bell 412EP</span>
+                    </div>
+                    <div class="intel-row">
+                        <span class="label">Medios Terrestres:</span>
+                        <span class="value">18 Veh. Tácticos | 6 Amb. | 1 Puesto Mando</span>
+                    </div>
+                </div>
+
+                <!-- NUEVA SECCIÓN: NÓMINA MILITAR -->
+                <div class="section-title">💼 Módulo Logístico y Nómina</div>
+                <div class="intel-card" id="card-nomina" style="border-left: 4px solid #ffaa00;">
+                    <div class="intel-row" style="border-bottom: 1px solid var(--border-color); padding-bottom: 5px; margin-bottom: 8px;">
+                        <span class="label">Presupuesto Operativo:</span>
+                        <span class="value" style="color: #ffaa00; font-weight: bold;">AUTORIZADO</span>
+                    </div>
+                    <div class="intel-row"><span class="label" style="font-weight: bold; color: var(--text-main);">Estructura Salarial Oficial</span></div>
+                    <div style="max-height: 140px; overflow-y: auto; margin-top: 5px; padding-right: 5px;">
+                        <table class="payroll-table">
+                            <tr><td>Cabo 2°</td><td style="text-align: right; color: #00ff66;">$3.800</td></tr>
+                            <tr><td>Cabo 1°</td><td style="text-align: right; color: #00ff66;">$3.800</td></tr>
+                            <tr><td>Sargento 2°</td><td style="text-align: right; color: #00ff66;">$4.000</td></tr>
+                            <tr><td>Sargento 1°</td><td style="text-align: right; color: #00ff66;">$4.300</td></tr>
+                            <tr><td>Suboficial</td><td style="text-align: right; color: #00ff66;">$4.600</td></tr>
+                            <tr><td>Suboficial Mayor</td><td style="text-align: right; color: #00ff66;">$5.000</td></tr>
+                            <tr><td>Subteniente</td><td style="text-align: right; color: #00ff66;">$5.300</td></tr>
+                            <tr><td>Teniente</td><td style="text-align: right; color: #00ff66;">$5.700</td></tr>
+                            <tr><td>Capitán</td><td style="text-align: right; color: #00ff66;">$6.200</td></tr>
+                            <tr><td>Mayor</td><td style="text-align: right; color: #00ff66;">$6.800</td></tr>
+                            <tr><td>Teniente Coronel</td><td style="text-align: right; color: #00ff66;">$7.500</td></tr>
+                            <tr><td>Coronel</td><td style="text-align: right; color: #00ff66;">$8.500</td></tr>
+                            <tr><td>General de Brigada</td><td style="text-align: right; color: #00ff66;">$9.500</td></tr>
+                            <tr><td>General de División</td><td style="text-align: right; color: #00ff66;">$11.000</td></tr>
+                            <tr><td>General en Jefe</td><td style="text-align: right; color: #ffaa00; font-weight: bold;">$13.000</td></tr>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="section-title">⚠️ Atentados Recientes</div>
+                <div class="intel-card" id="card-atentado1">
+                    <div class="intel-row">
+                        <span class="value" style="color: #ffaa00;">1. Embajada de Chile</span>
+                        <span class="label">23 Jun - 08:10</span>
+                    </div>
+                    <div class="intel-row">
+                        <span class="label">Bajas:</span>
+                        <span class="value" style="color: #ff4a4a;">40 Muertos / 12 Heridos</span>
+                    </div>
+                    <div class="intel-row">
+                        <span class="label">Estado actual:</span>
+                        <span class="badge badge-red">Perímetro Asegurado</span>
+                    </div>
+                </div>
+
+                <div class="intel-card" id="card-atentado2">
+                    <div class="intel-row">
+                        <span class="value" style="color: #ffaa00;">2. Ataques Coordinados</span>
+                        <span class="label">24 Jun - 09:15</span>
+                    </div>
+                    <div class="intel-row">
+                        <span class="label">Objetivos:</span>
+                        <span class="value">Hotel Int. / Centro Com. / Res. Extranjeros</span>
+                    </div>
+                    <div class="intel-row">
+                        <span class="label">Bajas Totales:</span>
+                        <span class="value" style="color: #ff4a4a;">78 Muertos / 150 Heridos</span>
+                    </div>
+                </div>
+
+                <div class="section-title">🌐 Fuerzas Aliadas y Locales</div>
+                <div class="intel-card">
+                    <div class="intel-row">
+                        <span class="label">Burkina Faso (Capital):</span>
+                        <span class="value">3.500 Ejército | 1.200 FF.EE | 5.000 Policía</span>
+                    </div>
+                    <div class="intel-row">
+                        <span class="label">Francia:</span>
+                        <span class="value">80 Operadores Esp. | 2 Helicópteros Caracal</span>
+                    </div>
+                    <div class="intel-row">
+                        <span class="label">EE.UU. (Drones):</span>
+                        <span class="value">50 Operadores | 2 MQ-9 Reaper (Vigilancia)</span>
+                    </div>
+                    <div class="intel-row">
+                        <span class="label">ONU:</span>
+                        <span class="value">150 Observadores (No Combatientes)</span>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="sidebar-content">
-
-            <!-- NUEVA SECCIÓN: CONFLICTOS GLOBALES -->
-            <div class="section-title">🌍 Panorama Global Actual</div>
-            <div class="intel-card" id="card-global-ru" style="border-left: 4px solid #ff4a4a;">
-                <div class="intel-row">
-                    <span class="value" style="color: #ff4a4a; font-weight: bold;">🇷🇺 Rusia vs 🇺🇦 Ucrania</span>
-                    <span class="badge badge-red">Pelea Activa</span>
-                </div>
-                <div class="intel-row">
-                    <span class="label">Muertes Totales Est.:</span>
-                    <span class="value" style="color: #ff4a4a;">360.000+</span>
-                </div>
-            </div>
-            
-            <div class="intel-card" id="card-global-il" style="border-left: 4px solid #ff4a4a;">
-                <div class="intel-row">
-                    <span class="value" style="color: #ff4a4a; font-weight: bold;">🇮🇱 Israel vs 🇮🇷 Irán</span>
-                    <span class="badge badge-red">Pelea Activa</span>
-                </div>
-                <div class="intel-row">
-                    <span class="label">Muertes Totales Est.:</span>
-                    <span class="value" style="color: #ff4a4a;">15.100+</span>
-                </div>
-            </div>
-
-            <div class="intel-card" id="card-global-cl" style="border-left: 4px solid #00ff66;">
-                <div class="intel-row">
-                    <span class="value" style="color: #00ff66; font-weight: bold;">🇨🇱 República de Chile</span>
-                    <span class="badge badge-green">Neutral / Estable</span>
-                </div>
-                <div class="intel-row">
-                    <span class="label">Estado Actual:</span>
-                    <span class="value">Guerra vs Bolivia Finalizada</span>
-                </div>
-            </div>
-
-            <!-- SECCIONES ORIGINALES MANTENIDAS INTACTAS -->
-            <div class="section-title">🎯 Objetivo de Alta Prioridad (HVT)</div>
-            <div class="intel-card" id="card-hvt" style="border-left: 4px solid #ff4a4a;">
-                <div class="intel-row">
-                    <span class="label">Objetivo:</span>
-                    <span class="value" style="color: #ff4a4a; font-weight: bold;">Abdul Rahman Al-Karim</span>
-                </div>
-                <div class="intel-row">
-                    <span class="label">Rol:</span>
-                    <span class="value">Líder Frente Liberación Sahel</span>
-                </div>
-                <div class="intel-row">
-                    <span class="label">Última Ubicación:</span>
-                    <span class="value">Campamento Norte (95 km de la Capital)</span>
-                </div>
-                <div class="intel-row">
-                    <span class="label">Certeza Inteligencia:</span>
-                    <span class="badge badge-red">90% Probabilidad</span>
-                </div>
-            </div>
-
-            <div class="section-title">🛡️ Fuerza Desplegada (Chile)</div>
-            <div class="intel-card" id="card-chile" style="border-left: 4px solid #47a3ff;">
-                <div class="intel-row">
-                    <span class="label">Base Operativa:</span>
-                    <span class="value">Base Temporal "Cóndor" (Aeropuerto)</span>
-                </div>
-                <div class="intel-row">
-                    <span class="label">Efectivos Totales:</span>
-                    <span class="value">520 Militares</span>
-                </div>
-                <div class="intel-row">
-                    <span class="label">Brigada Lautaro:</span>
-                    <span class="value">300 (Alpha: 100 | Bravo: 100 | Charlie: 100)</span>
-                </div>
-                <div class="intel-row">
-                    <span class="label">Unidades de Apoyo:</span>
-                    <span class="value">220 (Logística, Médicos, Intel, Coms)</span>
-                </div>
-                <div class="intel-row">
-                    <span class="label">Medios Aéreos:</span>
-                    <span class="value">2 C-130H Hercules | 4 Bell 412EP</span>
-                </div>
-                <div class="intel-row">
-                    <span class="label">Medios Terrestres:</span>
-                    <span class="value">18 Veh. Tácticos | 6 Amb. | 1 Puesto Mando</span>
-                </div>
-            </div>
-
-            <div class="section-title">⚠️ Atentados Recientes</div>
-            <div class="intel-card" id="card-atentado1">
-                <div class="intel-row">
-                    <span class="value" style="color: #ffaa00;">1. Embajada de Chile</span>
-                    <span class="label">23 Jun - 08:10</span>
-                </div>
-                <div class="intel-row">
-                    <span class="label">Bajas:</span>
-                    <span class="value" style="color: #ff4a4a;">40 Muertos / 12 Heridos</span>
-                </div>
-                <div class="intel-row">
-                    <span class="label">Estado actual:</span>
-                    <span class="badge badge-red">Perímetro Asegurado</span>
-                </div>
-            </div>
-
-            <div class="intel-card" id="card-atentado2">
-                <div class="intel-row">
-                    <span class="value" style="color: #ffaa00;">2. Ataques Coordinados</span>
-                    <span class="label">24 Jun - 09:15</span>
-                </div>
-                <div class="intel-row">
-                    <span class="label">Objetivos:</span>
-                    <span class="value">Hotel Int. / Centro Com. / Res. Extranjeros</span>
-                </div>
-                <div class="intel-row">
-                    <span class="label">Bajas Totales:</span>
-                    <span class="value" style="color: #ff4a4a;">78 Muertos / 150 Heridos</span>
-                </div>
-            </div>
-
-            <div class="section-title">🌐 Fuerzas Aliadas y Locales</div>
-            <div class="intel-card">
-                <div class="intel-row">
-                    <span class="label">Burkina Faso (Capital):</span>
-                    <span class="value">3.500 Ejército | 1.200 FF.EE | 5.000 Policía</span>
-                </div>
-                <div class="intel-row">
-                    <span class="label">Francia:</span>
-                    <span class="value">80 Operadores Esp. | 2 Helicópteros Caracal</span>
-                </div>
-                <div class="intel-row">
-                    <span class="label">EE.UU. (Drones):</span>
-                    <span class="value">50 Operadores | 2 MQ-9 Reaper (Vigilancia)</span>
-                </div>
-                <div class="intel-row">
-                    <span class="label">ONU:</span>
-                    <span class="value">150 Observadores (No Combatientes)</span>
-                </div>
-            </div>
-        </div>
+        <!-- MAPA INTERACTIVO -->
+        <div id="map"></div>
     </div>
 
-    <!-- MAPA INTERACTIVO -->
-    <div id="map"></div>
+    <!-- NUEVA SECCIÓN: TICKER DE INTELIGENCIA -->
+    <div class="ticker-wrap">
+        <div class="ticker">
+            <span class="red">🔴 ÚLTIMA HORA:</span> Drones Reaper confirman movimiento de 40-60 insurgentes en campamento norte (95km) ••• 
+            <span class="blue">🌐 REPORTE AEPS:</span> Comando Conjunto del Pacífico aprueba nueva fase de seguridad marítima ••• 
+            <span>🇨🇱 MINISTERIO DE DEFENSA:</span> Proyecto Escudo Cóndor alcanza 41% de avance operativo nacional ••• 
+            <span class="red">⚠️ ALERTA INTERNACIONAL:</span> Intercambio de fuego constante reportado en conflicto Israel-Irán ••• 
+            <span class="blue">💼 LOGÍSTICA:</span> Despliegue de sueldos para Brigada Lautaro y apoyo ejecutado con éxito bajo mando del General en Jefe.
+        </div>
+    </div>
 
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
     
     <script>
-        // --- EFECTO DE SONIDO (WEB AUDIO API) ---
-        // Se mantiene intacto el sonido suave para no saturar, como solicitaste.
         let audioCtx = null;
         function playTacticalBeep(freq = 800, duration = 0.04, type = 'sine') {
             try {
@@ -428,7 +519,7 @@ html_content = """<!DOCTYPE html>
                 osc.type = type;
                 osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
                 
-                gainNode.gain.setValueAtTime(0.02, audioCtx.currentTime); // Volumen muy bajo
+                gainNode.gain.setValueAtTime(0.02, audioCtx.currentTime);
                 gainNode.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + duration);
                 
                 osc.connect(gainNode);
@@ -437,19 +528,13 @@ html_content = """<!DOCTYPE html>
                 osc.start();
                 osc.stop(audioCtx.currentTime + duration);
             } catch (e) {
-                console.log("Audio no soportado o bloqueado aún.");
+                console.log("Audio no soportado.");
             }
         }
 
-        // Configuración Inicial del Mapa
         const uagaCoords = [12.3714, -1.5197];
-        const map = L.map('map', {
-            zoomControl: true,
-            maxZoom: 18,
-            minZoom: 2
-        }).setView(uagaCoords, 9);
+        const map = L.map('map', { zoomControl: true, maxZoom: 18, minZoom: 2 }).setView(uagaCoords, 9);
 
-        // --- CAPAS DE TEMA (DÍA / NOCHE) ---
         const darkTiles = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
             attribution: '&copy; CARTO', subdomains: 'abcd', maxZoom: 20
         });
@@ -458,9 +543,8 @@ html_content = """<!DOCTYPE html>
             attribution: '&copy; CARTO', subdomains: 'abcd', maxZoom: 20
         });
 
-        darkTiles.addTo(map); // Noche por defecto
+        darkTiles.addTo(map);
 
-        // Lógica del botón Día/Noche
         let isLightMode = false;
         const themeToggle = document.getElementById('themeToggle');
         themeToggle.addEventListener('click', () => {
@@ -481,14 +565,12 @@ html_content = """<!DOCTYPE html>
             }
         });
 
-        // --- CAPAS GRUPO (LAYERS) ---
         const globalWarsGroup = L.layerGroup().addTo(map);
         const zonesGroup = L.layerGroup().addTo(map);
         const locationsGroup = L.layerGroup().addTo(map);
         const attacksGroup = L.layerGroup().addTo(map);
         const intelligenceGroup = L.layerGroup().addTo(map);
 
-        // --- DEFINICIÓN DE ZONAS DE CONTROL EN BURKINA FASO ---
         const northZone = L.polygon([[15.1, -5.5], [15.1, 2.5], [12.9, 2.5], [12.9, -5.5]], {
             color: '#ff4a4a', weight: 1, fillColor: '#ff4a4a', fillOpacity: 0.15
         }).addTo(zonesGroup);
@@ -504,7 +586,6 @@ html_content = """<!DOCTYPE html>
         }).addTo(zonesGroup);
         southZone.bindPopup("<div class='popup-title'>🟢 ZONA SUR - CONTROL GUBERNAMENTAL</div><p>Territorio pacífico bajo control del Estado.</p>");
 
-        // --- MARCADORES GLOBALES (NUEVO) ---
         function createTacticalIcon(color, text = '') {
             return L.divIcon({
                 className: 'tactical-div-icon',
@@ -522,8 +603,6 @@ html_content = """<!DOCTYPE html>
         const markerCl = L.marker([-33.4, -70.6], { icon: createTacticalIcon('#00ff66') }).addTo(globalWarsGroup);
         markerCl.bindPopup("<div class='popup-title' style='color:#00ff66;'>🟢 República de Chile</div><p><b>Estado:</b> Neutral / Victorioso.<br>Bajas guerra finalizada: 155.</p>");
 
-
-        // --- MARCADORES ORIGINALES DE BURKINA FASO ---
         const abdulCoords = [13.2250, -1.1500];
         const hvtMarker = L.marker(abdulCoords, {
             icon: L.divIcon({
@@ -549,16 +628,15 @@ html_content = """<!DOCTYPE html>
             icon: L.divIcon({ html: `<div style="color: #ff4a4a; font-size: 20px; font-weight:bold; text-shadow: 0 0 5px #000;">💥</div>`, iconSize: [20, 20] })
         }).addTo(attacksGroup).bindPopup("<div class='popup-title' style='color:#ff4a4a;'>💥 EMBAJADA DE CHILE</div>");
 
-        // --- INTERACTIVIDAD DESDE EL SIDEBAR ---
         document.getElementById('card-global-ru').addEventListener('click', () => { playTacticalBeep(700, 0.08); map.flyTo([49.0, 31.0], 5); markerRu.openPopup(); });
         document.getElementById('card-global-il').addEventListener('click', () => { playTacticalBeep(700, 0.08); map.flyTo([32.0, 45.0], 5); markerIl.openPopup(); });
         document.getElementById('card-global-cl').addEventListener('click', () => { playTacticalBeep(700, 0.08); map.flyTo([-33.4, -70.6], 4); markerCl.openPopup(); });
 
         document.getElementById('card-hvt').addEventListener('click', () => { playTacticalBeep(900, 0.1, 'sawtooth'); map.flyTo(abdulCoords, 12); hvtMarker.openPopup(); });
         document.getElementById('card-chile').addEventListener('click', () => { playTacticalBeep(500, 0.06); map.flyTo([12.3532, -1.5121], 13); });
+        document.getElementById('card-nomina').addEventListener('click', () => { playTacticalBeep(600, 0.05); });
         document.getElementById('card-atentado1').addEventListener('click', () => { playTacticalBeep(400, 0.08); map.flyTo([12.3650, -1.4920], 15); attack1.openPopup(); });
 
-        // Control de Capas (Filtros)
         const baseMaps = {};
         const overlayMaps = {
             "🌍 Focos de Guerra Globales": globalWarsGroup,
