@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel Táctico de Operaciones - Global & Burkina Faso 2027</title>
+    <title>Panel Táctico de Operaciones - Global & Sahel 2027</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
     <style>
         :root {
@@ -205,41 +205,40 @@
             color: var(--text-main) !important;
             border: 1px solid var(--border-color);
             border-radius: 6px;
-            font-size: 13px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+            font-size: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.7);
+            max-width: 320px;
         }
         .leaflet-popup-tip {
             background: var(--popup-bg) !important;
             border: 1px solid var(--border-color);
         }
         .popup-title {
-            font-size: 14px;
+            font-size: 13px;
             font-weight: bold;
             color: var(--text-main);
             border-bottom: 1px solid var(--border-color);
-            padding-bottom: 5px;
-            margin-bottom: 8px;
+            padding-bottom: 4px;
+            margin-bottom: 6px;
             text-transform: uppercase;
-            display: flex;
-            align-items: center;
-            gap: 6px;
         }
         .popup-table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 5px;
+            margin-top: 4px;
         }
         .popup-table td {
-            padding: 4px 0;
-            vertical-align: top;
+            padding: 3px 0;
+            border-bottom: 1px solid var(--border-color);
         }
         .popup-table td.lbl {
             color: var(--text-muted);
-            width: 40%;
+            width: 55%;
         }
         .popup-table td.val {
             color: var(--text-main);
-            font-weight: 500;
+            font-weight: 600;
+            text-align: right;
         }
 
         .leaflet-control-layers {
@@ -284,108 +283,58 @@
         <!-- SIDEBAR DE CONTROL TÁCTICO -->
         <div class="sidebar">
             <div class="sidebar-header">
-                <h1>📡 ZONA AUTÓNOMA SAHEL <span class="defcon-badge">ESTABLE</span></h1>
+                <h1>📡 MANDO ESTRATÉGICO <span class="defcon-badge">ACTIVO</span></h1>
                 <button class="theme-toggle" id="themeToggle">☀️ Modo Día</button>
                 <div class="meta-grid">
                     <div class="meta-item">
                         <div class="meta-label">📅 Fecha de Operación</div>
-                        <div class="meta-val">27 JUN 2027</div>
+                        <div class="meta-val">5 JUL 2026</div>
                     </div>
                     <div class="meta-item">
                         <div class="meta-label">🕒 Hora Local</div>
-                        <div class="meta-val">11:30 (Día 3)</div>
+                        <div class="meta-val">17:27 HRS</div>
                     </div>
                     <div class="meta-item">
-                        <div class="meta-label">🌍 Territorio Saborano</div>
-                        <div class="meta-val">50% Burkina Faso</div>
+                        <div class="meta-label">🌍 Sahel Saborano</div>
+                        <div class="meta-val">2.000 Tropas</div>
                     </div>
                     <div class="meta-item">
-                        <div class="meta-label">🏛️ Estado de Zona</div>
-                        <div class="meta-val" style="color: #00ff66;">Pacificada / Ocupada</div>
+                        <div class="meta-label">🏛️ Estado Global</div>
+                        <div class="meta-val" style="color: #ffaa00;">Fricción Euro-Asiática</div>
                     </div>
                 </div>
             </div>
 
             <div class="sidebar-content">
-
-                <!-- OPERACIONES RECIENTES -->
-                <div class="section-title">🎯 OPERACIONES Y LOGÍSTICA RECIENTES</div>
-                <div class="intel-card" id="card-martillo" style="border-left: 4px solid #00ff66;">
+                <div class="section-title">🎯 INTERACCIÓN DE MAPA</div>
+                <div class="intel-card" style="border-left: 4px solid #47a3ff;">
                     <div class="intel-row">
-                        <span class="value" style="color: #00ff66; font-weight: bold;">OP: MARTILLO DE ARENA</span>
-                        <span class="badge badge-green">Completado</span>
+                        <span class="value" style="color: #47a3ff; font-weight: bold;">INVENTARIO INTERACTIVO</span>
                     </div>
                     <div class="intel-row">
-                        <span class="label">Acción:</span>
-                        <span class="value">Incursión Fronteriza en Malí</span>
-                    </div>
-                    <div class="intel-row">
-                        <span class="label">Resultado:</span>
-                        <span class="value">Campamento móvil hostil destruido</span>
-                    </div>
-                </div>
-
-                <div class="intel-card" id="card-finanzas" style="border-left: 4px solid #ffaa00;">
-                    <div class="intel-row">
-                        <span class="value" style="color: #ffaa00; font-weight: bold;">ESTADO FINANCIERO</span>
-                        <span class="badge badge-orange">Confiscado</span>
-                    </div>
-                    <div class="intel-row">
-                        <span class="label">Fondos Offshore:</span>
-                        <span class="value" style="color: #00ff66;">US$ 140 Millones Congelados</span>
-                    </div>
-                    <div class="intel-row">
-                        <span class="label">Asignación:</span>
-                        <span class="value">40% a Proyecto Chile 2037</span>
-                    </div>
-                </div>
-
-                <div class="section-title">🤝 Alianzas y Visitas en Base</div>
-                <div class="intel-card" id="card-brasil" style="border-left: 4px solid #47a3ff;">
-                    <div class="intel-row">
-                        <span class="value" style="color: #47a3ff; font-weight: bold;">DELEGACIÓN BRASILEÑA (AEPS)</span>
-                        <span class="badge badge-blue">Inspección OK</span>
-                    </div>
-                    <div class="intel-row">
-                        <span class="label">Estado:</span>
-                        <span class="value">Visita a Base Cóndor y Hospital</span>
-                    </div>
-                </div>
-
-                <div class="section-title">🎯 Objetivo de Alta Prioridad (HVT)</div>
-                <div class="intel-card" id="card-hvt" style="border-left: 4px solid #00ff66;">
-                    <div class="intel-row">
-                        <span class="label">Objetivo:</span>
-                        <span class="value" style="color: #00ff66; font-weight: bold;">Abdul Rahman Al-Karim</span>
-                    </div>
-                    <div class="intel-row">
-                        <span class="label">Estado Actual:</span>
-                        <span class="badge badge-green">AISLAMIENTO TOTAL</span>
-                    </div>
-                    <div class="intel-row">
-                        <span class="label">Ubicación:</span>
-                        <span class="value">Búnker Base Cóndor</span>
+                        <span class="label">Instrucción:</span>
+                        <span class="value">Pinche cualquier marcador del mapa para desplegar su ficha de fuerzas, aviones y misiles.</span>
                     </div>
                 </div>
 
                 <div class="section-title">🛡️ Fuerza Desplegada (Chile)</div>
-                <div class="intel-card" id="card-chile" style="border-left: 4px solid #47a3ff;">
+                <div class="intel-card" id="card-chile" style="border-left: 4px solid #00ff66;">
                     <div class="intel-row">
                         <span class="label">Efectivos en África:</span>
                         <span class="value" style="color: #00ff66; font-weight: bold;">2.000 Tropas Activas</span>
                     </div>
                     <div class="intel-row">
                         <span class="label">Aeronaves en Sahel:</span>
-                        <span class="value">2 UH-60M Black Hawk | 4 Bell 412EP | C-130H</span>
+                        <span class="value">2 UH-60M | 4 Bell 412EP | C-130H</span>
                     </div>
                 </div>
 
                 <!-- NÓMINA MILITAR -->
                 <div class="section-title">💼 Módulo Logístico y Nómina</div>
-                <div class="intel-card" id="card-nomina" style="border-left: 4px solid #ffaa00;">
+                <div class="intel-card" style="border-left: 4px solid #ffaa00;">
                     <div class="intel-row" style="border-bottom: 1px solid var(--border-color); padding-bottom: 5px; margin-bottom: 8px;">
-                        <span class="label">Presupuesto Operativo:</span>
-                        <span class="value" style="color: #ffaa00; font-weight: bold;">AUTORIZADO</span>
+                        <span class="label">Escala Salarial:</span>
+                        <span class="value" style="color: #ffaa00; font-weight: bold;">ACTIVA</span>
                     </div>
                     <div style="max-height: 140px; overflow-y: auto; margin-top: 5px; padding-right: 5px;">
                         <table class="payroll-table">
@@ -414,14 +363,12 @@
         <div id="map"></div>
     </div>
 
-    <!-- TICKER DE NOTICIAS ACTUALIZADO -->
+    <!-- TICKER DE NOTICIAS -->
     <div class="ticker-wrap">
         <div class="ticker">
-            <span class="green">🟢 DÍA 3 EN EL SAHEL:</span> Operación "Martillo de Arena" destruye campamento móvil en frontera con Malí ••• 
-            <span class="orange">💰 GESTIÓN FINANCIERA:</span> US$ 140 millones de activos del cartel congelados y redirigidos al desarrollo de Chile ••• 
-            <span class="blue">🤝 VISITA OFICIAL:</span> Delegación militar y diplomática de Brasil inspecciona la estabilidad en Base Cóndor ••• 
-            <span class="green">🚁 REFUERZO AÉREO:</span> Sikorsky UH-60M Black Hawk plenamente operativos en misiones de patrullaje transfronterizo ••• 
-            <span class="blue">🏛️ ONU:</span> Propuesta de administración conjunta aceptada tácitamente por socios occidentales.
+            <span class="green">🟢 ESTADO DE RED:</span> Sistema de inventario militar interactivo activado en cartografía digital ••• 
+            <span class="blue">CHILE:</span> 2.000 efectivos y base logística en Sahel con cobertura aérea total ••• 
+            <span class="orange">FRENTE GLOBAL:</span> Monitoreo en tiempo real de capacidades bélicas en Europa y Asia.
         </div>
     </div>
 
@@ -457,13 +404,11 @@
             }
         }
 
-        const uagaCoords = [12.3714, -1.5197];
-        const map = L.map('map', { zoomControl: true, maxZoom: 18, minZoom: 2 }).setView(uagaCoords, 9);
+        const map = L.map('map', { zoomControl: true, maxZoom: 18, minZoom: 2 }).setView([30.0, 10.0], 3);
 
         const darkTiles = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
             attribution: '&copy; CARTO', subdomains: 'abcd', maxZoom: 20
         });
-        
         const lightTiles = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
             attribution: '&copy; CARTO', subdomains: 'abcd', maxZoom: 20
         });
@@ -476,7 +421,6 @@
             playTacticalBeep(1200, 0.08, 'triangle');
             isLightMode = !isLightMode;
             document.body.classList.toggle('light-mode');
-            
             if (isLightMode) {
                 map.removeLayer(darkTiles);
                 lightTiles.addTo(map);
@@ -490,80 +434,81 @@
             }
         });
 
-        const globalWarsGroup = L.layerGroup().addTo(map);
-        const alliesGroup = L.layerGroup().addTo(map);
-        const zonesGroup = L.layerGroup().addTo(map);
-        const locationsGroup = L.layerGroup().addTo(map);
-        const attacksGroup = L.layerGroup().addTo(map);
-        const intelligenceGroup = L.layerGroup().addTo(map);
-
-        // ZONAS BURKINA FASO
-        const northZone = L.polygon([[15.1, -5.5], [15.1, 2.5], [12.9, 2.5], [12.9, -5.5]], {
-            color: '#00ff66', weight: 1, fillColor: '#00ff66', fillOpacity: 0.15
-        }).addTo(zonesGroup);
-        northZone.bindPopup("<div class='popup-title' style='color:#00ff66;'>🟢 ZONA NORTE - BAJO CONTROL CHILENO</div><p>Rutas de oro y patrullas de la BOE activas.</p>");
-
-        const centerZone = L.polygon([[12.9, -5.5], [12.9, 2.5], [11.8, 2.5], [11.8, -5.5]], {
-            color: '#47a3ff', weight: 1, fillColor: '#47a3ff', fillOpacity: 0.1
-        }).addTo(zonesGroup);
+        const forcesGroup = L.layerGroup().addTo(map);
 
         function createTacticalIcon(color, text = '') {
             return L.divIcon({
                 className: 'tactical-div-icon',
-                html: `<div style="background: ${color}; width: 14px; height: 14px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 10px ${color}; display:flex; align-items:center; justify-content:center; color:white; font-size:10px; font-weight:bold;">${text}</div>`,
+                html: `<div style="background: ${color}; width: 14px; height: 14px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 10px ${color}; display:flex; align-items:center; justify-content:center; color:white; font-size:9px; font-weight:bold;">${text}</div>`,
                 iconSize: [14, 14], iconAnchor: [7, 7]
             });
         }
 
-        // MARCADORES GLOBALES
-        L.marker([49.0, 31.0], { icon: createTacticalIcon('#ff4a4a') }).addTo(globalWarsGroup).bindPopup("<div class='popup-title' style='color:#ff4a4a;'>🟥 Rusia vs Ucrania</div>");
-        L.marker([32.0, 45.0], { icon: createTacticalIcon('#ff4a4a') }).addTo(globalWarsGroup).bindPopup("<div class='popup-title' style='color:#ff4a4a;'>🟥 Israel vs Irán</div>");
-        L.marker([-33.4, -70.6], { icon: createTacticalIcon('#00ff66') }).addTo(globalWarsGroup).bindPopup("<div class='popup-title' style='color:#00ff66;'>🟢 República de Chile</div>");
-
-        // ALIADOS AEPS
-        const aliados = [
-            { name: "Estados Unidos", coords: [38.8951, -77.0364] },
-            { name: "Reino Unido", coords: [51.5074, -0.1278] },
-            { name: "Japón", coords: [35.6895, 139.6917] },
-            { name: "Corea del Sur", coords: [37.5665, 126.9780] },
-            { name: "Australia", coords: [-35.2809, 149.1300] },
-            { name: "Canadá", coords: [45.4215, -75.6972] },
-            { name: "Francia", coords: [48.8566, 2.3522] },
-            { name: "Alemania", coords: [52.5200, 13.4050] },
-            { name: "Nueva Zelanda", coords: [-41.2865, 174.7762] },
-            { name: "Brasil", coords: [-15.8267, -47.9218] }
+        // DATOS CON INVENTARIO MILITAR POR NACIÓN
+        const naciones = [
+            {
+                name: "República de Chile (Nacional & Sahel)",
+                coords: [-33.4, -70.6],
+                color: "#00ff66",
+                tropas: "80.000 Activos (+2.000 Sahel)",
+                aviones: "30 F-16, 5 A-10, 8 C-130H, 2 KC-135R",
+                helos: "22 Bell 412/Huey, 2 UH-60M Black Hawk",
+                misiles: "NASAMS, Barak, Spike, AMRAAM"
+            },
+            {
+                name: "Rusia (Federación Rusa)",
+                coords: [55.7558, 37.6173],
+                color: "#ff4a4a",
+                tropas: "1.300.000 Activos",
+                aviones: "Su-35, Su-34, MiG-31, Tu-95",
+                helos: "Ka-52 Alligator, Mi-28 Havoc",
+                misiles: "Iskander, Kalibr, Kinzhal, S-400"
+            },
+            {
+                name: "Ucrania",
+                coords: [50.4501, 30.5234],
+                color: "#47a3ff",
+                tropas: "900.000 Activos",
+                aviones: "MiG-29, Su-27, F-16 (parcial)",
+                helos: "Mi-8, Mi-24 Hind",
+                misiles: "ATACMS, Storm Shadow, Patriot, HIMARS"
+            },
+            {
+                name: "China (República Popular)",
+                coords: [39.9042, 116.4074],
+                color: "#ffaa00",
+                tropas: "2.000.000 Activos",
+                aviones: "J-20 Mighty Dragon, J-16, H-6K",
+                helos: "Z-10, Z-20 Transport",
+                misiles: "DF-21D, DF-41, HQ-9 Air Defense"
+            },
+            {
+                name: "Estados Unidos",
+                coords: [38.8951, -77.0364],
+                color: "#00ffff",
+                tropas: "1.300.000 Activos",
+                aviones: "F-35 Lightning II, F-22 Raptor, B-21",
+                helos: "AH-64E Apache, UH-60M Black Hawk, CH-47",
+                misiles: "Patriot PAC-3, Tomahawk, Javelin, THAAD"
+            }
         ];
 
-        aliados.forEach(aliado => {
-            const m = L.marker(aliado.coords, { icon: createTacticalIcon('#00ffff') }).addTo(alliesGroup);
-            m.bindPopup(`<div class='popup-title' style='color:#00ffff;'>🤝 ${aliado.name}</div><p>Aliado Estratégico y miembro AEPS.</p>`);
-            m.on('mouseover', () => playTacticalBeep(1000, 0.03));
+        naciones.forEach(nacion => {
+            const marker = L.marker(nacion.coords, { icon: createTacticalIcon(nacion.color) }).addTo(forcesGroup);
+            
+            const popupHTML = `
+                <div class='popup-title' style='color:${nacion.color};'>${nacion.name}</div>
+                <table class='popup-table'>
+                    <tr><td class='lbl'>👤 Tropas:</td><td class='val'>${nacion.tropas}</td></tr>
+                    <tr><td class='lbl'>✈️ Aviones:</td><td class='val'>${nacion.aviones}</td></tr>
+                    <tr><td class='lbl'>🚁 Helicópteros:</td><td class='val'>${nacion.helos}</td></tr>
+                    <tr><td class='lbl'>🚀 Misiles/Sistemas:</td><td class='val'>${nacion.misiles}</td></tr>
+                </table>
+            `;
+            
+            marker.bindPopup(popupHTML);
+            marker.on('click', () => playTacticalBeep(900, 0.08, 'triangle'));
         });
-
-        // MARCADOR OPERACIÓN MARTILLO DE ARENA (Mali Frontera)
-        const martilloCoords = [13.2500, -1.1500];
-        L.marker(martilloCoords, {
-            icon: L.divIcon({ html: `<div style="background: #00ff66; width: 16px; height: 16px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 12px #00ff66;"></div>`, iconSize: [16, 16], iconAnchor: [8, 8] })
-        }).addTo(intelligenceGroup).bindPopup(`<div class='popup-title' style='color:#00ff66;'>🎯 ZONA OPERACIÓN MARTILLO</div><p>Campamento hostil neutralizado con éxito por UH-60M.</p>`);
-
-        const baseCondorCoords = [12.3532, -1.5121];
-        L.marker(baseCondorCoords, { icon: createTacticalIcon('#47a3ff') }).addTo(locationsGroup).bindPopup(`<div class='popup-title'>📍 BASE LOGÍSTICA CÓNDOR (CHILE)</div><p>2.000 efectivos desplegados y visita de delegación brasileña.</p>`);
-
-        // EVENTOS CLICK
-        document.getElementById('card-martillo').addEventListener('click', () => { playTacticalBeep(1000, 0.1); map.flyTo(martilloCoords, 11); });
-        document.getElementById('card-finanzas').addEventListener('click', () => { playTacticalBeep(800, 0.05); });
-        document.getElementById('card-brasil').addEventListener('click', () => { playTacticalBeep(900, 0.08); map.flyTo(baseCondorCoords, 14); });
-        document.getElementById('card-hvt').addEventListener('click', () => { playTacticalBeep(900, 0.1); map.flyTo(baseCondorCoords, 14); });
-
-        const baseMaps = {};
-        const overlayMaps = {
-            "🌍 Focos de Guerra Globales": globalWarsGroup,
-            "🤝 Aliados de Chile (AEPS)": alliesGroup,
-            "🔴/🟠/🟢 Zonas de Control": zonesGroup,
-            "📍 Infraestructura y Bases": locationsGroup,
-            "🎯 Inteligencia & Operaciones": intelligenceGroup
-        };
-        L.control.layers(baseMaps, overlayMaps, { collapsed: false }).addTo(map);
 
         map.on('popupopen', () => playTacticalBeep(700, 0.04));
     </script>
