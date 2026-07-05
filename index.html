@@ -70,7 +70,7 @@
         }
         .sidebar-header h1 {
             font-size: 18px;
-            color: #ff4a4a;
+            color: #00ff66;
             text-transform: uppercase;
             letter-spacing: 2px;
             margin-bottom: 5px;
@@ -79,18 +79,12 @@
             gap: 10px;
         }
         .defcon-badge {
-            background-color: #ff0000;
-            color: white;
+            background-color: #00ff66;
+            color: #0d0f12;
             font-size: 11px;
             padding: 2px 6px;
             border-radius: 3px;
             font-weight: bold;
-            animation: pulse 1.5s infinite;
-        }
-        @keyframes pulse {
-            0% { opacity: 0.6; }
-            50% { opacity: 1; }
-            100% { opacity: 0.6; }
         }
         .sidebar-header .meta-grid {
             display: grid;
@@ -273,7 +267,7 @@
             font-size: 13px;
             font-weight: bold;
             padding-left: 100%;
-            animation: ticker 35s linear infinite;
+            animation: ticker 38s linear infinite;
         }
         .ticker span.red { color: #ff4a4a; }
         .ticker span.blue { color: #47a3ff; }
@@ -290,48 +284,71 @@
         <!-- SIDEBAR DE CONTROL TÁCTICO -->
         <div class="sidebar">
             <div class="sidebar-header">
-                <h1>📡 PANEL DE SITUACIÓN <span class="defcon-badge">DEFCON 1</span></h1>
+                <h1>📡 ZONA AUTÓNOMA SAHEL <span class="defcon-badge">ESTABLE</span></h1>
                 <button class="theme-toggle" id="themeToggle">☀️ Modo Día</button>
                 <div class="meta-grid">
                     <div class="meta-item">
                         <div class="meta-label">📅 Fecha de Operación</div>
-                        <div class="meta-val">24 JUN 2027</div>
+                        <div class="meta-val">27 JUN 2027</div>
                     </div>
                     <div class="meta-item">
                         <div class="meta-label">🕒 Hora Local</div>
-                        <div class="meta-val">04:55 (Alba)</div>
+                        <div class="meta-val">11:30 (Día 3)</div>
                     </div>
                     <div class="meta-item">
-                        <div class="meta-label">🌍 País Objetivo</div>
-                        <div class="meta-val">Burkina Faso</div>
+                        <div class="meta-label">🌍 Territorio Saborano</div>
+                        <div class="meta-val">50% Burkina Faso</div>
                     </div>
                     <div class="meta-item">
-                        <div class="meta-label">🏛️ Estado de Alerta</div>
-                        <div class="meta-val" style="color: #ff4a4a;">Despliegue Total</div>
+                        <div class="meta-label">🏛️ Estado de Zona</div>
+                        <div class="meta-val" style="color: #00ff66;">Pacificada / Ocupada</div>
                     </div>
                 </div>
             </div>
 
             <div class="sidebar-content">
 
-                <!-- OPERACIÓN ACTUAL ACTUALIZADA -->
-                <div class="section-title">🚨 ESTADO DE EMERGENCIA EN CURSO</div>
-                <div class="intel-card" id="card-exodo" style="border-left: 4px solid #ff0000; animation: pulse 2s infinite;">
+                <!-- OPERACIONES RECIENTES -->
+                <div class="section-title">🎯 OPERACIONES Y LOGÍSTICA RECIENTES</div>
+                <div class="intel-card" id="card-martillo" style="border-left: 4px solid #00ff66;">
                     <div class="intel-row">
-                        <span class="value" style="color: #ff0000; font-weight: bold;">OP: ÉXODO BLANCO</span>
-                        <span class="badge badge-red">Crítico</span>
+                        <span class="value" style="color: #00ff66; font-weight: bold;">OP: MARTILLO DE ARENA</span>
+                        <span class="badge badge-green">Completado</span>
                     </div>
                     <div class="intel-row">
-                        <span class="label">Objetivo:</span>
-                        <span class="value">Evacuación Hospital Principal</span>
+                        <span class="label">Acción:</span>
+                        <span class="value">Incursión Fronteriza en Malí</span>
                     </div>
                     <div class="intel-row">
-                        <span class="label">Amenaza:</span>
-                        <span class="value" style="color: #ffaa00;">3 Coches Bomba (VBIED) Activos</span>
+                        <span class="label">Resultado:</span>
+                        <span class="value">Campamento móvil hostil destruido</span>
+                    </div>
+                </div>
+
+                <div class="intel-card" id="card-finanzas" style="border-left: 4px solid #ffaa00;">
+                    <div class="intel-row">
+                        <span class="value" style="color: #ffaa00; font-weight: bold;">ESTADO FINANCIERO</span>
+                        <span class="badge badge-orange">Confiscado</span>
                     </div>
                     <div class="intel-row">
-                        <span class="label">Progreso Evacuación:</span>
-                        <span class="value" style="color: #00ff66;">60% Completado</span>
+                        <span class="label">Fondos Offshore:</span>
+                        <span class="value" style="color: #00ff66;">US$ 140 Millones Congelados</span>
+                    </div>
+                    <div class="intel-row">
+                        <span class="label">Asignación:</span>
+                        <span class="value">40% a Proyecto Chile 2037</span>
+                    </div>
+                </div>
+
+                <div class="section-title">🤝 Alianzas y Visitas en Base</div>
+                <div class="intel-card" id="card-brasil" style="border-left: 4px solid #47a3ff;">
+                    <div class="intel-row">
+                        <span class="value" style="color: #47a3ff; font-weight: bold;">DELEGACIÓN BRASILEÑA (AEPS)</span>
+                        <span class="badge badge-blue">Inspección OK</span>
+                    </div>
+                    <div class="intel-row">
+                        <span class="label">Estado:</span>
+                        <span class="value">Visita a Base Cóndor y Hospital</span>
                     </div>
                 </div>
 
@@ -343,61 +360,23 @@
                     </div>
                     <div class="intel-row">
                         <span class="label">Estado Actual:</span>
-                        <span class="badge badge-green">CAPTURADO VIVO</span>
+                        <span class="badge badge-green">AISLAMIENTO TOTAL</span>
                     </div>
                     <div class="intel-row">
                         <span class="label">Ubicación:</span>
-                        <span class="value">Búnker Interrogatorio (Base Cóndor)</span>
-                    </div>
-                    <div class="intel-row">
-                        <span class="label">Campamento Norte:</span>
-                        <span class="value" style="color: #ff4a4a;">DESTRUIDO (Misiles Hellfire)</span>
-                    </div>
-                </div>
-
-                <div class="section-title">🌍 Panorama Global Actual</div>
-                <div class="intel-card" id="card-global-ru" style="border-left: 4px solid #ff4a4a;">
-                    <div class="intel-row">
-                        <span class="value" style="color: #ff4a4a; font-weight: bold;">🇷🇺 Rusia vs 🇺🇦 Ucrania</span>
-                        <span class="badge badge-red">Pelea Activa</span>
-                    </div>
-                    <div class="intel-row">
-                        <span class="label">Muertes Totales Est.:</span>
-                        <span class="value" style="color: #ff4a4a;">360.000+</span>
-                    </div>
-                </div>
-                
-                <div class="intel-card" id="card-global-il" style="border-left: 4px solid #ff4a4a;">
-                    <div class="intel-row">
-                        <span class="value" style="color: #ff4a4a; font-weight: bold;">🇮🇱 Israel vs 🇮🇷 Irán</span>
-                        <span class="badge badge-red">Pelea Activa</span>
-                    </div>
-                    <div class="intel-row">
-                        <span class="label">Muertes Totales Est.:</span>
-                        <span class="value" style="color: #ff4a4a;">15.100+</span>
-                    </div>
-                </div>
-
-                <div class="intel-card" id="card-global-cl" style="border-left: 4px solid #00ff66;">
-                    <div class="intel-row">
-                        <span class="value" style="color: #00ff66; font-weight: bold;">🇨🇱 República de Chile</span>
-                        <span class="badge badge-green">Neutral / Estable</span>
-                    </div>
-                    <div class="intel-row">
-                        <span class="label">Estado Actual:</span>
-                        <span class="value">Guerra vs Bolivia Finalizada</span>
+                        <span class="value">Búnker Base Cóndor</span>
                     </div>
                 </div>
 
                 <div class="section-title">🛡️ Fuerza Desplegada (Chile)</div>
                 <div class="intel-card" id="card-chile" style="border-left: 4px solid #47a3ff;">
                     <div class="intel-row">
-                        <span class="label">Efectivos Totales:</span>
-                        <span class="value">520 Militares (0 Bajas Letales)</span>
+                        <span class="label">Efectivos en África:</span>
+                        <span class="value" style="color: #00ff66; font-weight: bold;">2.000 Tropas Activas</span>
                     </div>
                     <div class="intel-row">
-                        <span class="label">Aeronaves:</span>
-                        <span class="value">2 C-130H Hercules | 4 Bell 412EP</span>
+                        <span class="label">Aeronaves en Sahel:</span>
+                        <span class="value">2 UH-60M Black Hawk | 4 Bell 412EP | C-130H</span>
                     </div>
                 </div>
 
@@ -438,11 +417,11 @@
     <!-- TICKER DE NOTICIAS ACTUALIZADO -->
     <div class="ticker-wrap">
         <div class="ticker">
-            <span class="green">🟢 VICTORIA TÁCTICA:</span> Operación "Caza Nocturna" completada. HVT-1 Capturado con vida en Uagadugú ••• 
-            <span class="red">💥 FUEGO ALIADO:</span> Misiles Hellfire de EE.UU. aniquilan convoy de refuerzo insurgente (12 vehículos) ••• 
-            <span class="orange">🚨 AMENAZA INMINENTE:</span> Confesión de Abdul revela 3 coches bomba (VBIED) ocultos en la capital ••• 
-            <span class="blue">🚁 ORDEN PRESIDENCIAL:</span> 100% de la fuerza militar chilena desplegada en Operación Éxodo Blanco para evacuar Hospital Principal ••• 
-            <span class="green">🟢 BAJAS CHILENAS:</span> 0 Bajas letales, 1 herido leve recuperándose en Base Cóndor.
+            <span class="green">🟢 DÍA 3 EN EL SAHEL:</span> Operación "Martillo de Arena" destruye campamento móvil en frontera con Malí ••• 
+            <span class="orange">💰 GESTIÓN FINANCIERA:</span> US$ 140 millones de activos del cartel congelados y redirigidos al desarrollo de Chile ••• 
+            <span class="blue">🤝 VISITA OFICIAL:</span> Delegación militar y diplomática de Brasil inspecciona la estabilidad en Base Cóndor ••• 
+            <span class="green">🚁 REFUERZO AÉREO:</span> Sikorsky UH-60M Black Hawk plenamente operativos en misiones de patrullaje transfronterizo ••• 
+            <span class="blue">🏛️ ONU:</span> Propuesta de administración conjunta aceptada tácitamente por socios occidentales.
         </div>
     </div>
 
@@ -512,7 +491,7 @@
         });
 
         const globalWarsGroup = L.layerGroup().addTo(map);
-        const alliesGroup = L.layerGroup().addTo(map); // Nuevo grupo para aliados
+        const alliesGroup = L.layerGroup().addTo(map);
         const zonesGroup = L.layerGroup().addTo(map);
         const locationsGroup = L.layerGroup().addTo(map);
         const attacksGroup = L.layerGroup().addTo(map);
@@ -520,16 +499,12 @@
 
         // ZONAS BURKINA FASO
         const northZone = L.polygon([[15.1, -5.5], [15.1, 2.5], [12.9, 2.5], [12.9, -5.5]], {
-            color: '#ff4a4a', weight: 1, fillColor: '#ff4a4a', fillOpacity: 0.15
+            color: '#00ff66', weight: 1, fillColor: '#00ff66', fillOpacity: 0.15
         }).addTo(zonesGroup);
-        northZone.bindPopup("<div class='popup-title'>🔴 ZONA NORTE - INSURGENTE</div><p>Campamento Norte Destruido.</p>");
+        northZone.bindPopup("<div class='popup-title' style='color:#00ff66;'>🟢 ZONA NORTE - BAJO CONTROL CHILENO</div><p>Rutas de oro y patrullas de la BOE activas.</p>");
 
         const centerZone = L.polygon([[12.9, -5.5], [12.9, 2.5], [11.8, 2.5], [11.8, -5.5]], {
-            color: '#ffaa00', weight: 1, fillColor: '#ffaa00', fillOpacity: 0.1
-        }).addTo(zonesGroup);
-        
-        const southZone = L.polygon([[11.8, -5.5], [11.8, 2.5], [9.4, 2.5], [9.4, -5.5]], {
-            color: '#00ff66', weight: 1, fillColor: '#00ff66', fillOpacity: 0.08
+            color: '#47a3ff', weight: 1, fillColor: '#47a3ff', fillOpacity: 0.1
         }).addTo(zonesGroup);
 
         function createTacticalIcon(color, text = '') {
@@ -545,7 +520,7 @@
         L.marker([32.0, 45.0], { icon: createTacticalIcon('#ff4a4a') }).addTo(globalWarsGroup).bindPopup("<div class='popup-title' style='color:#ff4a4a;'>🟥 Israel vs Irán</div>");
         L.marker([-33.4, -70.6], { icon: createTacticalIcon('#00ff66') }).addTo(globalWarsGroup).bindPopup("<div class='popup-title' style='color:#00ff66;'>🟢 República de Chile</div>");
 
-        // NUEVO: MARCADORES DE PAÍSES ALIADOS (AEPS)
+        // ALIADOS AEPS
         const aliados = [
             { name: "Estados Unidos", coords: [38.8951, -77.0364] },
             { name: "Reino Unido", coords: [51.5074, -0.1278] },
@@ -565,29 +540,20 @@
             m.on('mouseover', () => playTacticalBeep(1000, 0.03));
         });
 
-        // MARCADOR HVT ACTUALIZADO (Campamento)
-        const abdulCoords = [13.2250, -1.1500];
-        L.marker(abdulCoords, {
+        // MARCADOR OPERACIÓN MARTILLO DE ARENA (Mali Frontera)
+        const martilloCoords = [13.2500, -1.1500];
+        L.marker(martilloCoords, {
             icon: L.divIcon({ html: `<div style="background: #00ff66; width: 16px; height: 16px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 12px #00ff66;"></div>`, iconSize: [16, 16], iconAnchor: [8, 8] })
-        }).addTo(intelligenceGroup).bindPopup(`<div class='popup-title' style='color:#00ff66;'>🎯 CAMPAMENTO DESTRUIDO</div><p>HVT-1 Extraído con éxito.</p>`);
-
-        // MARCADOR HOSPITAL (Evacuación)
-        const hospitalCoords = [12.3630, -1.5280];
-        L.marker(hospitalCoords, {
-            icon: L.divIcon({ html: `<div style="background: #ffaa00; width: 18px; height: 18px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 15px #ffaa00; animation: pulse 1s infinite;"></div>`, iconSize: [18, 18], iconAnchor: [9, 9] })
-        }).addTo(locationsGroup).bindPopup(`<div class='popup-title' style='color:#ffaa00;'>🚨 HOSPITAL PRINCIPAL</div><p>Operación Éxodo Blanco en progreso. 60% evacuado.</p>`);
+        }).addTo(intelligenceGroup).bindPopup(`<div class='popup-title' style='color:#00ff66;'>🎯 ZONA OPERACIÓN MARTILLO</div><p>Campamento hostil neutralizado con éxito por UH-60M.</p>`);
 
         const baseCondorCoords = [12.3532, -1.5121];
-        L.marker(baseCondorCoords, { icon: createTacticalIcon('#47a3ff') }).addTo(locationsGroup).bindPopup(`<div class='popup-title'>📍 BASE CÓNDOR (CHILE)</div>`);
+        L.marker(baseCondorCoords, { icon: createTacticalIcon('#47a3ff') }).addTo(locationsGroup).bindPopup(`<div class='popup-title'>📍 BASE LOGÍSTICA CÓNDOR (CHILE)</div><p>2.000 efectivos desplegados y visita de delegación brasileña.</p>`);
 
         // EVENTOS CLICK
-        document.getElementById('card-global-ru').addEventListener('click', () => { playTacticalBeep(700, 0.08); map.flyTo([49.0, 31.0], 5); });
-        document.getElementById('card-global-il').addEventListener('click', () => { playTacticalBeep(700, 0.08); map.flyTo([32.0, 45.0], 5); });
-        document.getElementById('card-global-cl').addEventListener('click', () => { playTacticalBeep(700, 0.08); map.flyTo([-33.4, -70.6], 4); });
-        
-        document.getElementById('card-exodo').addEventListener('click', () => { playTacticalBeep(1000, 0.1); map.flyTo(hospitalCoords, 15); });
+        document.getElementById('card-martillo').addEventListener('click', () => { playTacticalBeep(1000, 0.1); map.flyTo(martilloCoords, 11); });
+        document.getElementById('card-finanzas').addEventListener('click', () => { playTacticalBeep(800, 0.05); });
+        document.getElementById('card-brasil').addEventListener('click', () => { playTacticalBeep(900, 0.08); map.flyTo(baseCondorCoords, 14); });
         document.getElementById('card-hvt').addEventListener('click', () => { playTacticalBeep(900, 0.1); map.flyTo(baseCondorCoords, 14); });
-        document.getElementById('card-nomina').addEventListener('click', () => { playTacticalBeep(600, 0.05); });
 
         const baseMaps = {};
         const overlayMaps = {
@@ -595,7 +561,7 @@
             "🤝 Aliados de Chile (AEPS)": alliesGroup,
             "🔴/🟠/🟢 Zonas de Control": zonesGroup,
             "📍 Infraestructura y Bases": locationsGroup,
-            "🎯 Inteligencia HVT": intelligenceGroup
+            "🎯 Inteligencia & Operaciones": intelligenceGroup
         };
         L.control.layers(baseMaps, overlayMaps, { collapsed: false }).addTo(map);
 
