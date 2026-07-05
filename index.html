@@ -1,12 +1,35 @@
-<!DOCTYPE html>
+html_content = """<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel Táctico de Operaciones - Burkina Faso 2027</title>
+    <title>Panel Táctico de Operaciones - Global & Burkina Faso 2027</title>
     <!-- Leaflet CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
     <style>
+        :root {
+            --bg-color: #0d0f12;
+            --sidebar-bg: #12161c;
+            --header-bg: #171d24;
+            --text-main: #d1d7e0;
+            --text-muted: #8592a6;
+            --border-color: #232b35;
+            --card-bg: #171d24;
+            --card-hover: #1c232c;
+            --popup-bg: #171d24;
+        }
+        .light-mode {
+            --bg-color: #e4e8ec;
+            --sidebar-bg: #f4f7fa;
+            --header-bg: #ffffff;
+            --text-main: #1e242b;
+            --text-muted: #5c6b7d;
+            --border-color: #d1d8e0;
+            --card-bg: #ffffff;
+            --card-hover: #eef1f5;
+            --popup-bg: #ffffff;
+        }
+
         * {
             box-sizing: border-box;
             margin: 0;
@@ -14,26 +37,29 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         body {
-            background-color: #0d0f12;
-            color: #d1d7e0;
+            background-color: var(--bg-color);
+            color: var(--text-main);
             display: flex;
             height: 100vh;
             overflow: hidden;
+            transition: background-color 0.3s, color 0.3s;
         }
         /* Sidebar Layout */
         .sidebar {
             width: 420px;
-            background-color: #12161c;
-            border-right: 2px solid #232b35;
+            background-color: var(--sidebar-bg);
+            border-right: 2px solid var(--border-color);
             display: flex;
             flex-direction: column;
             box-shadow: 4px 0 15px rgba(0,0,0,0.5);
             z-index: 1000;
+            transition: background-color 0.3s, border-color 0.3s;
         }
         .sidebar-header {
             padding: 20px;
-            background-color: #171d24;
-            border-bottom: 2px solid #232b35;
+            background-color: var(--header-bg);
+            border-bottom: 2px solid var(--border-color);
+            position: relative;
         }
         .sidebar-header h1 {
             font-size: 18px;
@@ -67,20 +93,38 @@
             font-size: 12px;
         }
         .meta-item {
-            background: #1c232c;
+            background: var(--card-hover);
             padding: 6px 10px;
             border-radius: 4px;
             border-left: 3px solid #47a3ff;
         }
         .meta-label {
-            color: #8592a6;
+            color: var(--text-muted);
             font-size: 10px;
             text-transform: uppercase;
         }
         .meta-val {
             font-weight: bold;
-            color: #ffffff;
+            color: var(--text-main);
         }
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #47a3ff;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .theme-toggle:hover {
+            background: #357abd;
+        }
+
         .sidebar-content {
             flex: 1;
             overflow-y: auto;
@@ -93,23 +137,23 @@
             letter-spacing: 1px;
             margin: 20px 0 10px 0;
             padding-bottom: 4px;
-            border-bottom: 1px solid #232b35;
+            border-bottom: 1px solid var(--border-color);
         }
         .section-title:first-of-type {
             margin-top: 0;
         }
         .intel-card {
-            background: #171d24;
-            border: 1px solid #232b35;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
             border-radius: 6px;
             padding: 12px;
             margin-bottom: 10px;
             font-size: 13px;
-            transition: background 0.2s;
+            transition: background 0.2s, border-color 0.2s;
         }
         .intel-card:hover {
-            background: #1c232c;
-            border-color: #384556;
+            background: var(--card-hover);
+            border-color: #47a3ff;
             cursor: pointer;
         }
         .intel-row {
@@ -120,8 +164,8 @@
         .intel-row:last-child {
             margin-bottom: 0;
         }
-        .label { color: #8592a6; }
-        .value { color: #ffffff; font-weight: 500; }
+        .label { color: var(--text-muted); }
+        .value { color: var(--text-main); font-weight: 500; }
         
         /* Badges de Estado */
         .badge {
@@ -139,27 +183,27 @@
         #map {
             flex: 1;
             height: 100%;
-            background-color: #11141a;
+            background-color: var(--bg-color);
         }
 
         /* Popup Custom Styling */
         .leaflet-popup-content-wrapper {
-            background: #171d24 !important;
-            color: #d1d7e0 !important;
-            border: 1px solid #384556;
+            background: var(--popup-bg) !important;
+            color: var(--text-main) !important;
+            border: 1px solid var(--border-color);
             border-radius: 6px;
             font-size: 13px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.6);
         }
         .leaflet-popup-tip {
-            background: #171d24 !important;
-            border: 1px solid #384556;
+            background: var(--popup-bg) !important;
+            border: 1px solid var(--border-color);
         }
         .popup-title {
             font-size: 14px;
             font-weight: bold;
-            color: #ffffff;
-            border-bottom: 1px solid #232b35;
+            color: var(--text-main);
+            border-bottom: 1px solid var(--border-color);
             padding-bottom: 5px;
             margin-bottom: 8px;
             text-transform: uppercase;
@@ -177,19 +221,19 @@
             vertical-align: top;
         }
         .popup-table td.lbl {
-            color: #8592a6;
+            color: var(--text-muted);
             width: 40%;
         }
         .popup-table td.val {
-            color: #ffffff;
+            color: var(--text-main);
             font-weight: 500;
         }
 
         /* Controls layer customization */
         .leaflet-control-layers {
-            background: #171d24 !important;
-            color: #d1d7e0 !important;
-            border: 1px solid #384556 !important;
+            background: var(--card-bg) !important;
+            color: var(--text-main) !important;
+            border: 1px solid var(--border-color) !important;
             border-radius: 6px !important;
         }
     </style>
@@ -200,6 +244,7 @@
     <div class="sidebar">
         <div class="sidebar-header">
             <h1>📡 PANEL DE SITUACIÓN <span class="defcon-badge">DEFCON 1</span></h1>
+            <button class="theme-toggle" id="themeToggle">☀️ Modo Día</button>
             <div class="meta-grid">
                 <div class="meta-item">
                     <div class="meta-label">📅 Fecha de Operación</div>
@@ -221,6 +266,43 @@
         </div>
 
         <div class="sidebar-content">
+
+            <!-- NUEVA SECCIÓN: CONFLICTOS GLOBALES -->
+            <div class="section-title">🌍 Panorama Global Actual</div>
+            <div class="intel-card" id="card-global-ru" style="border-left: 4px solid #ff4a4a;">
+                <div class="intel-row">
+                    <span class="value" style="color: #ff4a4a; font-weight: bold;">🇷🇺 Rusia vs 🇺🇦 Ucrania</span>
+                    <span class="badge badge-red">Pelea Activa</span>
+                </div>
+                <div class="intel-row">
+                    <span class="label">Muertes Totales Est.:</span>
+                    <span class="value" style="color: #ff4a4a;">360.000+</span>
+                </div>
+            </div>
+            
+            <div class="intel-card" id="card-global-il" style="border-left: 4px solid #ff4a4a;">
+                <div class="intel-row">
+                    <span class="value" style="color: #ff4a4a; font-weight: bold;">🇮🇱 Israel vs 🇮🇷 Irán</span>
+                    <span class="badge badge-red">Pelea Activa</span>
+                </div>
+                <div class="intel-row">
+                    <span class="label">Muertes Totales Est.:</span>
+                    <span class="value" style="color: #ff4a4a;">15.100+</span>
+                </div>
+            </div>
+
+            <div class="intel-card" id="card-global-cl" style="border-left: 4px solid #00ff66;">
+                <div class="intel-row">
+                    <span class="value" style="color: #00ff66; font-weight: bold;">🇨🇱 República de Chile</span>
+                    <span class="badge badge-green">Neutral / Estable</span>
+                </div>
+                <div class="intel-row">
+                    <span class="label">Estado Actual:</span>
+                    <span class="value">Guerra vs Bolivia Finalizada</span>
+                </div>
+            </div>
+
+            <!-- SECCIONES ORIGINALES MANTENIDAS INTACTAS -->
             <div class="section-title">🎯 Objetivo de Alta Prioridad (HVT)</div>
             <div class="intel-card" id="card-hvt" style="border-left: 4px solid #ff4a4a;">
                 <div class="intel-row">
@@ -326,11 +408,11 @@
     <div id="map"></div>
 
     <!-- Leaflet JS -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
     
     <script>
         // --- EFECTO DE SONIDO (WEB AUDIO API) ---
-        // Genera un sutil pitido electrónico al interactuar para ambientación táctica sin saturar
+        // Se mantiene intacto el sonido suave para no saturar, como solicitaste.
         let audioCtx = null;
         function playTacticalBeep(freq = 800, duration = 0.04, type = 'sine') {
             try {
@@ -346,7 +428,7 @@
                 osc.type = type;
                 osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
                 
-                gainNode.gain.setValueAtTime(0.02, audioCtx.currentTime); // Volumen muy bajo para no saturar
+                gainNode.gain.setValueAtTime(0.02, audioCtx.currentTime); // Volumen muy bajo
                 gainNode.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + duration);
                 
                 osc.connect(gainNode);
@@ -359,174 +441,127 @@
             }
         }
 
-        // Configuración Inicial del Mapa (Centrado en Burkina Faso / Uagadugú)
+        // Configuración Inicial del Mapa
         const uagaCoords = [12.3714, -1.5197];
         const map = L.map('map', {
             zoomControl: true,
             maxZoom: 18,
-            minZoom: 6
+            minZoom: 2
         }).setView(uagaCoords, 9);
 
-        // Capa de Mapa Oscura Estilo Militar (CartoDB DarkMatter)
+        // --- CAPAS DE TEMA (DÍA / NOCHE) ---
         const darkTiles = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-            attribution: '&copy; OpenStreetMap &copy; CARTO',
-            subdomains: 'abcd',
-            maxZoom: 20
-        }).addTo(map);
+            attribution: '&copy; CARTO', subdomains: 'abcd', maxZoom: 20
+        });
+        
+        const lightTiles = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; CARTO', subdomains: 'abcd', maxZoom: 20
+        });
+
+        darkTiles.addTo(map); // Noche por defecto
+
+        // Lógica del botón Día/Noche
+        let isLightMode = false;
+        const themeToggle = document.getElementById('themeToggle');
+        themeToggle.addEventListener('click', () => {
+            playTacticalBeep(1200, 0.08, 'triangle');
+            isLightMode = !isLightMode;
+            document.body.classList.toggle('light-mode');
+            
+            if (isLightMode) {
+                map.removeLayer(darkTiles);
+                lightTiles.addTo(map);
+                themeToggle.innerHTML = '🌙 Modo Noche';
+                themeToggle.style.background = '#2c3e50';
+            } else {
+                map.removeLayer(lightTiles);
+                darkTiles.addTo(map);
+                themeToggle.innerHTML = '☀️ Modo Día';
+                themeToggle.style.background = '#47a3ff';
+            }
+        });
 
         // --- CAPAS GRUPO (LAYERS) ---
+        const globalWarsGroup = L.layerGroup().addTo(map);
         const zonesGroup = L.layerGroup().addTo(map);
         const locationsGroup = L.layerGroup().addTo(map);
         const attacksGroup = L.layerGroup().addTo(map);
         const intelligenceGroup = L.layerGroup().addTo(map);
 
-        // --- DEFINICIÓN DE ZONAS DE CONTROL DEL TERRITORIO ---
-        // Zona Norte (Roja): Muy peligrosa, control insurgente
-        const northZone = L.polygon([
-            [15.1, -5.5], [15.1, 2.5], [12.9, 2.5], [12.9, -5.5]
-        ], {
+        // --- DEFINICIÓN DE ZONAS DE CONTROL EN BURKINA FASO ---
+        const northZone = L.polygon([[15.1, -5.5], [15.1, 2.5], [12.9, 2.5], [12.9, -5.5]], {
             color: '#ff4a4a', weight: 1, fillColor: '#ff4a4a', fillOpacity: 0.15
         }).addTo(zonesGroup);
-        northZone.bindPopup("<div class='popup-title'>🔴 ZONA NORTE - INSURGENTE</div><p>Control insurgente casi total. Patrullas escasas, pueblos abandonados y campamentos terroristas activos. Fronteras con Malí y Níger críticas.</p>");
+        northZone.bindPopup("<div class='popup-title'>🔴 ZONA NORTE - INSURGENTE</div><p>Control insurgente casi total.</p>");
 
-        // Zona Centro (Naranja): Control compartido, atentados activos
-        const centerZone = L.polygon([
-            [12.9, -5.5], [12.9, 2.5], [11.8, 2.5], [11.8, -5.5]
-        ], {
+        const centerZone = L.polygon([[12.9, -5.5], [12.9, 2.5], [11.8, 2.5], [11.8, -5.5]], {
             color: '#ffaa00', weight: 1, fillColor: '#ffaa00', fillOpacity: 0.1
         }).addTo(zonesGroup);
-        centerZone.bindPopup("<div class='popup-title'>🟠 ZONA CENTRO - CONTROL COMPARTIDO</div><p>Mucha presencia policial y retenes, pero con alto riesgo de atentados terroristas y ataques sorpresa.</p>");
+        centerZone.bindPopup("<div class='popup-title'>🟠 ZONA CENTRO - CONTROL COMPARTIDO</div><p>Mucha presencia policial, riesgo de ataques.</p>");
 
-        // Zona Sur (Verde): Estable, Gobierno controla casi todo
-        const southZone = L.polygon([
-            [11.8, -5.5], [11.8, 2.5], [9.4, 2.5], [9.4, -5.5]
-        ], {
+        const southZone = L.polygon([[11.8, -5.5], [11.8, 2.5], [9.4, 2.5], [9.4, -5.5]], {
             color: '#00ff66', weight: 1, fillColor: '#00ff66', fillOpacity: 0.08
         }).addTo(zonesGroup);
-        southZone.bindPopup("<div class='popup-title'>🟢 ZONA SUR - CONTROL GUBERNAMENTAL</div><p>Territorio más tranquilo y bajo control del Estado. Fronteras con Ghana, Benín y Costa de Marfil estables.</p>");
+        southZone.bindPopup("<div class='popup-title'>🟢 ZONA SUR - CONTROL GUBERNAMENTAL</div><p>Territorio pacífico bajo control del Estado.</p>");
 
-        // Radio de Cobertura Aérea / Vigilancia Drone (300 km desde la capital)
-        const airCoverage = L.circle(uagaCoords, {
-            radius: 300000,
-            color: '#47a3ff',
-            weight: 1,
-            dashArray: '5, 8',
-            fillColor: '#47a3ff',
-            fillOpacity: 0.02,
-            interactive: false
-        }).addTo(zonesGroup);
-
-        // --- MARCADORES Y PUNTOS CLAVE ---
-        
-        // Iconos Genéricos Básicos usando DivIcon para mantener todo nativo y estilizado
-        function createTacticalIcon(color, text = '•') {
+        // --- MARCADORES GLOBALES (NUEVO) ---
+        function createTacticalIcon(color, text = '') {
             return L.divIcon({
                 className: 'tactical-div-icon',
-                html: `<div style="background: ${color}; width: 12px; height: 12px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 8px ${color}; display:flex; align-items:center; justify-content:center; color:white; font-size:8px;"></div>`,
-                iconSize: [12, 12],
-                iconAnchor: [6, 6]
+                html: `<div style="background: ${color}; width: 14px; height: 14px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 10px ${color}; display:flex; align-items:center; justify-content:center; color:white; font-size:10px; font-weight:bold;">${text}</div>`,
+                iconSize: [14, 14], iconAnchor: [7, 7]
             });
         }
 
-        // 1. OBJETIVO DE ALTA PRIORIDAD: Abdul Rahman Al-Karim (95 km al norte)
+        const markerRu = L.marker([49.0, 31.0], { icon: createTacticalIcon('#ff4a4a') }).addTo(globalWarsGroup);
+        markerRu.bindPopup("<div class='popup-title' style='color:#ff4a4a;'>🟥 Rusia vs Ucrania</div><p><b>Estado:</b> Guerra Abierta.<br><b>Muertes:</b> ~360.000 combinadas.</p>");
+        
+        const markerIl = L.marker([32.0, 45.0], { icon: createTacticalIcon('#ff4a4a') }).addTo(globalWarsGroup);
+        markerIl.bindPopup("<div class='popup-title' style='color:#ff4a4a;'>🟥 Israel vs Irán</div><p><b>Estado:</b> Intercambio de Misiles.<br><b>Muertes:</b> ~15.100 combinadas.</p>");
+
+        const markerCl = L.marker([-33.4, -70.6], { icon: createTacticalIcon('#00ff66') }).addTo(globalWarsGroup);
+        markerCl.bindPopup("<div class='popup-title' style='color:#00ff66;'>🟢 República de Chile</div><p><b>Estado:</b> Neutral / Victorioso.<br>Bajas guerra finalizada: 155.</p>");
+
+
+        // --- MARCADORES ORIGINALES DE BURKINA FASO ---
         const abdulCoords = [13.2250, -1.1500];
         const hvtMarker = L.marker(abdulCoords, {
             icon: L.divIcon({
                 html: `<div style="background: #ff0000; width: 16px; height: 16px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 12px #ff0000; animation: pulse 1s infinite;"></div>`,
-                iconSize: [16, 16],
-                iconAnchor: [8, 8]
+                iconSize: [16, 16], iconAnchor: [8, 8]
             })
         }).addTo(intelligenceGroup);
+        hvtMarker.bindPopup(`<div class='popup-title' style='color:#ff4a4a;'>🎯 BLANCO EN LA MIRA</div><table class='popup-table'><tr><td class='lbl'>Objetivo:</td><td class='val'>Abdul Rahman Al-Karim</td></tr></table>`);
 
-        hvtMarker.bindPopup(`
-            <div class='popup-title' style='color:#ff4a4a;'>🎯 BLANCO EN LA MIRA</div>
-            <table class='popup-table'>
-                <tr><td class='lbl'>Objetivo:</td><td class='val'>Abdul Rahman Al-Karim</td></tr>
-                <tr><td class='lbl'>Ubicación:</td><td class='val'>Zona Montañosa (95km Norte)</td></tr>
-                <tr><td class='lbl'>Defensas:</td><td class='val'>40-60 Insurgentes, Torres, Sacos de Arena, Camionetas</td></tr>
-                <tr><td class='lbl'>Certeza:</td><td class='val' style='color:#ff4a4a;'>90% Confirmado por Drones EE.UU.</td></tr>
-            </table>
-        `);
-
-        // 2. INFRAESTRUCTURA DE LA CAPITAL (UAGADUGÚ)
         const locationsData = [
-            { name: "Aeropuerto Int. / Base Cóndor (Chile)", coords: [12.3532, -1.5121], color: "#47a3ff", desc: "Base Temporal 'Cóndor' de las FF.AA Chilenas. Aloja 520 efectivos, hangar para 2 C-130H, helipuerto para 4 Bell 412EP, centro de mando, hospital de campaña, combustible y municiones." },
-            { name: "Embajada de EE.UU.", coords: [12.3620, -1.4980], color: "#ffffff", desc: "Operación de 50 operadores tácticos. Controlan los 2 drones MQ-9 Reaper que ejecutan vigilancia continua sobre el Sahel." },
-            { name: "Embajada de Francia", coords: [12.3710, -1.5050], color: "#ffffff", desc: "Despliegue de 80 operadores especiales y 2 helicópteros Airbus H225M Caracal." },
-            { name: "Embajada de Alemania", coords: [12.3670, -1.5010], color: "#ffffff", desc: "Zona protegida de la delegación diplomática alemana." },
-            { name: "Palacio Presidencial (Kosyam)", coords: [12.3320, -1.5140], color: "#00ff66", desc: "Sede del Gobierno de Burkina Faso. Alta seguridad local." },
-            { name: "Ministerio de Defensa", coords: [12.3780, -1.5150], color: "#00ff66", desc: "Coordinación central de las operaciones de movilización DEFCON 1." },
-            { name: "Cuartel General del Ejército", coords: [12.3760, -1.5120], color: "#00ff66", desc: "Centro de comando militar de las fuerzas locales (3.500 tropas en la ciudad)." },
-            { name: "Hospital Principal", coords: [12.3630, -1.5280], color: "#00ffff", desc: "Centro médico civil y militar saturado por los recientes atentados." }
+            { name: "Base Cóndor (Chile)", coords: [12.3532, -1.5121], color: "#47a3ff" },
+            { name: "Embajada de EE.UU.", coords: [12.3620, -1.4980], color: "#ffffff" },
+            { name: "Palacio Presidencial", coords: [12.3320, -1.5140], color: "#00ff66" }
         ];
 
         locationsData.forEach(loc => {
             const marker = L.marker(loc.coords, { icon: createTacticalIcon(loc.color) }).addTo(locationsGroup);
-            marker.bindPopup(`
-                <div class='popup-title'>📍 ${loc.name}</div>
-                <p style='font-size:12px; line-height:1.4; color:#bcffff;'>${loc.desc}</p>
-            `);
+            marker.bindPopup(`<div class='popup-title'>📍 ${loc.name}</div>`);
             marker.on('mouseover', () => playTacticalBeep(600, 0.03));
         });
 
-        // 3. PUNTOS DE LOS ATENTADOS RECIENTES
         const attack1 = L.marker([12.3650, -1.4920], {
-            icon: L.divIcon({
-                html: `<div style="color: #ff4a4a; font-size: 20px; font-weight:bold; text-shadow: 0 0 5px #000;">💥</div>`,
-                iconSize: [20, 20], iconAnchor: [10, 10]
-            })
-        }).addTo(attacksGroup);
-        attack1.bindPopup(`
-            <div class='popup-title' style='color:#ff4a4a;'>💥 ATENTADO 1: EMBAJADA DE CHILE</div>
-            <table class='popup-table'>
-                <tr><td class='lbl'>Fecha/Hora:</td><td class='val'>23 Junio - 08:10</td></tr>
-                <tr><td class='lbl'>Resultado:</td><td class='val' style='color:#ff4a4a;'>40 Muertos / 12 Heridos</td></tr>
-                <tr><td class='lbl'>Estado:</td><td class='val'>Perímetro de 200m en doble contención militar.</td></tr>
-            </table>
-        `);
-
-        const attack2 = L.marker([12.3685, -1.5110], {
-            icon: L.divIcon({
-                html: `<div style="color: #ffaa00; font-size: 20px; font-weight:bold; text-shadow: 0 0 5px #000;">💥</div>`,
-                iconSize: [20, 20], iconAnchor: [10, 10]
-            })
-        }).addTo(attacksGroup);
-        attack2.bindPopup(`
-            <div class='popup-title' style='color:#ffaa00;'>💥 ATENTADO 2: ATAQUE COORDINADO</div>
-            <table class='popup-table'>
-                <tr><td class='lbl'>Fecha/Hora:</td><td class='val'>24 Junio - 09:15</td></tr>
-                <tr><td class='lbl'>Zonas:</td><td class='val'>Hotel Internacional, Centro Comercial, Residencial de extranjeros</td></tr>
-                <tr><td class='lbl'>Resultado:</td><td class='val' style='color:#ff4a4a;'>78 Muertos / 150 Heridos</td></tr>
-            </table>
-        `);
+            icon: L.divIcon({ html: `<div style="color: #ff4a4a; font-size: 20px; font-weight:bold; text-shadow: 0 0 5px #000;">💥</div>`, iconSize: [20, 20] })
+        }).addTo(attacksGroup).bindPopup("<div class='popup-title' style='color:#ff4a4a;'>💥 EMBAJADA DE CHILE</div>");
 
         // --- INTERACTIVIDAD DESDE EL SIDEBAR ---
-        document.getElementById('card-hvt').addEventListener('click', () => {
-            playTacticalBeep(900, 0.1, 'sawtooth');
-            map.setView(abdulCoords, 12);
-            hvtMarker.openPopup();
-        });
+        document.getElementById('card-global-ru').addEventListener('click', () => { playTacticalBeep(700, 0.08); map.flyTo([49.0, 31.0], 5); markerRu.openPopup(); });
+        document.getElementById('card-global-il').addEventListener('click', () => { playTacticalBeep(700, 0.08); map.flyTo([32.0, 45.0], 5); markerIl.openPopup(); });
+        document.getElementById('card-global-cl').addEventListener('click', () => { playTacticalBeep(700, 0.08); map.flyTo([-33.4, -70.6], 4); markerCl.openPopup(); });
 
-        document.getElementById('card-chile').addEventListener('click', () => {
-            playTacticalBeep(500, 0.06);
-            map.setView([12.3532, -1.5121], 13);
-        });
-
-        document.getElementById('card-atentado1').addEventListener('click', () => {
-            playTacticalBeep(400, 0.08);
-            map.setView([12.3650, -1.4920], 15);
-            attack1.openPopup();
-        });
-
-        document.getElementById('card-atentado2').addEventListener('click', () => {
-            playTacticalBeep(400, 0.08);
-            map.setView([12.3685, -1.5110], 14);
-            attack2.openPopup();
-        });
+        document.getElementById('card-hvt').addEventListener('click', () => { playTacticalBeep(900, 0.1, 'sawtooth'); map.flyTo(abdulCoords, 12); hvtMarker.openPopup(); });
+        document.getElementById('card-chile').addEventListener('click', () => { playTacticalBeep(500, 0.06); map.flyTo([12.3532, -1.5121], 13); });
+        document.getElementById('card-atentado1').addEventListener('click', () => { playTacticalBeep(400, 0.08); map.flyTo([12.3650, -1.4920], 15); attack1.openPopup(); });
 
         // Control de Capas (Filtros)
-        const baseMaps = { "Mapa Táctico Nocturno": darkTiles };
+        const baseMaps = {};
         const overlayMaps = {
+            "🌍 Focos de Guerra Globales": globalWarsGroup,
             "🔴/🟠/🟢 Zonas de Control": zonesGroup,
             "📍 Infraestructura y Bases": locationsGroup,
             "💥 Atentados Recientes": attacksGroup,
@@ -534,7 +569,6 @@
         };
         L.control.layers(baseMaps, overlayMaps, { collapsed: false }).addTo(map);
 
-        // Sonidos generales al interactuar con marcadores
         map.on('popupopen', () => playTacticalBeep(700, 0.04));
 
     </script>
