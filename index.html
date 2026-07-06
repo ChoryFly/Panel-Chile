@@ -110,7 +110,7 @@
             display: block;
         }
 
-        /* Tablas de Rangos y Sueldos */
+        /* Tablas de Datos */
         .data-table {
             width: 100%;
             border-collapse: collapse;
@@ -138,7 +138,7 @@
             background-color: rgba(212, 175, 55, 0.05);
         }
 
-        /* MÓDULO DEL MAPA TÁCTICO RECONSTRUIDO */
+        /* MÓDULO DE MAPA TÁCTICO */
         .map-container {
             position: relative;
             width: 100%;
@@ -152,6 +152,7 @@
                 linear-gradient(90deg, rgba(0, 255, 102, 0.05) 1px, transparent 1px);
             background-size: 40px 40px;
             box-shadow: inset 0 0 30px rgba(0,0,0,0.8);
+            margin-top: 20px;
         }
 
         .map-radar-line {
@@ -197,6 +198,7 @@
             border-radius: 4px;
             font-size: 0.8rem;
             font-family: monospace;
+            color: white;
         }
 
         @keyframes scan {
@@ -209,7 +211,7 @@
             100% { transform: scale(3); opacity: 0; }
         }
 
-        /* Panel de Altos Mandos */
+        /* Panel de Altos Mandos y Cards */
         .admin-box {
             background-color: rgba(192, 57, 43, 0.1);
             border: 1px solid var(--danger-color);
@@ -255,8 +257,9 @@
         <button class="nav-btn" onclick="switchSection('fach')">Sección FACh</button>
         <button class="nav-btn" onclick="switchSection('armada')">Escuadra Naval</button>
         <button class="nav-btn" onclick="switchSection('sueldos')">Escala de Sueldos</button>
-        <!-- Panel visible para el General en Jefe -->
-        <button class="nav-btn" id="btn-altos-mandos" onclick="switchSection('altos-mandos')" style="border-left: 3px solid var(--danger-color);">⚠️ Altos Mandos</button>
+        
+        <!-- Panel visible de Altos Mandos -->
+        <button class="nav-btn" id="btn-altos-mandos" onclick="switchSection('altos-mandos')" style="border-left: 3px solid var(--danger-color); margin-top: 20px;">⚠️ Altos Mandos</button>
     </div>
 
     <!-- CONTENIDO PRINCIPAL -->
@@ -286,7 +289,7 @@
             <p>Las líneas logísticas terrestres y aéreas permanecen bajo monitoreo constante. La extracción polimetálica del plan Escudo Dorado continúa sin interrupciones en el sector norte.</p>
         </div>
 
-        <!-- SECCIÓN RECONSTRUIDA: MAPA TÁCTICO -->
+        <!-- SECCIÓN: MAPA TÁCTICO -->
         <div id="mapa" class="content-section">
             <h3>Teatro de Operaciones Transcontinental</h3>
             <p>Monitoreo de radar de posiciones de unidades aéreas y despliegue terrestre de la Brigada Lautaro.</p>
@@ -301,12 +304,12 @@
 
                 <!-- Marcador Frontera Malí -->
                 <div class="map-marker" style="top: 40%; left: 35%; background-color: var(--danger-color); box-shadow: 0 0 15px var(--danger-color);">
-                    <div class="marker-label">Sección Avance Malí (BOE)</div>
+                    <div class="marker-label">Avance Malí (BOE)</div>
                 </div>
 
                 <!-- Marcador Frontera Níger -->
                 <div class="map-marker" style="top: 45%; left: 70%; background-color: var(--danger-color); box-shadow: 0 0 15px var(--danger-color);">
-                    <div class="marker-label">Sección Avance Níger (Mowag)</div>
+                    <div class="marker-label">Avance Níger (Mowag)</div>
                 </div>
 
                 <!-- Marcador Órbita A-10 -->
@@ -442,7 +445,7 @@
                 <h3>⚠️ PANEL DE CONTROL DE ESTRATEGIA SUBTERRÁNEA</h3>
                 <p><strong>Nivel de Acceso:</strong> Autorizado exclusivamente para el General en Jefe.</p>
                 <hr style="border-color: var(--danger-color);">
-                <h4>Directiva de Expansión Territorial Inmediata (Opción 2)</h4>
+                <h4>Directiva de Expansión Territorial Inmediata</h4>
                 <p>Las coordenadas de despliegue sobre las fronteras de Malí y Níger han sido cargadas en el sistema táctico. Los equipos de artillería pesada y blindados Mowag Piranha esperan la orden de ignición de motores.</p>
                 <button class="nav-btn" style="background-color: var(--danger-color); color: white; padding: 10px 20px;" onclick="alert('Despliegue de Expansión Territorial Inicializado...')">AUTORIZAR AVANCE DE COMBATE</button>
             </div>
@@ -451,32 +454,40 @@
 
     <!-- SCRIPT TÁCTICO: SONIDO HOVER Y NAVEGACIÓN -->
     <script>
+        // Sistema de audio de baja saturación
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
         function playSoftBeep() {
             try {
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
                 const osc = audioCtx.createOscillator();
                 const gain = audioCtx.createGain();
                 
                 osc.type = 'sine';
-                osc.frequency.setValueAtTime(900, audioCtx.currentTime); 
-                gain.gain.setValueAtTime(0.02, audioCtx.currentTime);    // Sonido sutil no saturante
+                osc.frequency.setValueAtTime(800, audioCtx.currentTime); 
+                gain.gain.setValueAtTime(0.015, audioCtx.currentTime); // Volumen muy bajo
                 
                 osc.connect(gain);
                 gain.connect(audioCtx.destination);
                 
                 osc.start();
-                gain.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 0.03);
-                osc.stop(audioCtx.currentTime + 0.03);
-            } catch (e) {}
+                gain.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 0.04);
+                osc.stop(audioCtx.currentTime + 0.04);
+            } catch (e) {
+                console.log("Audio de hover bloqueado hasta interacción del usuario.");
+            }
         }
 
+        // Asignación de sonido a botones y tablas
         document.querySelectorAll('.nav-btn, .data-table tr').forEach(element => {
             element.addEventListener('mouseenter', () => {
-                playSoftBeep(); // Implementado correctamente
+                playSoftBeep();
             });
         });
 
+        // Navegación entre paneles
         function switchSection(sectionId) {
             document.querySelectorAll('.content-section').forEach(section => {
                 section.classList.remove('active');
