@@ -12,7 +12,6 @@
             --text-color: #ecf0f1;
             --danger-color: #c0392b;
             --success-color: #27ae60;
-            --radar-green: #00ff66;
         }
 
         body {
@@ -35,6 +34,7 @@
             flex-direction: column;
             padding: 20px;
             box-sizing: border-box;
+            z-index: 10;
         }
 
         .sidebar h2 {
@@ -82,6 +82,8 @@
             box-sizing: border-box;
             overflow-y: auto;
             background-image: linear-gradient(rgba(17, 23, 26, 0.95), rgba(17, 23, 26, 0.95)), url('https://www.transparenttextures.com/patterns/dark-matter.png');
+            display: flex;
+            flex-direction: column;
         }
 
         .header-panel {
@@ -91,6 +93,7 @@
             border-bottom: 2px solid var(--secondary-color);
             padding-bottom: 20px;
             margin-bottom: 30px;
+            flex-shrink: 0;
         }
 
         .user-tag {
@@ -104,6 +107,7 @@
         /* Secciones de Contenido */
         .content-section {
             display: none;
+            flex: 1; 
         }
 
         .content-section.active {
@@ -138,40 +142,53 @@
             background-color: rgba(212, 175, 55, 0.05);
         }
 
-        /* MÓDULO DE MAPA TÁCTICO */
-        .map-container {
+        /* 🗺️ MAPA MUNDIAL GEOPOLÍTICO 🗺️ */
+        .full-world-map {
             position: relative;
             width: 100%;
-            height: 550px;
-            background-color: #0d1317;
+            height: calc(100vh - 160px); 
+            background-color: #000;
+            
+            /* Mapa Mundial Oscuro (Vida Real) */
+            background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/World_map_%28dark%29.svg/1200px-World_map_%28dark%29.svg.png'); 
+            
+            background-size: cover;
+            background-position: center;
             border: 2px solid var(--secondary-color);
             border-radius: 8px;
+            box-shadow: inset 0 0 50px rgba(0,0,0,0.9);
             overflow: hidden;
-            background-image: 
-                linear-gradient(rgba(0, 255, 102, 0.05) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 255, 102, 0.05) 1px, transparent 1px);
-            background-size: 40px 40px;
-            box-shadow: inset 0 0 30px rgba(0,0,0,0.8);
-            margin-top: 20px;
-        }
-
-        .map-radar-line {
-            position: absolute;
-            width: 100%;
-            height: 2px;
-            background: linear-gradient(to bottom, rgba(0, 255, 102, 0), rgba(0, 255, 102, 0.5), rgba(0, 255, 102, 0));
-            top: 0;
-            animation: scan 4s linear infinite;
         }
 
         .map-marker {
             position: absolute;
-            width: 12px;
-            height: 12px;
-            background-color: var(--radar-green);
+            width: 14px;
+            height: 14px;
             border-radius: 50%;
             transform: translate(-50%, -50%);
-            box-shadow: 0 0 15px var(--radar-green);
+            z-index: 2;
+        }
+
+        /* Coordenadas en el mapa mundial */
+        .marker-chile {
+            background-color: var(--accent-color);
+            box-shadow: 0 0 20px var(--accent-color);
+            top: 75%; /* Santiago, Chile */
+            left: 28%;
+        }
+
+        .marker-africa {
+            background-color: var(--danger-color);
+            box-shadow: 0 0 20px var(--danger-color);
+            top: 52%; /* Sahel / Burkina Faso */
+            left: 48%;
+        }
+
+        .marker-fleet {
+            background-color: #2980b9;
+            box-shadow: 0 0 20px #2980b9;
+            top: 65%; /* Océano Atlántico Sur */
+            left: 38%;
         }
 
         .map-marker::after {
@@ -179,34 +196,31 @@
             position: absolute;
             width: 100%;
             height: 100%;
-            border: 2px solid var(--radar-green);
+            border: 2px solid inherit;
             border-radius: 50%;
-            animation: pulse 2s infinite;
+            animation: pulse-map 2s infinite;
             top: -2px;
             left: -2px;
             box-sizing: content-box;
+            border-color: inherit;
         }
 
         .marker-label {
             position: absolute;
             left: 20px;
-            top: -5px;
+            top: -10px;
             white-space: nowrap;
-            background-color: rgba(17, 23, 26, 0.85);
-            padding: 4px 8px;
-            border: 1px solid var(--secondary-color);
+            background-color: rgba(0, 0, 0, 0.85);
+            padding: 6px 10px;
+            border: 1px solid rgba(255,255,255,0.2);
             border-radius: 4px;
-            font-size: 0.8rem;
-            font-family: monospace;
+            font-size: 0.85rem;
+            font-weight: bold;
             color: white;
+            pointer-events: none;
         }
 
-        @keyframes scan {
-            0% { top: 0%; }
-            100% { top: 100%; }
-        }
-
-        @keyframes pulse {
+        @keyframes pulse-map {
             0% { transform: scale(1); opacity: 1; }
             100% { transform: scale(3); opacity: 0; }
         }
@@ -253,7 +267,7 @@
     <div class="sidebar">
         <h2>MANDO CONJUNTO</h2>
         <button class="nav-btn active" onclick="switchSection('resumen')">Resumen Operativo</button>
-        <button class="nav-btn" onclick="switchSection('mapa')">🗺️ Mapa Táctico</button>
+        <button class="nav-btn" onclick="switchSection('mapa')">🗺️ Mapa Mundial</button>
         <button class="nav-btn" onclick="switchSection('fach')">Sección FACh</button>
         <button class="nav-btn" onclick="switchSection('armada')">Escuadra Naval</button>
         <button class="nav-btn" onclick="switchSection('sueldos')">Escala de Sueldos</button>
@@ -278,44 +292,36 @@
                     <p>OPERATIVA</p>
                 </div>
                 <div class="status-card">
-                    <h4>Reservas Oro (Santiago)</h4>
-                    <p>740 Lingotes</p>
+                    <h4>Reservas Banco Central</h4>
+                    <p>740 Lingotes (Oro)</p>
                 </div>
                 <div class="status-card" style="border-left-color: #2980b9;">
                     <h4>Control de Espacio Aéreo</h4>
                     <p>100% SEGURO</p>
                 </div>
             </div>
-            <p>Las líneas logísticas terrestres y aéreas permanecen bajo monitoreo constante. La extracción polimetálica del plan Escudo Dorado continúa sin interrupciones en el sector norte.</p>
+            <p>Las líneas logísticas terrestres y aéreas permanecen bajo monitoreo constante. La extracción polimetálica del plan Escudo Dorado continúa sin interrupciones en el sector norte de África.</p>
         </div>
 
-        <!-- SECCIÓN: MAPA TÁCTICO -->
-        <div id="mapa" class="content-section">
-            <h3>Teatro de Operaciones Transcontinental</h3>
-            <p>Monitoreo de radar de posiciones de unidades aéreas y despliegue terrestre de la Brigada Lautaro.</p>
-            
-            <div class="map-container">
-                <div class="map-radar-line"></div>
+        <!-- SECCIÓN: MAPA MUNDIAL -->
+        <div id="mapa" class="content-section" style="display: none; height: 100%;">
+            <div class="full-world-map">
                 
-                <!-- Marcador Base Cóndor -->
-                <div class="map-marker" style="top: 65%; left: 50%;">
-                    <div class="marker-label"><span style="color: var(--accent-color);">[HQ]</span> Base Cóndor (Burkina Faso)</div>
+                <!-- Marcador Mando Conjunto (Santiago, Chile) -->
+                <div class="map-marker marker-chile">
+                    <div class="marker-label" style="color: var(--accent-color);">Santiago (Mando Conjunto)</div>
                 </div>
 
-                <!-- Marcador Frontera Malí -->
-                <div class="map-marker" style="top: 40%; left: 35%; background-color: var(--danger-color); box-shadow: 0 0 15px var(--danger-color);">
-                    <div class="marker-label">Avance Malí (BOE)</div>
+                <!-- Marcador Base África (Sahel) -->
+                <div class="map-marker marker-africa">
+                    <div class="marker-label" style="color: #ff7675;">Zona Autónoma (Base Cóndor)</div>
                 </div>
 
-                <!-- Marcador Frontera Níger -->
-                <div class="map-marker" style="top: 45%; left: 70%; background-color: var(--danger-color); box-shadow: 0 0 15px var(--danger-color);">
-                    <div class="marker-label">Avance Níger (Mowag)</div>
+                <!-- Marcador Escuadra Naval (Atlántico Sur) -->
+                <div class="map-marker marker-fleet">
+                    <div class="marker-label" style="color: #74b9ff;">Fuerza de Tarea Naval (Ruta de la Plata)</div>
                 </div>
 
-                <!-- Marcador Órbita A-10 -->
-                <div class="map-marker" style="top: 52%; left: 48%; background-color: #2980b9; box-shadow: 0 0 15px #2980b9;">
-                    <div class="marker-label">⚡ Órbita CAS: A-10 Warthog</div>
-                </div>
             </div>
         </div>
 
@@ -325,7 +331,7 @@
             <table class="data-table">
                 <thead>
                     <tr>
-                        <th>Modelo</th>
+                        <th>Modelo (Vida Real)</th>
                         <th>Tipo</th>
                         <th>Cantidad</th>
                         <th>Estado Táctico</th>
@@ -362,7 +368,7 @@
 
         <!-- SECCIÓN: ESCUADRA NAVAL -->
         <div id="armada" class="content-section">
-            <h3>Fuerza de Tarea Transatlántica (Ruta de la Plata)</h3>
+            <h3>Fuerza de Tarea Transatlántica</h3>
             <table class="data-table">
                 <thead>
                     <tr>
@@ -467,7 +473,7 @@
                 
                 osc.type = 'sine';
                 osc.frequency.setValueAtTime(800, audioCtx.currentTime); 
-                gain.gain.setValueAtTime(0.015, audioCtx.currentTime); // Volumen muy bajo
+                gain.gain.setValueAtTime(0.015, audioCtx.currentTime); // Volumen muy bajo para no molestar
                 
                 osc.connect(gain);
                 gain.connect(audioCtx.destination);
@@ -476,7 +482,7 @@
                 gain.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 0.04);
                 osc.stop(audioCtx.currentTime + 0.04);
             } catch (e) {
-                console.log("Audio de hover bloqueado hasta interacción del usuario.");
+                console.log("Audio de hover bloqueado hasta interacción.");
             }
         }
 
@@ -491,18 +497,21 @@
         function switchSection(sectionId) {
             document.querySelectorAll('.content-section').forEach(section => {
                 section.classList.remove('active');
+                section.style.display = 'none'; 
             });
             document.querySelectorAll('.nav-btn').forEach(btn => {
                 btn.classList.remove('active');
             });
 
-            document.getElementById(sectionId).classList.add('active');
+            const activeSection = document.getElementById(sectionId);
+            activeSection.classList.add('active');
+            activeSection.style.display = 'block'; 
             
             const titles = {
                 'resumen': 'Resumen Operativo',
-                'mapa': 'Mapa Táctico de Operaciones',
+                'mapa': 'Teatro de Operaciones Global',
                 'fach': 'Sección FACh - Fuerza de Tarea',
-                'armada': 'Escuadra Naval - Despliegue Atlántico',
+                'armada': 'Escuadra Naval',
                 'sueldos': 'Escala Salarial General',
                 'altos-mandos': 'Panel de Altos Mandos'
             };
@@ -510,6 +519,13 @@
             
             event.currentTarget.classList.add('active');
         }
+        
+        // Asegurar que solo el resumen se muestre al cargar
+        window.onload = function() {
+            document.querySelectorAll('.content-section').forEach(section => {
+                if(section.id !== 'resumen') section.style.display = 'none';
+            });
+        };
     </script>
 </body>
 </html>
