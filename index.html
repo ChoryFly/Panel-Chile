@@ -389,7 +389,7 @@
                     </div>
                     <div class="meta-item" onmouseenter="playHoverSound()">
                         <div class="meta-label">🌍 Frente Sahel</div>
-                        <div class="meta-val">Consolidado 50%</div>
+                        <div class="meta-val">Expandido (Malí/Níger)</div>
                     </div>
                 </div>
             </div>
@@ -400,6 +400,7 @@
                 <div class="admin-panel" id="adminPanel">
                     <div class="admin-panel-title">🛡️ PANEL DE ADMIN - GENERAL EN JEFE</div>
                     <button class="admin-btn" onmouseenter="playHoverSound()" onclick="map.flyTo([12.3532, -1.5121], 6)">📍 Ir a Zona Autónoma Sahel (Burkina Faso)</button>
+                    <button class="admin-btn" onmouseenter="playHoverSound()" onclick="map.flyTo([4.5, -0.2], 6)">📍 Ir a Corredor Marítimo (Ghana / Golfo de Guinea)</button>
                     <button class="admin-btn" onmouseenter="playHoverSound()" onclick="map.flyTo([49.0, 31.0], 5)">📍 Ir a Frente Europa del Este (Ucrania/Rusia)</button>
                     <button class="admin-btn" onmouseenter="playHoverSound()" onclick="map.flyTo([31.0, 35.0], 6)">📍 Ir a Frente Medio Oriente (Israel/Irán)</button>
                     <button class="admin-btn" onmouseenter="playHoverSound()" onclick="map.flyTo([35.0, 120.0], 4)">📍 Ir a Frente Asia-Pacífico (China/Corea)</button>
@@ -411,9 +412,9 @@
                     <div class="intel-row">
                         <span class="value" style="color: #00ff66; font-weight: bold; width: 100%; text-align: left;">REPORTE EN TIEMPO REAL</span>
                     </div>
-                    <div class="intel-row"><span class="label">Operación:</span><span class="value">Misión "Escudo Dorado"</span></div>
-                    <div class="intel-row"><span class="label">Efectivos:</span><span class="value" style="color:#00ff66;">2.000 (BOE Lautaro, IM)</span></div>
-                    <div class="intel-row"><span class="label">Aeronaves Base:</span><span class="value">2 UH-60M, 4 Bell 412EP, C-130H</span></div>
+                    <div class="intel-row"><span class="label">Operación:</span><span class="value">Misión "Escudo Dorado" y Expansión</span></div>
+                    <div class="intel-row"><span class="label">Efectivos:</span><span class="value" style="color:#00ff66;">2.120 (BOE Lautaro, IM, Codelco)</span></div>
+                    <div class="intel-row"><span class="label">Aeronaves Base:</span><span class="value">2x A-10 Warthog, 3x C-130H, 10x F-16, 2x KC-135, 2x UH-60M</span></div>
                     <div class="intel-row"><span class="label">Bajas Combate:</span><span class="value">0 Muertos / 0 Heridos</span></div>
                 </div>
 
@@ -454,10 +455,10 @@
     <!-- TICKER DE NOTICIAS -->
     <div class="ticker-wrap">
         <div class="ticker">
-            <span class="green">🟢 GENERAL EN JEFE:</span> Panel de control global inicializado con éxito. Capas de África, Europa, Aliados y nóminas renderizadas. Pase el cursor por los marcadores para inspección. ••• 
-            <span class="blue">🤝 ALIANZA AEPS:</span> Mando Conjunto reporta operatividad total. ••• 
-            <span class="red">🟥 FRENTE UCRANIA:</span> Combate intensivo en el este. ••• 
-            <span class="orange">🚁 SAHEL CHILENO:</span> Extracción minera al 100%, seguridad fronteriza sin alteraciones.
+            <span class="green">🟢 GENERAL EN JEFE:</span> Panel de control global actualizado. Capas del Sahel, Escuadra Naval y nóminas renderizadas. ••• 
+            <span class="orange">✈️ FUERZA AÉREA:</span> 2x A-10 Thunderbolt II operativos en Base Cóndor (1 en órbita CAS, 1 en Alerta 5). Puente de 3x C-130H activo. ••• 
+            <span class="blue">🚢 ESCUADRA NAVAL:</span> Fuerza de Tarea (5 Fragatas, 2 Submarinos Scorpène y el AO-52 Montt) toma posiciones para asegurar la salida por Ghana. •••
+            <span class="red">⚠️ GEOPOLÍTICA:</span> Incremento drástico de hostilidades en Ucrania, Israel y la península de Corea. Eje Atlántico Sur en alerta máxima.
         </div>
     </div>
 
@@ -527,7 +528,6 @@
         });
 
         // 2. CREACIÓN DE GRUPOS DE CAPAS
-        // Al añadirlas explícitamente a map al declararlas, evitamos que Leaflet las oculte en la carga
         const chileGroup = L.layerGroup().addTo(map);
         const sahelGroup = L.layerGroup().addTo(map);
         const alliesGroup = L.layerGroup().addTo(map);
@@ -590,7 +590,7 @@
         // DATOS DE MAPA: CHILE Y SAHEL (ÁFRICA)
         // =========================================================================
         
-        // Polígonos Zona Autónoma de Burkina Faso
+        // Polígonos Zona Autónoma de Burkina Faso y expansión fronteriza
         L.polygon([[15.1, -5.5], [15.1, 2.5], [12.9, 2.5], [12.9, -5.5]], { 
             color: '#00ff66', weight: 1, fillColor: '#00ff66', fillOpacity: 0.2 
         }).addTo(sahelGroup);
@@ -608,30 +608,41 @@
                 aereo: "30x F-16 (Block 50/MLU), 5x A-10 Thunderbolt II, 8x C-130H, 2x KC-135.",
                 helos: "22x Bell 412/Huey, 16x AS365 Dauphin, UH-60M.",
                 misiles: "NASAMS, Barak 8, Spike LR2, AMRAAM AIM-120C.",
-                moral: "100% - Logística Operativa Global.",
+                moral: "100% - Logística Operativa Global con recepción de Tierras Raras.",
                 bajas: { muertos: "0", heridos: "0" }
             },
             {
                 coords: [12.3532, -1.5121], color: "#00ff66", titulo: "📍 BASE LOGÍSTICA CÓNDOR (Uagadugú)",
-                estado: "Ocupación Militar Soberana", 
-                terrestre: "2.000 Efectivos (Brigada BOE Lautaro, Infantería de Marina). Mowag Piranha.",
-                naval: "Apoyo satelital naval remoto.",
-                aereo: "Puente aéreo ininterrumpido C-130H desde Chile.",
+                estado: "Ocupación Militar Soberana - Hub Central", 
+                terrestre: "2.120 Efectivos (Brigada BOE Lautaro, Infantería de Marina, Ingenieros).",
+                naval: "Monitoreo y enlace con Fuerza de Tarea en Atlántico.",
+                aereo: "10x F-16, 2x A-10 Thunderbolt II (1 Órbita CAS, 1 Alerta 5), 3x C-130H Hercules.",
                 helos: "2x Sikorsky UH-60M Black Hawk, 4x Bell 412EP.",
-                misiles: "Defensa AA portátil, radares tácticos.",
-                moral: "Alta. Minas aseguradas. Salarios activos.",
+                misiles: "Sistemas antiaéreos portátiles y radares de cota táctica.",
+                moral: "Excelente. Perímetro ampliado. Rutas mineras estables.",
                 bajas: { muertos: "0", heridos: "0" }
             },
             {
-                coords: [13.2500, -1.1500], color: "#ffaa00", titulo: "🎯 OP. MARTILLO DE ARENA (Frontera Níger)",
-                estado: "Objetivo Hostil Aniquilado", 
-                terrestre: "Comandos BOE Lautaro en patrulla profunda.",
+                coords: [13.2500, -1.1500], color: "#ffaa00", titulo: "🎯 EXPANSION DE FRONTERAS (Líneas Malí / Níger)",
+                estado: "Control Territorial Ampliado (Opción 2)", 
+                terrestre: "Patrullas de comandos BOE Lautaro y blindados Mowag Piranha.",
                 naval: "N/A",
-                aereo: "Cobertura de Drones de Reconocimiento.",
-                helos: "Inserción táctica completada por UH-60M.",
-                misiles: "Fuego pesado (Minigun / Artillería de puerta).",
-                moral: "Misión Completada. Células dispersas.",
-                bajas: { muertos: "0 (Chilenos) / 35+ (Insurgentes)", heridos: "0 (Chilenos)" }
+                aereo: "Vigilancia constante por drones y apoyo CAS de los cazas A-10.",
+                helos: "UH-60M listos para inserciones de reacción rápida.",
+                misiles: "Artillería de tubo y fuego pesado de apoyo.",
+                moral: "Alta. Células insurgentes replegadas tras bombardeo de precisión.",
+                bajas: { muertos: "0 (Chilenos) / Enemigo Neutralizado", heridos: "0 (Chilenos)" }
+            },
+            {
+                coords: [4.5, -0.2], color: "#00ff66", titulo: "🚢 ESCUADRA NAVAL / CORREDOR GHANA (Golfo de Guinea)",
+                estado: "Despliegue y Protección de Flota Logística", 
+                terrestre: "Destacamentos de Infantería de Marina en alerta táctica de puerto.",
+                naval: "5x Fragatas (Adelaide, Duke, M), 2x Submarinos Scorpène, 1x AO-52 Almirante Montt.",
+                aereo: "Helicópteros navales embarcados en misiones ASW y reconocimiento.",
+                helos: "AS365 Dauphin, helicópteros de ataque y exploración naval.",
+                misiles: "Misiles antiaéreos de zona y Harpoon antibuque activos.",
+                moral: "Máxima combatividad. Asegurando puertos de Ghana para evacuación de minerales.",
+                bajas: { muertos: "0", heridos: "0" }
             }
         ];
         chileData.forEach(d => createMarker(d, chileGroup, true)); // True = radar visual effect
@@ -666,11 +677,11 @@
                 coords: [-15.8267, -47.9218], color: "#00ffff", titulo: "🇧🇷 BRASIL",
                 estado: "Socio Sudamericano AEPS",
                 terrestre: "334.000 Activos. Leopard 1A5, Guaraní.",
-                naval: "Submarinos Clase Riachuelo, NAM Atlântico.",
+                naval: "Submarinos Clase Riachuelo, NAM Atlântico. Coordinación de escoltas con la Armada de Chile.",
                 aereo: "F-39 Gripen, Embraer KC-390, Super Tucano.",
                 helos: "EC725 Caracal, AH-2 Sabre.",
                 misiles: "ASTROS II, Misil Antibuque Mansup.",
-                moral: "Excelente cooperación con Chile.",
+                moral: "Excelente cooperación en el resguardo del Atlántico Sur.",
                 bajas: { muertos: "0", heridos: "0" }
             },
             {
@@ -681,7 +692,7 @@
                 aereo: "F-35A, F-15J, Mitsubishi F-2.",
                 helos: "AH-64D, UH-60JA.",
                 misiles: "Type 12 (Defensa Costera), SM-3 Block IIA.",
-                moral: "Alerta máxima en el mar del este.",
+                moral: "Alerta máxima en el mar del este por incremento de tensión en Corea.",
                 bajas: { muertos: "0", heridos: "0" }
             }
         ];
@@ -693,68 +704,68 @@
         const warData = [
             {
                 coords: [50.4501, 30.5234], color: "#47a3ff", titulo: "🟦 UCRANIA",
-                estado: "Defensa Activa",
+                estado: "Defensa Activa - Escalada Masiva",
                 terrestre: "900.000 Efectivos. Leopard 2, Abrams, T-64BV.",
                 naval: "Flota de drones marinos Magura V5.",
                 aereo: "F-16AM/BM, MiG-29, Su-24M.",
                 helos: "Mi-8, Mi-24.",
                 misiles: "ATACMS, Storm Shadow, HIMARS, Patriot PAC-3.",
-                moral: "Fatiga extrema de combate.",
+                moral: "Fatiga extrema de combate bajo nueva ofensiva enemiga.",
                 bajas: { muertos: "Est. 75.000 - 100.000+", heridos: "250.000+" }
             },
             {
                 coords: [55.7558, 37.6173], color: "#ff4a4a", titulo: "🟥 RUSIA",
-                estado: "Ofensiva Sostenida",
-                terrestre: "1.320.000 Activos. T-90M, T-72B3.",
+                estado: "Ofensiva Sostenida Avanzada",
+                terrestre: "1.320.000 Activos. T-90M, T-72B3. Ruptura de líneas estratégicas.",
                 naval: "Flota del Mar Negro, Flota del Norte.",
                 aereo: "Su-35S, Su-34, Tu-95MS, MiG-31K.",
                 helos: "Ka-52 Alligator, Mi-28NM.",
                 misiles: "Iskander-M, Kinzhal, Kalibr, FAB-3000.",
-                moral: "Economía de guerra sostenida.",
+                moral: "Economía de guerra acelerada y movilización en curso.",
                 bajas: { muertos: "Est. 130.000 - 150.000+", heridos: "400.000+" }
             },
             {
                 coords: [39.0194, 125.7381], color: "#ff4a4a", titulo: "🟥 COREA DEL NORTE",
-                estado: "Proveedor de Munición",
-                terrestre: "1.280.000 Activos.",
-                naval: "Submarinos diésel.",
+                estado: "Fin del Armisticio - Escalada de Artillería",
+                terrestre: "1.280.000 Activos. Despliegue masivo en la ZDM.",
+                naval: "Submarinos diésel en patrullas de incursión.",
                 aereo: "MiG-29 tempranos, Il-28.",
                 helos: "MD 500, Mi-2.",
-                misiles: "Hwasong-17, KN-23.",
-                moral: "Fanatismo de Estado.",
+                misiles: "Hwasong-17 (ICBM), KN-23. Lanzamiento de vectores sobre Japón.",
+                moral: "Fanatismo de Estado en orden de movilización absoluta.",
                 bajas: { muertos: "0", heridos: "0" }
             },
             {
                 coords: [39.9042, 116.4074], color: "#ffaa00", titulo: "🟧 CHINA",
-                estado: "Presión sobre Taiwán",
+                estado: "Presión Marítima de Bloqueo sobre Taiwán",
                 terrestre: "2.035.000 Activos (EPL). Type 99A.",
                 naval: "3 Portaaviones (Liaoning, Shandong, Fujian).",
                 aereo: "J-20 Mighty Dragon, J-16, Bombarderos H-6K.",
                 helos: "Z-10, Z-20.",
                 misiles: "DF-41, DF-21D (Carrier Killer), DF-17 Hipersónico.",
-                moral: "Alta preparación logística.",
+                moral: "Alta preparación logística en alerta ante el frente coreano.",
                 bajas: { muertos: "0", heridos: "0" }
             },
             {
                 coords: [31.0461, 34.8516], color: "#ffaa00", titulo: "🟧 ISRAEL",
-                estado: "Conflicto Multifrente",
+                estado: "Conflicto de Alta Intensidad Multifrente",
                 terrestre: "170.000 Activos + 350.000 Reservistas. Merkava Mk IV.",
                 naval: "Corbetas Sa'ar 6, Submarinos Clase Dolphin.",
                 aereo: "F-35I Adir, F-15I Ra'am, F-16I Sufa.",
                 helos: "AH-64D Apache Longbow, CH-53 Yas'ur.",
-                misiles: "Iron Dome, Arrow 3, David's Sling.",
-                moral: "Emergencia civil constante.",
+                misiles: "Iron Dome, Arrow 3, David's Sling saturados por enjambres.",
+                moral: "Emergencia nacional e interrupción de líneas de suministro.",
                 bajas: { muertos: "1.600+", heridos: "12.000+" }
             },
             {
                 coords: [35.6892, 51.3890], color: "#ff4a4a", titulo: "🟥 IRÁN",
-                estado: "Guerra Proxy",
+                estado: "Guerra Proxy y Lanzamiento Hipersónico",
                 terrestre: "610.000 Activos (IRGC y Artesh).",
-                naval: "Lanchas rápidas de ataque.",
+                naval: "Lanchas rápidas de ataque bloqueando el Estrecho de Ormuz.",
                 aereo: "F-14 Tomcat, Su-35.",
                 helos: "AH-1J SeaCobra, Mi-17.",
-                misiles: "Fattah, Kheibar, Shahed-136.",
-                moral: "Mando consolidado.",
+                misiles: "Fattah (Hipersónico), Kheibar, Shahed-136.",
+                moral: "Mando consolidado operando a capacidad plena.",
                 bajas: { muertos: "Clasificado", heridos: "N/A" }
             }
         ];
