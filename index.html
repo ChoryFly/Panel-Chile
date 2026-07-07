@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel Táctico de Operaciones - Global & Sahel 2026</title>
-    <!-- Leaflet CSS -->
+    <title>Panel Táctico de Operaciones - Global & Sahel 2027</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
     <style>
         :root {
@@ -377,7 +376,6 @@
 <body>
     
     <div class="main-container">
-        <!-- SIDEBAR DE CONTROL TÁCTICO -->
         <div class="sidebar">
             <div class="sidebar-header">
                 <h1>📡 MANDO ESTRATÉGICO <span class="defcon-badge">GLOBAL</span></h1>
@@ -385,26 +383,26 @@
                 <div class="meta-grid">
                     <div class="meta-item" onmouseenter="playHoverSound()">
                         <div class="meta-label">📅 Fecha Actual</div>
-                        <div class="meta-val">5 JUL 2026</div>
+                        <div class="meta-val">15 MAR 2027</div>
                     </div>
                     <div class="meta-item" onmouseenter="playHoverSound()">
-                        <div class="meta-label">🌍 Frente Sahel</div>
-                        <div class="meta-val">Expandido (Malí/Níger)</div>
+                        <div class="meta-label">🌍 Frente Operativo</div>
+                        <div class="meta-val">Sahel & Pacífico Sur</div>
                     </div>
                 </div>
             </div>
 
             <div class="sidebar-content">
                 
-                <!-- PANEL DEL GENERAL EN JEFE -->
                 <div class="admin-panel" id="adminPanel">
                     <div class="admin-panel-title">🛡️ PANEL DE ADMIN - GENERAL EN JEFE</div>
                     <button class="admin-btn" onmouseenter="playHoverSound()" onclick="map.flyTo([12.3532, -1.5121], 6)">📍 Ir a Zona Autónoma Sahel (Burkina Faso)</button>
                     <button class="admin-btn" onmouseenter="playHoverSound()" onclick="map.flyTo([4.5, -0.2], 6)">📍 Ir a Corredor Marítimo (Ghana / Golfo de Guinea)</button>
+                    <button class="admin-btn" onmouseenter="playHoverSound()" onclick="map.flyTo([-33.4, -70.6], 5)">📍 Ir a Comando Central (Chile)</button>
+                    <button class="admin-btn" onmouseenter="playHoverSound()" onclick="map.flyTo([-25.0, -110.0], 5)">📍 Ir a Portaaviones Piloto Pardo II (Pacífico)</button>
                     <button class="admin-btn" onmouseenter="playHoverSound()" onclick="map.flyTo([49.0, 31.0], 5)">📍 Ir a Frente Europa del Este (Ucrania/Rusia)</button>
                     <button class="admin-btn" onmouseenter="playHoverSound()" onclick="map.flyTo([31.0, 35.0], 6)">📍 Ir a Frente Medio Oriente (Israel/Irán)</button>
                     <button class="admin-btn" onmouseenter="playHoverSound()" onclick="map.flyTo([35.0, 120.0], 4)">📍 Ir a Frente Asia-Pacífico (China/Corea)</button>
-                    <button class="admin-btn" onmouseenter="playHoverSound()" onclick="map.flyTo([-33.4, -70.6], 5)">📍 Ir a Comando Central (Chile)</button>
                 </div>
 
                 <div class="section-title">🎯 BASE LOGÍSTICA CÓNDOR (SAHEL)</div>
@@ -412,18 +410,17 @@
                     <div class="intel-row">
                         <span class="value" style="color: #00ff66; font-weight: bold; width: 100%; text-align: left;">REPORTE EN TIEMPO REAL</span>
                     </div>
-                    <div class="intel-row"><span class="label">Operación:</span><span class="value">Misión "Escudo Dorado" y Expansión</span></div>
+                    <div class="intel-row"><span class="label">Operación:</span><span class="value">Misión "Escudo Dorado", RAOE y Tridente</span></div>
                     <div class="intel-row"><span class="label">Efectivos:</span><span class="value" style="color:#00ff66;">2.120 (BOE Lautaro, IM, Codelco)</span></div>
-                    <div class="intel-row"><span class="label">Aeronaves Base:</span><span class="value">2x A-10 Warthog, 3x C-130H, 10x F-16, 2x KC-135, 2x UH-60M</span></div>
+                    <div class="intel-row"><span class="label">Aeronaves Base:</span><span class="value">2x A-10 Warthog, 2x KC-390, 3x C-130H, 10x F-16, 4x UH-60M (Harpías)</span></div>
                     <div class="intel-row"><span class="label">Bajas Combate:</span><span class="value">0 Muertos / 0 Heridos</span></div>
                 </div>
 
-                <!-- NÓMINA MILITAR ESTRICTA -->
                 <div class="section-title">💼 NÓMINA DE COMBATE</div>
                 <div class="intel-card" onmouseenter="playHoverSound()" style="border-left: 4px solid #ffaa00;">
                     <div class="intel-row" style="border-bottom: 1px solid var(--border-color); padding-bottom: 5px; margin-bottom: 8px;">
                         <span class="label">Fondo Soberano:</span>
-                        <span class="value" style="color: #ffaa00; font-weight: bold;">FONDOS APROBADOS</span>
+                        <span class="value" style="color: #ffaa00; font-weight: bold;">$3.361,0 M USD (APROBADO)</span>
                     </div>
                     <div style="max-height: 250px; overflow-y: auto; padding-right: 5px;">
                         <table class="payroll-table">
@@ -448,21 +445,18 @@
             </div>
         </div>
 
-        <!-- MAPA INTERACTIVO -->
         <div id="map"></div>
     </div>
 
-    <!-- TICKER DE NOTICIAS -->
     <div class="ticker-wrap">
         <div class="ticker">
-            <span class="green">🟢 GENERAL EN JEFE:</span> Panel de control global actualizado. Capas del Sahel, Escuadra Naval y nóminas renderizadas. ••• 
-            <span class="orange">✈️ FUERZA AÉREA:</span> 2x A-10 Thunderbolt II operativos en Base Cóndor (1 en órbita CAS, 1 en Alerta 5). Puente de 3x C-130H activo. ••• 
-            <span class="blue">🚢 ESCUADRA NAVAL:</span> Fuerza de Tarea (5 Fragatas, 2 Submarinos Scorpène y el AO-52 Montt) toma posiciones para asegurar la salida por Ghana. •••
-            <span class="red">⚠️ GEOPOLÍTICA:</span> Incremento drástico de hostilidades en Ucrania, Israel y la península de Corea. Eje Atlántico Sur en alerta máxima.
+            <span class="green">🟢 GENERAL EN JEFE:</span> Panel de control global actualizado a Marzo 2027. Fondo Soberano Táctico en $3.361,0 M. Red de vigilancia E-99 AWACS en línea. ••• 
+            <span class="orange">✈️ FUERZA AÉREA:</span> 2x KC-390 Millennium estableciendo puente logístico transatlántico. Regimiento RAOE Harpías operativo al 100%. ••• 
+            <span class="blue">🚢 ESCUADRA NAVAL:</span> Portaaviones Piloto Pardo II proyectando fuerza en el Pacífico Sur junto a escoltas y 3x helicópteros MH-60R Seahawk. •••
+            <span class="red">⚠️ INTELIGENCIA:</span> Cuentas de corporación mercenaria suiza congeladas por mandato de la ONU tras operativo táctico biométrico en el Sahel. Eje Atlántico Sur asegurado.
         </div>
     </div>
 
-    <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
     
     <script>
@@ -605,8 +599,8 @@
                 estado: "Mando Supremo", 
                 terrestre: "80.000 Activos. Tanques Leopard 2A4CHL, Marder 1A3.",
                 naval: "Fragatas Tipo 23, Submarinos Scorpene.",
-                aereo: "30x F-16 (Block 50/MLU), 5x A-10 Thunderbolt II, 8x C-130H, 2x KC-135.",
-                helos: "22x Bell 412/Huey, 16x AS365 Dauphin, UH-60M.",
+                aereo: "1x E-99 AWACS, 30x F-16 (Block 50/MLU), 5x A-10 Thunderbolt II, 8x C-130H, 2x KC-135.",
+                helos: "22x Bell 412/Huey, 16x AS365 Dauphin, 4x UH-60M.",
                 misiles: "NASAMS, Barak 8, Spike LR2, AMRAAM AIM-120C.",
                 moral: "100% - Logística Operativa Global con recepción de Tierras Raras.",
                 bajas: { muertos: "0", heridos: "0" }
@@ -616,21 +610,32 @@
                 estado: "Ocupación Militar Soberana - Hub Central", 
                 terrestre: "2.120 Efectivos (Brigada BOE Lautaro, Infantería de Marina, Ingenieros).",
                 naval: "Monitoreo y enlace con Fuerza de Tarea en Atlántico.",
-                aereo: "10x F-16, 2x A-10 Thunderbolt II (1 Órbita CAS, 1 Alerta 5), 3x C-130H Hercules.",
-                helos: "2x Sikorsky UH-60M Black Hawk, 4x Bell 412EP.",
+                aereo: "10x F-16, 2x A-10 Thunderbolt II (1 Órbita CAS, 1 Alerta 5), 2x KC-390, 3x C-130H Hercules.",
+                helos: "4x UH-60M Black Hawk (RAOE Harpías), 4x Bell 412EP.",
                 misiles: "Sistemas antiaéreos portátiles y radares de cota táctica.",
                 moral: "Excelente. Perímetro ampliado. Rutas mineras estables.",
                 bajas: { muertos: "0", heridos: "0" }
             },
             {
+                coords: [-25.0000, -110.0000], color: "#00ff66", titulo: "🚢 PORTAAVIONES PILOTO PARDO II (Pacífico Sur)",
+                estado: "Despliegue Profundo - Operación Tridente", 
+                terrestre: "Destacamento de Infantería de Marina Embarcada.",
+                naval: "1x Portaaviones Ligero, escoltado por Fragatas y 1x SS Scorpène.",
+                aereo: "6x F-16 Navalizados, 12x Drones de Combate Avanzados (Tierras Raras).",
+                helos: "3x MH-60R Seahawk (Guerra Antisubmarina activa).",
+                misiles: "Sistemas defensivos de punto y radar AESA integrado.",
+                moral: "100% - Hegemonía establecida frente a Oceanía.",
+                bajas: { muertos: "0", heridos: "0" }
+            },
+            {
                 coords: [13.2500, -1.1500], color: "#ffaa00", titulo: "🎯 EXPANSION DE FRONTERAS (Líneas Malí / Níger)",
-                estado: "Control Territorial Ampliado (Opción 2)", 
+                estado: "Control Territorial Ampliado", 
                 terrestre: "Patrullas de comandos BOE Lautaro y blindados Mowag Piranha.",
                 naval: "N/A",
-                aereo: "Vigilancia constante por drones y apoyo CAS de los cazas A-10.",
-                helos: "UH-60M listos para inserciones de reacción rápida.",
+                aereo: "Vigilancia constante por AWACS e inteligencia electrónica.",
+                helos: "UH-60M (Harpías) ejecutando misiones nocturnas CERO bajas.",
                 misiles: "Artillería de tubo y fuego pesado de apoyo.",
-                moral: "Alta. Células insurgentes replegadas tras bombardeo de precisión.",
+                moral: "Alta. Insurgencia local desarticulada y sin fondos europeos.",
                 bajas: { muertos: "0 (Chilenos) / Enemigo Neutralizado", heridos: "0 (Chilenos)" }
             },
             {
