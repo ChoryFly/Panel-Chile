@@ -192,6 +192,26 @@
             border-radius: 3px;
         }
 
+        /* Quote Card */
+        .quote-card {
+            background: rgba(255, 40, 0, 0.08);
+            border-left: 4px solid var(--ferrari-red);
+            padding: 20px 25px;
+            border-radius: 0 12px 12px 0;
+            margin-bottom: 25px;
+            font-style: italic;
+            color: #e2e8f0;
+        }
+
+        .quote-author {
+            font-style: normal;
+            font-weight: 700;
+            color: var(--accent-gold);
+            margin-top: 8px;
+            display: block;
+            font-size: 0.9rem;
+        }
+
         /* Timeline Section */
         .timeline {
             display: flex;
@@ -282,7 +302,6 @@
             font-size: 1.05rem;
             color: #ffffff;
             margin-bottom: 6px;
-
         }
 
         .highlight-item p {
@@ -375,11 +394,11 @@
                 </div>
                 <div class="meta-item">
                     <span class="label">Mejor Resultado Mundial</span>
-                    <span class="val">4.º Lugar (2017)</span>
+                    <span class="val" style="color: var(--accent-gold);">Subcampeón Mundial (2° - 2018)</span>
                 </div>
                 <div class="meta-item">
                     <span class="label">Puntos Totales F1</span>
-                    <span class="val">355 PTS</span>
+                    <span class="val">667 PTS</span>
                 </div>
             </div>
         </header>
@@ -387,30 +406,138 @@
         <!-- Global Stats Grid -->
         <section class="stats-grid">
             <div class="stat-card">
-                <div class="stat-number">1</div>
-                <div class="stat-label">Victoria F1</div>
-                <div class="stat-subtext">GP de Azerbaiyán (Bakú 2017)</div>
+                <div class="stat-number">4</div>
+                <div class="stat-label">Victorias F1</div>
+                <div class="stat-subtext">Bakú (2017), Bahréin (2018), Silverstone (2018)</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number">8</div>
+                <div class="stat-number">19</div>
                 <div class="stat-label">Podios Totales</div>
-                <div class="stat-subtext">1 (2015) + 7 (2017)</div>
+                <div class="stat-subtext">11 solo en la temporada 2018</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number">355</div>
+                <div class="stat-number">667</div>
                 <div class="stat-label">Puntos Acumulados</div>
-                <div class="stat-subtext">3 Temporadas en F1</div>
+                <div class="stat-subtext">4 Temporadas en la F1</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number">P4</div>
-                <div class="stat-label">Mejor Ranking</div>
-                <div class="stat-subtext">Mundial de Pilotos 2017</div>
+                <div class="stat-number">P2</div>
+                <div class="stat-label">Subcampeón del Mundo</div>
+                <div class="stat-subtext">Mundial de Pilotos 2018 (312 pts)</div>
             </div>
         </section>
 
         <!-- Timeline / Season Breakdown -->
         <h2 class="section-title">Trayectoria por Temporadas</h2>
         <div class="timeline">
+
+            <!-- 2018 SEASON CARD -->
+            <div class="season-card">
+                <div class="season-header">
+                    <div class="season-title-group">
+                        <span class="season-year">2018</span>
+                        <span class="team-pill team-ferrari">Scuderia Ferrari (SF71H)</span>
+                    </div>
+                    <div class="season-summary-stats">
+                        <span style="color: var(--accent-gold);">Subcampeón Mundial (P2)</span> • 
+                        <span style="color: var(--accent-gold);">312 Pts</span> • 
+                        <span style="color: #ff5555;">3 Victorias</span> • 
+                        <span>11 Podios</span>
+                    </div>
+                </div>
+                <div class="season-body">
+
+                    <div class="quote-card">
+                        "Ferrari tiene el mejor coche de la parrilla este 2018, pero tiene una bomba de tiempo en el garaje. Lukas Betanzo no ha venido a ser el escudero de nadie, y Sebastian Vettel se está empezando a poner nervioso."
+                        <span class="quote-author">— David Croft, Sky Sports F1</span>
+                    </div>
+
+                    <div class="highlights-grid">
+                        <div class="highlight-item win">
+                            <h4>🏆 GP de Bahréin – Victoria (P1)</h4>
+                            <p>Desobedeciste las órdenes de muro a 3 vueltas del final, te tiraste por fuera en la Curva 1 sobre Vettel y te llevaste un triunfo legendario provocando un cisma en Ferrari.</p>
+                        </div>
+                        <div class="highlight-item">
+                            <h4>🥈 GP de Azerbaiyán (Bakú) – P2</h4>
+                            <p>Ruedas frío tras la resalida, evitas el caos y superas a tu compañero tras su bloqueo en la frenada para amarrar un gran segundo puesto.</p>
+                        </div>
+                        <div class="highlight-item win">
+                            <h4>🏆 GP de Gran Bretaña (Silverstone) – Victoria (P1)</h4>
+                            <p>Victoria épica en el feudo de Mercedes batiendo a Lewis Hamilton en pista tras un duelo implacable a ritmo infernal.</p>
+                        </div>
+                        <div class="highlight-item">
+                            <h4>🌧️ GP de Alemania (Hockenheim) – P2</h4>
+                            <p>Sangre fría bajo lluvia torrencial. Mientras Vettel se estrelló por la presión, mantuviste el coche en pista asegurando un P2 crucial.</p>
+                        </div>
+                        <div class="highlight-item">
+                            <h4>⚡ GP de Italia (Monza) – Pole Position</h4>
+                            <p>Dominio en clasificación bloqueando la primera fila de Maranello. En carrera mantuviste la trazada en Curva Grande defendiéndote de Vettel.</p>
+                        </div>
+                        <div class="highlight-item">
+                            <h4>⚔️ Subcampeón & Guerra Fría Interna</h4>
+                            <p>Derrotaste a Sebastian Vettel por 22 puntos en el mundial, consolidándote como el líder emergente de Maranello a los 20 años.</p>
+                        </div>
+                    </div>
+
+                    <h4 style="margin-top: 20px; font-size: 0.95rem; color: var(--text-muted); text-transform: uppercase;">Tabla Final de Posiciones 2018</h4>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Pos</th>
+                                    <th>Piloto / Escudería</th>
+                                    <th>Puntos</th>
+                                    <th>Victorias</th>
+                                    <th>Podios</th>
+                                    <th>Notas del Campeonato</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>1°</td>
+                                    <td>Lewis Hamilton (Mercedes)</td>
+                                    <td>408 pts</td>
+                                    <td>11</td>
+                                    <td>17</td>
+                                    <td>Se corona Pentacampeón tras el caos interno de Ferrari</td>
+                                </tr>
+                                <tr class="user-row-ferrari">
+                                    <td>2°</td>
+                                    <td>Lukas Betanzo (#15 - Ferrari)</td>
+                                    <td>312 pts</td>
+                                    <td>3</td>
+                                    <td>11</td>
+                                    <td>Subcampeón Mundial. Derrotas a Vettel por 22 pts</td>
+                                </tr>
+                                <tr>
+                                    <td>3°</td>
+                                    <td>Sebastian Vettel (Ferrari)</td>
+                                    <td>290 pts</td>
+                                    <td>5</td>
+                                    <td>12</td>
+                                    <td>Errores severos bajo presión (Alemania, Monza, Japón)</td>
+                                </tr>
+                                <tr>
+                                    <td>4°</td>
+                                    <td>Max Verstappen (Red Bull)</td>
+                                    <td>249 pts</td>
+                                    <td>2</td>
+                                    <td>11</td>
+                                    <td>Gran segunda mitad de temporada</td>
+                                </tr>
+                                <tr>
+                                    <td>5°</td>
+                                    <td>Valtteri Bottas (Mercedes)</td>
+                                    <td>247 pts</td>
+                                    <td>0</td>
+                                    <td>8</td>
+                                    <td>Obligado a ser escudero de Hamilton todo el año</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
 
             <!-- 2017 SEASON CARD -->
             <div class="season-card">
@@ -430,7 +557,7 @@
                     <div class="highlights-grid">
                         <div class="highlight-item win">
                             <h4>🏆 Primera Victoria en F1 (Bakú)</h4>
-                            <p>Brillante triunfo en el GP de Azerbaiyán tras una carrera táctica impeledora, logrando la primera victoria de tu carrera en la máxima categoría.</p>
+                            <p>Brillante triunfo en el GP de Azerbaiyán tras una carrera táctica impecable, logrando la primera victoria de tu carrera en la máxima categoría.</p>
                         </div>
                         <div class="highlight-item">
                             <h4>🥉 Constancia en el Podio</h4>
